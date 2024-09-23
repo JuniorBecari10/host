@@ -168,35 +168,35 @@ function setupApiRoutes(app) {
 
         Returns: the modified room.
     */
-        app.post("/api/checkin", async (req, res) => {
-            const { number } = req.body;
-    
-            if (!number) {
-                res.status(400).send("Incorrect parameters.");
-                return;
-            }
-    
-            const roomIndex = rooms.getRoomIndex(number);
-            const room = rooms.rooms[roomIndex];
-    
-            if (roomIndex === -1) {
-                res.status(404).send("Room not found");
-                return;
-            }
-            
-            if (rooms.isOccupied(room)) {
-                res.status(403).send("Room is already occupied.");
-                return;
-            }
-    
-            if (rooms.isAvailable(room)) {
-                res.status(403).send("Room is available. Try reserving it first.");
-                return;
-            }
-            
-            rooms.setRoomField(roomIndex, "state", rooms.OCCUPIED);
-            res.json(rooms.rooms[roomIndex]);
-        });
+    app.post("/api/checkin", async (req, res) => {
+        const { number } = req.body;
+
+        if (!number) {
+            res.status(400).send("Incorrect parameters.");
+            return;
+        }
+
+        const roomIndex = rooms.getRoomIndex(number);
+        const room = rooms.rooms[roomIndex];
+
+        if (roomIndex === -1) {
+            res.status(404).send("Room not found");
+            return;
+        }
+        
+        if (rooms.isOccupied(room)) {
+            res.status(403).send("Room is already occupied.");
+            return;
+        }
+
+        if (rooms.isAvailable(room)) {
+            res.status(403).send("Room is available. Try reserving it first.");
+            return;
+        }
+        
+        rooms.setRoomField(roomIndex, "state", rooms.OCCUPIED);
+        res.json(rooms.rooms[roomIndex]);
+    });
 }
 
 module.exports = setupRoutes;
