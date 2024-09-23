@@ -1,5 +1,6 @@
 const express = require("express");
 
+// TODO: prevent crashes when an error occurs inside a handler
 function init(app) {
     app.set("view engine", "ejs");
 
@@ -9,10 +10,15 @@ function init(app) {
     app.use(express.json());
 }
 
-function logMiddleware(req, res, next) {
+function logMiddleware(req, _, next) {
+    console.log(logMessage(req));
+    next();
+}
+
+function logMessage(req) {
     // [00/00/00 - 00:00:00] GET /path
     const now = new Date(Date.now());
-    
+        
     const day = [
         now.getDay() < 10 ? "0" + now.getDay() : now.getDay(),
         now.getMonth() + 1 < 10 ? "0" + (now.getMonth() + 1) : now.getMonth() + 1,
@@ -25,8 +31,7 @@ function logMiddleware(req, res, next) {
         now.getSeconds() < 10 ? "0" + now.getSeconds() : now.getSeconds(),
     ];
 
-    console.log(`[${day.join("/")} - ${time.join(":")}] ${req.method} ${req.originalUrl}`)
-    next();
+    return `[${day.join("/")} - ${time.join(":")}] ${req.method} ${req.originalUrl}`;
 }
 
 module.exports = init;

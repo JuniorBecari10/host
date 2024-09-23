@@ -17,22 +17,9 @@ const OCCUPIED = "occupied";
     "108",
     "109",
     "110"
-].forEach(number => rooms.push({
-    number: number,
-    state: AVAILABLE,
+].forEach(number => rooms.push(defaultRoom(number)));
 
-    // Optional - only when it's occupied
-    guests: [],
-    price: 0,
-    debt: 0,
-
-    check_in: 0,
-    check_out: 0,
-
-    isAvailable: function () {
-        return this.state == AVAILABLE;
-    },
-}));
+// ---
 
 function getRoom(number) {
     return rooms.find(r => r.number.toLowerCase() === number.toLowerCase());
@@ -46,6 +33,41 @@ function setRoom(index, room) {
     rooms[index] = room;
 }
 
+function setRoomField(index, field, value) {
+    rooms[index][field] = value;
+}
+
+// ---
+
+function isAvailable(room) {
+    return room.state == AVAILABLE;
+}
+
+function isReserved(room) {
+    return room.state == RESERVED;
+}
+
+function isOccupied(room) {
+    return room.state == OCCUPIED;
+}
+
+// ---
+
+function defaultRoom(number) {
+    return {
+        number,
+        state: AVAILABLE,
+    
+        // Optional - only when it's occupied
+        guests: [],
+        price: 0,
+        debt: 0,
+    
+        check_in: 0,
+        check_out: 0,
+    };
+}
+
 module.exports = {
     rooms,
 
@@ -53,7 +75,15 @@ module.exports = {
     RESERVED,
     OCCUPIED,
 
+    isAvailable,
+    isReserved,
+    isOccupied,
+
+    setRoomField,
+
     getRoom,
     getRoomIndex,
     setRoom,
+
+    defaultRoom,
 };
