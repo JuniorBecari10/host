@@ -80,8 +80,8 @@ function defaultRoom(number) {
 }
 
 module.exports = {
-    // rooms,
-    // cash,
+    rooms,
+    cash,
 
     default_check_out_days,
     default_check_out_hours,

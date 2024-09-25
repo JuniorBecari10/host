@@ -19,9 +19,27 @@ function setupRoutes(app) {
 }
 
 function setupApiRoutes(app) {
+    /*
+        GET /api/rooms
+        Gets all the rooms of the hotel.
+
+        Returns: All the rooms, in an array.
+        Return Type: number
+    */
     app.get("/api/rooms", async (_, res) => {
-        res.json(rooms.rooms);
+        res.json({ rooms: rooms.rooms });
     });
+
+    /*
+        GET /api/cash
+        Gets the current value of the cash.
+
+        Returns: The current value of the cash.
+        Return Type: number
+    */
+        app.get("/api/cash", async (_, res) => {
+            res.json({ cash: rooms.cash });
+        });
 
     /*
         GET /api/room/{number}
@@ -30,7 +48,8 @@ function setupApiRoutes(app) {
         Parameters:
         - number - The room number.
 
-        Returns: The specified room.r
+        Returns: The specified room.
+        Return Type: Room (object)
     */
     app.get("/api/room/:number", async (req, res) => {
         const number = req.params.number;
@@ -64,6 +83,7 @@ function setupApiRoutes(app) {
                               tomorrow at noon. It is defined in milliseconds.
 
         Returns: the modified room.
+        Return Type: Room (object)
     */
     app.post("/api/reserve/", async (req, res) => {
         const {
@@ -149,6 +169,7 @@ function setupApiRoutes(app) {
         number: string
 
         Returns: the modified room.
+        Return Type: Room (object)
     */
     app.post("/api/cancel", async (req, res) => {
         const { number } = req.body;
@@ -197,6 +218,7 @@ function setupApiRoutes(app) {
         number: string
 
         Returns: the modified room.
+        Return Type: Room (object)
     */
     app.post("/api/checkin", async (req, res) => {
         const { number } = req.body;
@@ -243,6 +265,7 @@ function setupApiRoutes(app) {
         number: string
 
         Returns: the modified room.
+        Return Type: Room (object)
     */
     app.post("/api/checkout", async (req, res) => {
         const { number } = req.body;
