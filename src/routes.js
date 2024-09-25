@@ -20,6 +20,17 @@ function setupRoutes(app) {
 
 function setupApiRoutes(app) {
     /*
+        GET /api/name
+        Gets the name of the hotel.
+
+        Returns: The name of the hotel.
+        Return Type: string
+    */
+        app.get("/api/name", async (_, res) => {
+            res.json({ name: rooms.getHotelName() });
+        });
+
+    /*
         GET /api/rooms
         Gets all the rooms of the hotel.
 
@@ -27,7 +38,7 @@ function setupApiRoutes(app) {
         Return Type: number
     */
     app.get("/api/rooms", async (_, res) => {
-        res.json({ rooms: rooms.rooms });
+        res.json({ rooms: rooms.getHotelRooms() });
     });
 
     /*
@@ -38,7 +49,7 @@ function setupApiRoutes(app) {
         Return Type: number
     */
         app.get("/api/cash", async (_, res) => {
-            res.json({ cash: rooms.cash });
+            res.json({ cash: rooms.getHotelCash() });
         });
 
     /*

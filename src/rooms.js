@@ -1,5 +1,8 @@
-const rooms = [];
-let cash = 0;
+const hotel = {
+    name: "Trajano Palace Hotel",
+    rooms: [],
+    cash: 0,
+};
 
 const AVAILABLE = "available";
 const RESERVED = "reserved";
@@ -21,31 +24,45 @@ const default_check_out_hours = [12, 0, 0, 0];
     "108",
     "109",
     "110"
-].forEach(number => rooms.push(defaultRoom(number)));
+].forEach(number => hotel.rooms.push(defaultRoom(number)));
+
+// ---
+
+function getHotelName() {
+    return hotel.name;
+}
+
+function getHotelRooms() {
+    return hotel.rooms;
+}
+
+function getHotelCash() {
+    return hotel.cash;
+}
 
 // ---
 
 function getRoom(number) {
-    return rooms.find(r => r.number.toLowerCase() === number.toLowerCase());
+    return hotel.rooms.find(r => r.number.toLowerCase() === number.toLowerCase());
 }
 
 function getRoomIndex(number) {
-    return rooms.indexOf(rooms.find(r => r.number.toLowerCase() === number.toLowerCase()));
+    return hotel.rooms.indexOf(hotel.rooms.find(r => r.number.toLowerCase() === number.toLowerCase()));
 }
 
 function getRoomByIndex(index) {
-    if (index < 0 || index >= rooms.length)
+    if (index < 0 || index >= hotel.rooms.length)
         return null;
 
-    return rooms[index];
+    return hotel.rooms[index];
 }
 
 function setRoom(index, room) {
-    rooms[index] = room;
+    hotel.rooms[index] = room;
 }
 
 function setRoomField(index, field, value) {
-    rooms[index][field] = value;
+    hotel.rooms[index][field] = value;
 }
 
 // ---
@@ -80,8 +97,7 @@ function defaultRoom(number) {
 }
 
 module.exports = {
-    rooms,
-    cash,
+    hotel,
 
     default_check_out_days,
     default_check_out_hours,
@@ -95,6 +111,10 @@ module.exports = {
     isOccupied,
 
     setRoomField,
+
+    getHotelName,
+    getHotelRooms,
+    getHotelCash,
 
     getRoom,
     getRoomIndex,
