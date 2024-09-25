@@ -1,5 +1,14 @@
 const rooms = require("./rooms");
 const util = require("./util");
+const status = require("./status");
+
+// DEBUG
+Object.prototype.getName = function() { 
+    const funcNameRegex = /function (.{1,})\(/;
+    const results = funcNameRegex.exec(this.constructor.toString());
+
+    return (results && results.length > 1) ? results[1] : "";
+};
 
 function setupRoutes(app) {
     app.get("/hello", (_, res) => {
@@ -21,14 +30,19 @@ function setupApiRoutes(app) {
         Parameters:
         - number - The room number.
 
-        Returns: The specified room.
+        Returns: The specified room.r
     */
     app.get("/api/room/:number", async (req, res) => {
         const number = req.params.number;
         const room = rooms.getRoom(number);
 
+        if (typeof number !== "string") {
+            res.status(status.BAD_REQUEST).send("Incorrect parameter type.");
+            return;
+        }
+
         if (room === undefined) {
-            res.status(404).send("Room not found");
+            res.status(status.NOT_FOUND).send("Room not found");
             return;
         }
 
@@ -64,37 +78,54 @@ function setupApiRoutes(app) {
         // TODO: change check_out absence sentinel value to 0, instead of -1, and modify this if statement to accept it,
         //       because 0 is considered falsy
         if (!(number && guests && price && check_out)) {
-            res.status(400).send("Incorrect parameters.");
+            res.status(status.BAD_REQUEST).send("Incorrect parameters.");
+            return;
+        }
+
+        if (!(
+            typeof number === "string" &&
+            guests instanceof Array &&
+            typeof price === "number" &&
+            typeof check_out === "number"
+        )) {
+            res.status(status.BAD_REQUEST).send("Incorrect parameter types.");
             return;
         }
 
         const roomIndex = rooms.getRoomIndex(number);
-        const room = rooms.rooms[roomIndex];
+        const room = rooms.getRoomByIndex(roomIndex);
 
         if (roomIndex === -1) {
-            res.status(404).send("Room not found.");
+            res.status(status.NOT_FOUND).send("Room not found.");
             return;
         }
 
-        if (!rooms.isAvailable(room)) {
-            res.status(403).send("Room is not available.");
+        if (rooms.isReserved(room)) {
+            res.status(status.FORBIDDEN).send("Room is already reserved.");
+            return;
+        }
+
+        if (rooms.isOccupied(room)) {
+            res.status(status.FORBIDDEN).send("Room is occupied.");
             return;
         }
 
         if (guests.length === 0) {
-            res.status(400).send("There must be at least one guest.");
+            res.status(status.BAD_REQUEST).send("There must be at least one guest.");
             return;
         }
+
+        // TODO check if all guests are of the same type
 
         const now = Date.now();
         const check_out_date = new Date(
             check_out == -1
-                ? util.addDays(now, 1)
+                ? util.addDays(now, rooms.default_check_out_days)
                 : check_out
-        ).setHours(12, 0, 0, 0);
+        ).setHours(...rooms.default_check_out_hours);
 
-        if (check_out_date <= new Date(now).setHours(12, 0, 0, 0)) {
-            res.status(400).send("Check-out date cannot be earlier or in the same day than the check-in date.");
+        if (check_out_date <= new Date(now).setHours(...rooms.default_check_out_hours)) {
+            res.status(status.BAD_REQUEST).send("Check-out date cannot be earlier or in the same day than the check-in date.");
             return;
         }
 
@@ -129,25 +160,30 @@ function setupApiRoutes(app) {
         const { number } = req.body;
 
         if (!number) {
-            res.status(400).send("Incorrect parameters.");
+            res.status(status.BAD_REQUEST).send("Incorrect parameters.");
+            return;
+        }
+
+        if (typeof number !== "string") {
+            res.status(status.BAD_REQUEST).send("Incorrect parameter type.");
             return;
         }
 
         const roomIndex = rooms.getRoomIndex(number);
-        const room = rooms.rooms[roomIndex];
+        const room = rooms.getRoomByIndex(roomIndex);
 
         if (roomIndex === -1) {
-            res.status(404).send("Room not found.");
+            res.status(status.NOT_FOUND).send("Room not found.");
             return;
         }
         
         if (rooms.isAvailable(room)) {
-            res.status(403).send("Room is already available.");
+            res.status(status.FORBIDDEN).send("Room is already available.");
             return;
         }
 
         if (rooms.isOccupied(room)) {
-            res.status(403).send("Room is occupied - cannot cancel. Try checking out.");
+            res.status(status.FORBIDDEN).send("Room is occupied. Try checking out.");
             return;
         }
 
@@ -172,30 +208,95 @@ function setupApiRoutes(app) {
         const { number } = req.body;
 
         if (!number) {
-            res.status(400).send("Incorrect parameters.");
+            res.status(status.BAD_REQUEST).send("Incorrect parameters.");
+            return;
+        }
+
+        if (typeof number !== "string") {
+            res.status(status.BAD_REQUEST).send("Incorrect parameter type.");
             return;
         }
 
         const roomIndex = rooms.getRoomIndex(number);
-        const room = rooms.rooms[roomIndex];
+        const room = rooms.getRoomByIndex(roomIndex);
 
         if (roomIndex === -1) {
-            res.status(404).send("Room not found");
+            res.status(status.NOT_FOUND).send("Room not found.");
             return;
         }
         
         if (rooms.isOccupied(room)) {
-            res.status(403).send("Room is already occupied.");
+            res.status(status.FORBIDDEN).send("Room is already occupied.");
             return;
         }
 
         if (rooms.isAvailable(room)) {
-            res.status(403).send("Room is available. Try reserving it first.");
+            res.status(status.FORBIDDEN).send("Room is available. Try reserving it first.");
             return;
         }
         
         rooms.setRoomField(roomIndex, "state", rooms.OCCUPIED);
-        res.json(rooms.rooms[roomIndex]);
+        res.json(rooms.getRoomByIndex(roomIndex));
+    });
+
+    /*
+        POST /api/checkout
+        Performs the check-out of the specified room.
+        It must be in the occupied state.
+
+        Body:
+
+        number: string
+
+        Returns: the modified room.
+    */
+    app.post("/api/checkout", async (req, res) => {
+        const { number } = req.body;
+
+        if (!number) {
+            res.status(status.BAD_REQUEST).send("Incorrect parameters.");
+            return;
+        }
+
+        if (typeof number !== "string") {
+            res.status(status.BAD_REQUEST).send("Incorrect parameter type.");
+            return;
+        }
+
+        const roomIndex = rooms.getRoomIndex(number);
+        const room = rooms.getRoomByIndex(roomIndex);
+
+        if (roomIndex === -1) {
+            res.status(status.NOT_FOUND).send("Room not found.");
+            return;
+        }
+        
+        if (rooms.isAvailable(room)) {
+            res.status(status.FORBIDDEN).send("Room is already available.");
+            return;
+        }
+
+        if (rooms.isReserved(room)) {
+            res.status(status.FORBIDDEN).send("Room is reserved. Try cancelling the reservation.");
+            return;
+        }
+
+        // TODO: handle if the debt is less than 0
+        // maybe ask for devolution or keep it
+        if (room.debt !== 0) {
+            res.status(status.FORBIDDEN).send("Room is in debt. Pay it first.");
+            return;
+        }
+
+        if (new Date(Date.now()).setHours(...rooms.default_check_out_hours) !== room.check_out) {
+            res.status(status.FORBIDDEN).send("Room's check-out is not today.");
+            return;
+        }
+        
+        const newRoom = rooms.defaultRoom(number);
+
+        rooms.setRoom(roomIndex, newRoom);
+        res.json(newRoom);
     });
 }
 

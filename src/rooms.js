@@ -1,8 +1,12 @@
 const rooms = [];
+let cash = 0;
 
 const AVAILABLE = "available";
 const RESERVED = "reserved";
 const OCCUPIED = "occupied";
+
+const default_check_out_days = 1;
+const default_check_out_hours = [12, 0, 0, 0];
 
 [
     "101",
@@ -27,6 +31,13 @@ function getRoom(number) {
 
 function getRoomIndex(number) {
     return rooms.indexOf(rooms.find(r => r.number.toLowerCase() === number.toLowerCase()));
+}
+
+function getRoomByIndex(index) {
+    if (index < 0 || index >= rooms.length)
+        return null;
+
+    return rooms[index];
 }
 
 function setRoom(index, room) {
@@ -69,7 +80,11 @@ function defaultRoom(number) {
 }
 
 module.exports = {
-    rooms,
+    // rooms,
+    // cash,
+
+    default_check_out_days,
+    default_check_out_hours,
 
     AVAILABLE,
     RESERVED,
@@ -83,6 +98,7 @@ module.exports = {
 
     getRoom,
     getRoomIndex,
+    getRoomByIndex,
     setRoom,
 
     defaultRoom,
