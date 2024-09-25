@@ -16,7 +16,9 @@ function logMiddleware(req, _, next) {
 }
 
 function logMessage(req) {
-    // [00/00/00 - 00:00:00] GET /path
+    // Message structure:
+    // [00/00/00 - 00:00:00] METHOD /path
+    
     const now = new Date(Date.now());
         
     const day = [

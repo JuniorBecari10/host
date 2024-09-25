@@ -1,6 +1,3 @@
-const rooms = require("./rooms");
-const status = require("./status");
-
 const one_day = 24 * 60 * 60 * 1000;
 
 function diffDays(date_a, date_b) {
