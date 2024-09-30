@@ -1,22 +1,7 @@
-const rooms = require("./rooms");
-const util = require("./util");
-const status = require("./status");
-
-// DEBUG
-Object.prototype.getName = function() { 
-    const funcNameRegex = /function (.{1,})\(/;
-    const results = funcNameRegex.exec(this.constructor.toString());
-
-    return (results && results.length > 1) ? results[1] : "";
-};
-
-function setupRoutes(app) {
-    app.get("/hello", (_, res) => {
-        res.render("hello.ejs");
-    });
-
-    setupApiRoutes(app);
-}
+const rooms = require("../../rooms");
+const util = require("../../util");
+const status = require("../../status");
+const msg = require("./msg");
 
 function setupApiRoutes(app) {
     /*
@@ -67,12 +52,12 @@ function setupApiRoutes(app) {
         const room = rooms.getRoom(number);
 
         if (typeof number !== "string") {
-            res.status(status.BAD_REQUEST).send({ message: "Incorrect parameter type." });
+            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETER_TYPES });
             return;
         }
 
         if (room === undefined) {
-            res.status(status.NOT_FOUND).send({ message: "Room not found" });
+            res.status(status.NOT_FOUND).send({ message: msg.ROOM_NOT_FOUND });
             return;
         }
 
@@ -105,7 +90,7 @@ function setupApiRoutes(app) {
         } = req.body;
 
         if (!(number && guests && price && check_out)) {
-            res.status(status.BAD_REQUEST).send({ message: "Incorrect parameters." });
+            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
             return;
         }
 
@@ -115,7 +100,7 @@ function setupApiRoutes(app) {
             typeof price === "number" &&
             typeof check_out === "number"
         )) {
-            res.status(status.BAD_REQUEST).send({ message: "Incorrect parameter types." });
+            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETER_TYPES });
             return;
         }
 
@@ -123,22 +108,22 @@ function setupApiRoutes(app) {
         const room = rooms.getRoomByIndex(roomIndex);
 
         if (roomIndex === -1) {
-            res.status(status.NOT_FOUND).send({ message: "Room not found." });
+            res.status(status.NOT_FOUND).send({ message: msg.ROOM_NOT_FOUND });
             return;
         }
 
         if (rooms.isReserved(room)) {
-            res.status(status.FORBIDDEN).send({ message: "Room is already reserved." });
+            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_ALREADY_RESERVED });
             return;
         }
 
         if (rooms.isOccupied(room)) {
-            res.status(status.FORBIDDEN).send({ message: "Room is occupied." });
+            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_OCCUPIED });
             return;
         }
 
         if (guests.length === 0) {
-            res.status(status.BAD_REQUEST).send({ message: "There must be at least one guest." });
+            res.status(status.BAD_REQUEST).send({ message: msg.THERE_MUST_BE_AT_LEAST_ONE_GUEST });
             return;
         }
 
@@ -150,7 +135,7 @@ function setupApiRoutes(app) {
         ).setHours(...rooms.default_check_out_hours);
 
         if (check_out_date <= new Date(now).setHours(...rooms.default_check_out_hours)) {
-            res.status(status.BAD_REQUEST).send({ message: "Check-out date cannot be earlier or in the same day than the check-in date." });
+            res.status(status.BAD_REQUEST).send({ message: msg.CHECK_OUT_CANNOT_BE_EARLIER });
             return;
         }
 
@@ -186,12 +171,12 @@ function setupApiRoutes(app) {
         const { number } = req.body;
 
         if (!number) {
-            res.status(status.BAD_REQUEST).send({ message: "Incorrect parameters." });
+            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
             return;
         }
 
         if (typeof number !== "string") {
-            res.status(status.BAD_REQUEST).send({ message: "Incorrect parameter type." });
+            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETER_TYPE });
             return;
         }
 
@@ -199,17 +184,17 @@ function setupApiRoutes(app) {
         const room = rooms.getRoomByIndex(roomIndex);
 
         if (roomIndex === -1) {
-            res.status(status.NOT_FOUND).send({ message: "Room not found." });
+            res.status(status.NOT_FOUND).send({ message: msg.ROOM_NOT_FOUND });
             return;
         }
         
         if (rooms.isAvailable(room)) {
-            res.status(status.FORBIDDEN).send({ message: "Room is already available." });
+            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_ALREADY_AVAILABLE });
             return;
         }
 
         if (rooms.isOccupied(room)) {
-            res.status(status.FORBIDDEN).send({ message: "Room is occupied. Try checking out." });
+            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_OCCUPIED }); // TODO: Try checking out
             return;
         }
 
@@ -235,12 +220,12 @@ function setupApiRoutes(app) {
         const { number } = req.body;
 
         if (!number) {
-            res.status(status.BAD_REQUEST).send({ message: "Incorrect parameters." });
+            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
             return;
         }
 
         if (typeof number !== "string") {
-            res.status(status.BAD_REQUEST).send({ message: "Incorrect parameter type." });
+            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETER_TYPE });
             return;
         }
 
@@ -248,17 +233,17 @@ function setupApiRoutes(app) {
         const room = rooms.getRoomByIndex(roomIndex);
 
         if (roomIndex === -1) {
-            res.status(status.NOT_FOUND).send({ message: "Room not found." });
+            res.status(status.NOT_FOUND).send({ message: msg.ROOM_NOT_FOUND });
             return;
         }
         
         if (rooms.isOccupied(room)) {
-            res.status(status.FORBIDDEN).send({ message: "Room is already occupied." });
+            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_ALREADY_OCCUPIED });
             return;
         }
 
         if (rooms.isAvailable(room)) {
-            res.status(status.FORBIDDEN).send({ message: "Room is available. Try reserving it first." });
+            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_AVAILABLE }); // TODO: Try reserving it first
             return;
         }
         
@@ -282,12 +267,12 @@ function setupApiRoutes(app) {
         const { number } = req.body;
 
         if (!number) {
-            res.status(status.BAD_REQUEST).send({ message: "Incorrect parameters." });
+            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
             return;
         }
 
         if (typeof number !== "string") {
-            res.status(status.BAD_REQUEST).send({ message: "Incorrect parameter type." });
+            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETER_TYPE });
             return;
         }
 
@@ -295,27 +280,27 @@ function setupApiRoutes(app) {
         const room = rooms.getRoomByIndex(roomIndex);
 
         if (roomIndex === -1) {
-            res.status(status.NOT_FOUND).send({ message: "Room not found." });
+            res.status(status.NOT_FOUND).send({ message: msg.ROOM_NOT_FOUND});
             return;
         }
         
         if (rooms.isAvailable(room)) {
-            res.status(status.FORBIDDEN).send({ message: "Room is already available." });
+            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_ALREADY_AVAILABLE });
             return;
         }
 
         if (rooms.isReserved(room)) {
-            res.status(status.FORBIDDEN).send({ message: "Room is reserved. Try cancelling the reservation." });
+            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_RESERVED }); // TODO: Try cancelling the reservation.
             return;
         }
 
         if (room.debt !== 0) {
-            res.status(status.FORBIDDEN).send({ message: "Room is in debt. Pay it first." });
+            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_IN_DEBT }); // TODO: Pay it first
             return;
         }
 
         if (new Date(Date.now()).setHours(...rooms.default_check_out_hours) !== room.check_out) {
-            res.status(status.FORBIDDEN).send({ message: "Room's check-out is not today." });
+            res.status(status.FORBIDDEN).send({ message: msg.ROOMS_CHECK_OUT_NOT_TODAY });
             return;
         }
         
@@ -326,4 +311,4 @@ function setupApiRoutes(app) {
     });
 }
 
-module.exports = setupRoutes;
+module.exports = setupApiRoutes;

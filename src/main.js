@@ -3,7 +3,7 @@ if (process.env.NODE_ENV !== "production")
 
 const express = require("express");
 const init = require("./init");
-const setupRoutes = require("./routes");
+const setupRoutes = require("./routes/routes");
 
 const PORT = process.env.PORT || 3000;
 const app = express();
