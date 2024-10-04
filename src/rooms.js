@@ -1,3 +1,5 @@
+const fs = require("fs");
+
 const hotel = {
     name: "Trajano Palace Hotel",
     rooms: [],
@@ -60,10 +62,12 @@ function getRoomByIndex(index) {
 
 function setRoom(index, room) {
     hotel.rooms[index] = room;
+    saveData();
 }
 
 function setRoomField(index, field, value) {
     hotel.rooms[index][field] = value;
+    saveData();
 }
 
 // ---
@@ -96,6 +100,15 @@ function defaultRoom(number) {
         check_out: 0,
     };
 }
+
+// ---
+
+function saveData() {
+    const json = JSON.stringify(hotel);
+    fs.writeFile("database.json", json, "utf8");
+}
+
+// ---
 
 module.exports = {
     hotel,
