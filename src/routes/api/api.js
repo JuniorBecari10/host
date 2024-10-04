@@ -20,11 +20,44 @@ function setupApiRoutes(app) {
         Gets all the rooms of the hotel.
 
         Returns: All the rooms, in an array.
-        Return Type: number
+        Return Type: Room[]
     */
     app.get("/api/rooms", async (_, res) => {
         res.json({ rooms: rooms.getHotelRooms() });
     });
+
+    /*
+        GET /api/rooms/available
+        Gets all available rooms of the hotel.
+
+        Returns: All the available rooms, in an array.
+        Return Type: Room[]
+    */
+        app.get("/api/rooms/available", async (_, res) => {
+            res.json({ rooms: rooms.getHotelRooms().filter(r => rooms.isAvailable(r)) });
+        });
+    
+    /*
+        GET /api/rooms/reserved
+        Gets all reserved rooms of the hotel.
+
+        Returns: All the reserved rooms, in an array.
+        Return Type: Room[]
+    */
+        app.get("/api/rooms/reserved", async (_, res) => {
+            res.json({ rooms: rooms.getHotelRooms().filter(r => rooms.isReserved(r)) });
+        });
+    
+    /*
+        GET /api/rooms/occupied
+        Gets all occupied rooms of the hotel.
+
+        Returns: All the occupied rooms, in an array.
+        Return Type: Room[]
+    */
+        app.get("/api/rooms/occupied", async (_, res) => {
+            res.json({ rooms: rooms.getHotelRooms().filter(r => rooms.isOccupied(r)) });
+        });
 
     /*
         GET /api/cash
