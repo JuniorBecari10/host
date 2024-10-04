@@ -1,0 +1,15 @@
+* {
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+    color: #fff;
+    font-family: "Montserrat", sans-serif;
+
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
+.select {
+    user-select: text;
+}

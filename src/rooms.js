@@ -2,6 +2,7 @@ const hotel = {
     name: "Trajano Palace Hotel",
     rooms: [],
     cash: 0,
+    // TODO: add opening time
 };
 
 const AVAILABLE = "available";

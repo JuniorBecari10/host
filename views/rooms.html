@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Host - Apartamentos</title>
+
+        <link rel="shortcut icon" href="../public/assets/favicon.png" type="image/x-icon" />
+        <link rel="stylesheet" href="../public/style.css" />
+
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        <script defer src="../public/rooms.js"></script>
+        <script defer src="../public/ripple.min.js"></script>
+    </head>
+
+    <body class="overflow-hidden bg-[#111313]" x-data="{ mode: 'none', visible: false }">
+        <!-- Header -->
+        <header class="flex justify-center items-center h-16">
+            <!-- Logo -->
+            <a href="#" class="ripple w-12 p-2 ml-4 hover:bg-[#32383a] rounded-md transition-[background] duration-300">
+                <img src="assets/logo-h.svg" alt="H" class="w-full" />
+            </a>
+
+            <!-- Hotel name -->
+            <h1 class="text-sm font-bold uppercase tracking-widest flex-1 text-center">
+                Trajano Palace Hotel
+            </h1>
+
+            <!-- Padding to center the hotel name -->
+            <div class="w-12 p-2 ml-4"></div>
+        </header>
+
+        <main>
+            <!-- Options Bar -->
+            <div class="flex justify-center items-center width-full h-14 bg-[#1c1f21] m-4 rounded-lg">
+                <!-- Option Card - Guests -->
+                <a href="#" class="
+                    flex justify-center items-center
+                    w-fit inline bg-[#272c2d]
+                    m-2 my-4 p-4 py-2
+                    font-semibold text-sm ripple
+                    hover:bg-[#32383a] rounded-md transition-[background] duration-300
+                ">
+                    <img class="mr-2" src="assets/icons/guests.png" alt="Hóspedes">
+                    Hóspedes
+                </a>
+
+                <!-- Option Card - Cash -->
+                <a href="#" class="
+                    flex justify-center items-center
+                    w-fit inline bg-[#272c2d]
+                    m-2 my-4 p-4 py-2
+                    font-semibold text-sm ripple
+                    hover:bg-[#32383a] rounded-md transition-[background] duration-300
+                " @click="mode = 'cash'; visible = true">
+                    <img class="mr-2" src="assets/icons/cash.png" alt="Caixa">
+                    Caixa
+                </a>
+            </div>
+
+            <!-- Hints -->
+            <div class="w-full h-2 p-5 flex items-center text-sm font-medium">
+                <div class="rounded-full bg-[#6dc644] w-1.5 h-1.5 mr-2.5"></div>
+                <span class="mr-6">Vago</span>
+
+                <div class="rounded-full bg-[#3976d0] w-1.5 h-1.5 mr-2.5"></div>
+                <span class="mr-6">Reservado</span>
+
+                <div class="rounded-full bg-[#c64444] w-1.5 h-1.5 mr-2.5"></div>
+                <span class="mr-6">Ocupado</span>
+            </div>
+
+            <!-- Room Area -->
+            <div class="w-full h-screen p-4">
+                <!-- Apartment Group -->
+                <div class="w-full">
+                    <!-- Group Name -->
+                    <div class="mb-5 text-sm font-semibold uppercase tracking-widest">
+                        Térreo
+                    </div>
+    
+                    <!-- Apartment Card -->
+                    <a href="#" class="
+                        flex justify-center items-center inline-block
+                        w-20 h-20
+                        bg-[#6dc644] hover:bg-[#77d64a]
+                        font-bold text-xl rounded-xl ripple
+                        transition-[background] duration-300
+                    " @click="mode = 'reserve'; visible = true">
+                        101
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <!-- Popup Card Background -->
+        <div class="
+            absolute top-0 left-0
+            flex justify-center items-center
+            w-full h-screen
+            bg-black/30
+        " x-show="visible" x-transition>
+            <!-- Card -->
+            <div class="
+                w-4/5 md:w-1/2
+                bg-[#1c1f21] rounded-xl shadow-md top-full
+            "
+            :class="mode == 'cash' ? 'h-3/5' : 'h-4/5'"
+            x-transition x-transition.duration.300ms @click.outside="visible = false; setTimeout(() => mode = 'none', 350)">
+                <!-- Header -->
+                <div class="flex justify-center items-center w-full h-16 p-4">
+                    <div class="w-10"></div>
+                    <span class="flex-1 text-center text-sm font-semibold uppercase tracking-widest" x-transition>
+                        <p x-show="mode == 'cash'">Caixa</p>
+                        <p x-show="mode == 'reserve'">Reservar</p>
+                    </span>
+
+                    <a class="flex justify-center items-center w-10 h-10 p-2 ml-4 hover:bg-[#32383a] rounded-md transition-[background] duration-300" href="#" @click="visible = false; setTimeout(() => mode = 'none', 350)">
+                        <img src="assets/icons/close.png" alt="X">
+                    </a>
+                </div>
+
+                <template x-if="mode == 'cash'">
+                    <div class="w-full h-full p-5" x-data="{ cash: 0 }" x-init="axios.get('http://localhost:8080/api/cash').then(c => cash = c.data.cash)">
+                        <p>Total do caixa:</p>
+                        <h1 class="font-bold text-4xl" x-text="formatCurrency(cash)"></h1>
+
+                        <a class="ripple flex justify-center items-center w-8 h-8 p-2 mt-2 hover:bg-[#32383a] rounded-lg transition-[background] duration-300" href="#" href="#" @click="axios.get('http://localhost:8080/api/cash').then(c => cash = c.data.cash)" title="Recarregar">
+                            <img src="assets/icons/reload.png" alt="Recarregar">
+                        </a>
+                    </div>
+                </template>
+
+                <template x-if="mode == 'reserve'">
+                    <div class="w-full h-full p-5">
+                        Reservar!
+                    </div>
+                </template>
+            </div>
+        </div>
+    </body>
+</html>
