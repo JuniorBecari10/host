@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const hotel = {
+let hotel = {
     name: "Trajano Palace Hotel",
     rooms: [],
     cash: 0,
@@ -13,6 +13,8 @@ const OCCUPIED = "occupied";
 
 const default_check_out_days = 1;
 const default_check_out_hours = [12, 0, 0, 0];
+
+const DATABASE_LOCATION = "./database.json";
 
 [
     "101",
@@ -105,7 +107,24 @@ function defaultRoom(number) {
 
 function saveData() {
     const json = JSON.stringify(hotel);
-    fs.writeFile("database.json", json, "utf8");
+    fs.writeFile(DATABASE_LOCATION, json, "utf8", error => {
+        if (error) {
+            console.log("Couldn't write database to file.");
+            throw error;
+        }
+    });
+}
+
+function loadData() {
+    fs.readFile(DATABASE_LOCATION, "utf8", (error, data) => {
+        if (error) {
+            console.log("Couldn't read database.");
+            throw error;
+        }
+
+        hotel = JSON.parse(data);
+        console.log(hotel);
+    });
 }
 
 // ---
@@ -115,6 +134,8 @@ module.exports = {
 
     default_check_out_days,
     default_check_out_hours,
+
+    DATABASE_LOCATION,
 
     AVAILABLE,
     RESERVED,
@@ -136,4 +157,5 @@ module.exports = {
     setRoom,
 
     defaultRoom,
+    loadData,
 };
