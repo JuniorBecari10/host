@@ -28,7 +28,16 @@ const DATABASE_LOCATION = "./database.json";
     "107",
     "108",
     "109",
-    "110"
+    "110",
+    "111",
+    "112",
+    "113",
+    "114",
+    "115",
+    "116",
+    "117A",
+    "117B",
+    "118",
 ].forEach(number => hotel.rooms.push(defaultRoom(number)));
 
 // ---

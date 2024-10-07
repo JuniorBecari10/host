@@ -180,7 +180,7 @@ function setupApiRoutes(app) {
             price,
             debt: price,
         
-            check_in: now,
+            check_in: 0,
             check_out: check_out_date,
         };
 
@@ -281,6 +281,8 @@ function setupApiRoutes(app) {
         }
         
         rooms.setRoomField(roomIndex, "state", rooms.OCCUPIED);
+        rooms.setRoomField(roomIndex, "check_in", Date.now());
+
         res.json(rooms.getRoomByIndex(roomIndex));
     });
 
