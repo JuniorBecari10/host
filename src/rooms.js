@@ -132,7 +132,6 @@ function loadData() {
         }
 
         hotel = JSON.parse(data);
-        console.log(hotel);
     });
 }
 
