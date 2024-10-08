@@ -71,6 +71,17 @@ function setupApiRoutes(app) {
         });
 
     /*
+        GET /api/cash-opening-time
+        Gets the time the cash has been opened.
+
+        Returns: The time the cash has been opened.
+        Return Type: number
+    */
+        app.get("/api/cash-opening-time", async (_, res) => {
+            res.json({ time: rooms.getHotelCashOpeningTime() });
+        });
+
+    /*
         GET /api/check-out-hour
         Gets the check_out hour (the default is 12:00 - noon)
 
@@ -112,6 +123,23 @@ function setupApiRoutes(app) {
     });
 
     // ---
+
+    /*
+        POST /api/close-cash
+        Closes the current cash and opens a new one.
+
+        Returns: The new cash value and opening time.
+        Return Type: { cash: number, time: number }
+    */
+    app.post("/api/close-cash/", async (_, res) => {
+        rooms.setHotelCash(0);
+        rooms.setHotelCashOpeningTime(Date.now());
+
+        res.json({
+            cash: rooms.getHotelCash(),
+            time: rooms.getHotelCashOpeningTime(),
+        });
+    });
 
     /*
         POST /api/reserve/

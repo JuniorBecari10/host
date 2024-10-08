@@ -3,8 +3,9 @@ const fs = require("fs");
 let hotel = {
     name: "Antônio's Hotel",
     rooms: [],
+
     cash: 0,
-    // TODO: add opening time
+    cash_opening_time: Date.now(),
 };
 
 const AVAILABLE = "available";
@@ -52,6 +53,20 @@ function getHotelRooms() {
 
 function getHotelCash() {
     return hotel.cash;
+}
+
+function getHotelCashOpeningTime() {
+    return hotel.cash_opening_time;
+}
+
+function setHotelCash(value) {
+    hotel.cash = value;
+    saveData();
+}
+
+function setHotelCashOpeningTime(value) {
+    hotel.cash_opening_time = value;
+    saveData();
 }
 
 // ---
@@ -158,6 +173,10 @@ module.exports = {
     getHotelName,
     getHotelRooms,
     getHotelCash,
+    getHotelCashOpeningTime,
+
+    setHotelCash,
+    setHotelCashOpeningTime,
 
     getRoom,
     getRoomIndex,
