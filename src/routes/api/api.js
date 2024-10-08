@@ -75,10 +75,13 @@ function setupApiRoutes(app) {
         Gets the check_out hour (the default is 12:00 - noon)
 
         Returns: The check_out hour
-        Return Type: array, string
+        Return Type: { raw: array, formatted: string }
     */
         app.get("/api/check-out-hour", async (_, res) => {
-            res.json({ raw: rooms.default_check_out_hours, formatted: util.formatCheckOutHour(rooms.default_check_out_hours) });
+            res.json({
+                raw: rooms.default_check_out_hours,
+                formatted: util.formatCheckOutHour(rooms.default_check_out_hours)
+            });
         });
 
     /*
@@ -189,7 +192,7 @@ function setupApiRoutes(app) {
         
             guests,
             price,
-            debt: price,
+            debt: 0,
         
             check_in: 0,
             check_out: check_out_date,
@@ -290,10 +293,21 @@ function setupApiRoutes(app) {
             res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_AVAILABLE }); // TODO: Try reserving it first
             return;
         }
-        
-        rooms.setRoomField(roomIndex, "state", rooms.OCCUPIED);
-        rooms.setRoomField(roomIndex, "check_in", Date.now());
 
+        const now = Date.now();
+        const newRoom = {
+            number: room.number,
+            state: rooms.OCCUPIED,
+        
+            guests: room.guests,
+            price: room.price,
+            debt: room.price * util.diffDays(now, room.check_out),
+        
+            check_in: now,
+            check_out: room.check_out,
+        };
+        
+        rooms.setRoom(roomIndex, newRoom);
         res.json(rooms.getRoomByIndex(roomIndex));
     });
 
