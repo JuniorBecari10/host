@@ -15,6 +15,12 @@ function logMiddleware(req, _, next) {
     next();
 }
 
+function formatCheckOutHour(check_out) {
+    const hours = check_out[0].toString().padStart(2, "0");
+    const minutes = check_out[1].toString().padStart(2, "0");
+    return `${hours}:${minutes}`
+}
+
 function logMessage(req) {
     // Message structure:
     // [00/00/00 - 00:00:00] METHOD /path
@@ -40,4 +46,5 @@ module.exports = {
     diffDays,
     addDays,
     logMiddleware,
+    formatCheckOutHour,
 }

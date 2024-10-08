@@ -71,6 +71,17 @@ function setupApiRoutes(app) {
         });
 
     /*
+        GET /api/check-out-hour
+        Gets the check_out hour (the default is 12:00 - noon)
+
+        Returns: The check_out hour
+        Return Type: array, string
+    */
+        app.get("/api/check-out-hour", async (_, res) => {
+            res.json({ raw: rooms.default_check_out_hours, formatted: util.formatCheckOutHour(rooms.default_check_out_hours) });
+        });
+
+    /*
         GET /api/room/{number}
         Gets information about the specified room.
 

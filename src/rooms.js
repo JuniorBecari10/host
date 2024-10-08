@@ -1,7 +1,7 @@
 const fs = require("fs");
 
 let hotel = {
-    name: "Trajano Palace Hotel",
+    name: "Antônio's Hotel",
     rooms: [],
     cash: 0,
     // TODO: add opening time
