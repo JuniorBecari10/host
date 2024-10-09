@@ -164,7 +164,7 @@ function setupApiRoutes(app) {
             check_out
         } = req.body;
 
-        const newRoom = util.reserve(res, number, guests, price, check_out);
+        const newRoom = util.editReservation(res, number, guests, price, check_out);
         res.json(newRoom);
     });
 
