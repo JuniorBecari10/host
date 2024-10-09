@@ -1,3 +1,7 @@
+const rooms = require("./rooms");
+const status = require("./status");
+const msg = require("./routes/api/msg");
+
 const one_day = 24 * 60 * 60 * 1000;
 
 function diffDays(date_a, date_b) {
@@ -42,9 +46,87 @@ function logMessage(req) {
     return `[${day.join("/")} - ${time.join(":")}] ${req.method} ${req.originalUrl}`;
 }
 
+
+function reserve(res, number, guests, price, check_out) {
+    const roomIndex = rooms.getRoomIndex(number);
+    const room = rooms.getRoomByIndex(roomIndex);
+
+    if (rooms.isReserved(room)) {
+        res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_ALREADY_RESERVED });
+        return;
+    }
+
+    editReserve(res, number, guests, price, check_out);
+}
+
+function editReservation(res, number, guests, price, check_out) {
+    if (!(number && guests && price && check_out)) {
+        res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
+        return;
+    }
+
+    if (!(
+        typeof number === "string" &&
+        guests instanceof Array &&
+        typeof price === "number" &&
+        typeof check_out === "number"
+    )) {
+        res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETER_TYPES });
+        return;
+    }
+
+    const roomIndex = rooms.getRoomIndex(number);
+    const room = rooms.getRoomByIndex(roomIndex);
+
+    if (roomIndex === -1) {
+        res.status(status.NOT_FOUND).send({ message: msg.ROOM_NOT_FOUND });
+        return;
+    }
+
+    if (rooms.isOccupied(room)) {
+        res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_OCCUPIED });
+        return;
+    }
+
+    if (guests.length === 0) {
+        res.status(status.BAD_REQUEST).send({ message: msg.THERE_MUST_BE_AT_LEAST_ONE_GUEST });
+        return;
+    }
+
+    const now = Date.now();
+    const check_out_date = new Date(
+        check_out == -1
+            ? addDays(now, rooms.default_check_out_days)
+            : check_out
+    ).setHours(...rooms.default_check_out_hours);
+
+    if (check_out_date <= new Date(now).setHours(...rooms.default_check_out_hours)) {
+        res.status(status.BAD_REQUEST).send({ message: msg.CHECK_OUT_CANNOT_BE_EARLIER });
+        return;
+    }
+
+    const newRoom = {
+        number: room.number,
+        state: rooms.RESERVED,
+    
+        guests,
+        price,
+        debt: 0,
+    
+        check_in: 0,
+        check_out: check_out_date,
+    };
+
+    rooms.setRoom(roomIndex, newRoom);
+    return newRoom;
+}
+
 module.exports = {
     diffDays,
     addDays,
     logMiddleware,
     formatCheckOutHour,
+
+    reserve,
+    editReservation,
 }
