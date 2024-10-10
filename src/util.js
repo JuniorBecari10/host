@@ -56,10 +56,22 @@ function reserve(res, number, guests, price, check_out) {
         return;
     }
 
-    editReserve(res, number, guests, price, check_out);
+    return makeReservation(res, number, guests, price, check_out);
 }
 
 function editReservation(res, number, guests, price, check_out) {
+    const roomIndex = rooms.getRoomIndex(number);
+    const room = rooms.getRoomByIndex(roomIndex);
+
+    if (rooms.isAvailable(room)) {
+        res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_NOT_RESERVED });
+        return;
+    }
+
+    return makeReservation(res, number, guests, price, check_out);
+}
+
+function makeReservation(res, number, guests, price, check_out) {
     if (!(number && guests && price && check_out)) {
         res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
         return;

@@ -164,7 +164,7 @@ function setupApiRoutes(app) {
             check_out
         } = req.body;
 
-        const newRoom = util.editReservation(res, number, guests, price, check_out);
+        const newRoom = util.reserve(res, number, guests, price, check_out);
         res.json(newRoom);
     });
 
@@ -277,13 +277,13 @@ function setupApiRoutes(app) {
             return;
         }
         
-        if (rooms.isOccupied(room)) {
-            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_ALREADY_OCCUPIED });
+        if (rooms.isAvailable(room)) {
+            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_AVAILABLE }); // TODO: Try reserving it first
             return;
         }
 
-        if (rooms.isAvailable(room)) {
-            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_AVAILABLE }); // TODO: Try reserving it first
+        if (rooms.isOccupied(room)) {
+            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_ALREADY_OCCUPIED });
             return;
         }
 
