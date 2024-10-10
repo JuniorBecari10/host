@@ -51,6 +51,14 @@ function reserve(res, number, guests, price, checkOut) {
     const roomIndex = rooms.getRoomIndex(number);
     const room = rooms.getRoomByIndex(roomIndex);
 
+    if (roomIndex === -1) {
+        res.status(status.NOT_FOUND).send({
+            title: msg.TITLE_ROOM_NOT_FOUND,
+            message: msg.MSG_ROOM_NOT_FOUND,
+        });
+        return;
+    }
+
     if (rooms.isReserved(room)) {
         res.status(status.NOT_FOUND).send({
             title: msg.TITLE_ROOM_IS_ALREADY_RESERVED,
@@ -65,6 +73,14 @@ function reserve(res, number, guests, price, checkOut) {
 function editReservation(res, number, guests, price, checkOut) {
     const roomIndex = rooms.getRoomIndex(number);
     const room = rooms.getRoomByIndex(roomIndex);
+
+    if (roomIndex === -1) {
+        res.status(status.NOT_FOUND).send({
+            title: msg.TITLE_ROOM_NOT_FOUND,
+            message: msg.MSG_ROOM_NOT_FOUND,
+        });
+        return;
+    }
 
     if (rooms.isAvailable(room)) {
         res.status(status.FORBIDDEN).send({
@@ -95,6 +111,14 @@ function makeReservation(res, number, guests, price, checkOut) {
         res.status(status.BAD_REQUEST).send({
             title: msg.TITLE_INCORRECT_DATA_TYPES,
             message: msg.MSG_INCORRECT_DATA_TYPES,
+        });
+        return;
+    }
+
+    if (guests.length === 0) {
+        res.status(status.BAD_REQUEST).send({
+            title: msg.TITLE_THERE_MUST_BE_AT_LEAST_ONE_GUEST,
+            message: msg.MSG_THERE_MUST_BE_AT_LEAST_ONE_GUEST,
         });
         return;
     }
@@ -146,14 +170,6 @@ function makeReservation(res, number, guests, price, checkOut) {
         res.status(status.FORBIDDEN).send({
             title: msg.TITLE_ROOM_IS_OCCUPIED,
             message: msg.MSG_ROOM_IS_OCCUPIED_RESERVATION
-        });
-        return;
-    }
-
-    if (guests.length === 0) {
-        res.status(status.BAD_REQUEST).send({
-            title: msg.TITLE_THERE_MUST_BE_AT_LEAST_ONE_GUEST,
-            message: msg.MSG_THERE_MUST_BE_AT_LEAST_ONE_GUEST,
         });
         return;
     }
