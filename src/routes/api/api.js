@@ -110,12 +110,18 @@ function setupApiRoutes(app) {
         const room = rooms.getRoom(number);
 
         if (typeof number !== "string") {
-            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETER_TYPES });
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA_TYPES,
+                message: msg.MSG_INCORRECT_DATA_TYPES,
+            });
             return;
         }
 
         if (room === undefined) {
-            res.status(status.NOT_FOUND).send({ message: msg.ROOM_NOT_FOUND });
+            res.status(status.NOT_FOUND).send({
+                title: msg.TITLE_ROOM_NOT_FOUND,
+                message: msg.MSG_ROOM_NOT_FOUND,
+            });
             return;
         }
 
@@ -134,6 +140,7 @@ function setupApiRoutes(app) {
     app.post("/api/close-cash/", async (_, res) => {
         rooms.setHotelCash(0);
         rooms.setHotelCashOpeningTime(Date.now());
+        // TODO: remove all payments (and call the server endpoint to show them all?)
 
         res.json({
             cash: rooms.getHotelCash(),
@@ -211,12 +218,18 @@ function setupApiRoutes(app) {
         const { number } = req.body;
 
         if (!number) {
-            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA,
+                message: msg.MSG_INCORRECT_DATA,
+            });
             return;
         }
 
         if (typeof number !== "string") {
-            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETER_TYPE });
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA_TYPES,
+                message: msg.MSG_INCORRECT_DATA_TYPES,
+            });
             return;
         }
 
@@ -224,17 +237,26 @@ function setupApiRoutes(app) {
         const room = rooms.getRoomByIndex(roomIndex);
 
         if (roomIndex === -1) {
-            res.status(status.NOT_FOUND).send({ message: msg.ROOM_NOT_FOUND });
+            res.status(status.NOT_FOUND).send({
+                title: msg.TITLE_ROOM_NOT_FOUND,
+                message: msg.MSG_ROOM_NOT_FOUND,
+            });
             return;
         }
         
         if (rooms.isAvailable(room)) {
-            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_ALREADY_AVAILABLE });
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_ALREADY_AVAILABLE,
+                message: msg.MSG_ROOM_IS_ALREADY_AVAILABLE_CANCEL,
+            });
             return;
         }
 
         if (rooms.isOccupied(room)) {
-            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_OCCUPIED }); // TODO: Try checking out
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_OCCUPIED,
+                message: msg.MSG_ROOM_IS_OCCUPIED_CANCEL,
+            });
             return;
         }
 
@@ -260,12 +282,18 @@ function setupApiRoutes(app) {
         const { number } = req.body;
 
         if (!number) {
-            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA,
+                message: msg.MSG_INCORRECT_DATA,
+            });
             return;
         }
 
         if (typeof number !== "string") {
-            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETER_TYPE });
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA_TYPES,
+                message: msg.MSG_INCORRECT_DATA_TYPES,
+            });
             return;
         }
 
@@ -273,17 +301,26 @@ function setupApiRoutes(app) {
         const room = rooms.getRoomByIndex(roomIndex);
 
         if (roomIndex === -1) {
-            res.status(status.NOT_FOUND).send({ message: msg.ROOM_NOT_FOUND });
+            res.status(status.NOT_FOUND).send({
+                title: msg.TITLE_ROOM_NOT_FOUND,
+                message: msg.MSG_ROOM_NOT_FOUND,
+            });
             return;
         }
         
         if (rooms.isAvailable(room)) {
-            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_AVAILABLE }); // TODO: Try reserving it first
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_ALREADY_AVAILABLE,
+                message: msg.MSG_ROOM_IS_ALREADY_AVAILABLE_CHECK_IN,
+            });
             return;
         }
 
         if (rooms.isOccupied(room)) {
-            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_ALREADY_OCCUPIED });
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_ALREADY_OCCUPIED,
+                message: msg.MSG_ROOM_IS_ALREADY_OCCUPIED_CHECK_IN,
+            });
             return;
         }
 
@@ -320,12 +357,18 @@ function setupApiRoutes(app) {
         const { number } = req.body;
 
         if (!number) {
-            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA,
+                message: msg.MSG_INCORRECT_DATA,
+            });
             return;
         }
 
         if (typeof number !== "string") {
-            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETER_TYPE });
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA_TYPES,
+                message: msg.MSG_INCORRECT_DATA_TYPES,
+            });
             return;
         }
 
@@ -333,27 +376,42 @@ function setupApiRoutes(app) {
         const room = rooms.getRoomByIndex(roomIndex);
 
         if (roomIndex === -1) {
-            res.status(status.NOT_FOUND).send({ message: msg.ROOM_NOT_FOUND});
+            res.status(status.NOT_FOUND).send({
+                title: msg.TITLE_ROOM_NOT_FOUND,
+                message: msg.MSG_ROOM_NOT_FOUND,
+            });
             return;
         }
         
         if (rooms.isAvailable(room)) {
-            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_ALREADY_AVAILABLE });
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_ALREADY_AVAILABLE,
+                message: msg.MSG_ROOM_IS_ALREADY_AVAILABLE_CHECK_OUT,
+            });
             return;
         }
 
         if (rooms.isReserved(room)) {
-            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_RESERVED }); // TODO: Try cancelling the reservation.
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_RESERVED,
+                message: msg.MSG_ROOM_IS_RESERVED_CHECK_OUT,
+            });
             return;
         }
 
         if (room.debt !== 0) {
-            res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_IN_DEBT }); // TODO: Pay it first
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_IN_DEBT,
+                message: msg.MSG_ROOM_IS_IN_DEBT,
+            });
             return;
         }
 
-        if (new Date(Date.now()).setHours(...rooms.defaultCheckOutHours) !== room.check_out) {
-            res.status(status.FORBIDDEN).send({ message: msg.ROOMS_CHECK_OUT_NOT_TODAY });
+        if (new Date(Date.now()).setHours(...rooms.defaultCheckOutHours) !== new Date(room.check_out).setHours(...rooms.defaultCheckOutHours)) {
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOMS_CHECK_OUT_IS_NOT_TODAY,
+                message: msg.MSG_ROOMS_CHECK_OUT_IS_NOT_TODAY,
+            });
             return;
         }
         

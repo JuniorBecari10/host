@@ -52,7 +52,10 @@ function reserve(res, number, guests, price, checkOut) {
     const room = rooms.getRoomByIndex(roomIndex);
 
     if (rooms.isReserved(room)) {
-        res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_ALREADY_RESERVED });
+        res.status(status.NOT_FOUND).send({
+            title: msg.TITLE_ROOM_IS_ALREADY_RESERVED,
+            message: msg.MSG_ROOM_IS_ALREADY_RESERVED,
+        });
         return;
     }
 
@@ -64,7 +67,10 @@ function editReservation(res, number, guests, price, checkOut) {
     const room = rooms.getRoomByIndex(roomIndex);
 
     if (rooms.isAvailable(room)) {
-        res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_NOT_RESERVED });
+        res.status(status.FORBIDDEN).send({
+            title: msg.TITLE_ROOM_IS_AVAILABLE,
+            message: msg.MSG_ROOM_IS_AVAILABLE,
+        });
         return;
     }
 
@@ -73,7 +79,10 @@ function editReservation(res, number, guests, price, checkOut) {
 
 function makeReservation(res, number, guests, price, checkOut) {
     if (!(number && guests && price && checkOut)) {
-        res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
+        res.status(status.BAD_REQUEST).send({
+            title: msg.TITLE_INCORRECT_DATA,
+            message: msg.MSG_INCORRECT_DATA,
+        });
         return;
     }
 
@@ -83,15 +92,21 @@ function makeReservation(res, number, guests, price, checkOut) {
         typeof price === "number" &&
         typeof checkOut === "number"
     )) {
-        res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETER_TYPES });
+        res.status(status.BAD_REQUEST).send({
+            title: msg.TITLE_INCORRECT_DATA_TYPES,
+            message: msg.MSG_INCORRECT_DATA_TYPES,
+        });
         return;
     }
 
-    for (let guest of guests) {
-        // TODO: allow only these fields and ensure they are correctly formatted
+    const formattedGuests = [];
 
+    for (let guest of guests) {
         if (!(guest.name && guest.cpf && guest.phone)) {
-            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA,
+                message: msg.MSG_INCORRECT_DATA_GUESTS,
+            });
             return;
         }
 
@@ -100,26 +115,46 @@ function makeReservation(res, number, guests, price, checkOut) {
             typeof guest.cpf === "string" &&
             typeof guest.phone === "string"
         )) {
-            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA_TYPES,
+                message: msg.MSG_INCORRECT_DATA_TYPES_GUESTS,
+            });
             return;
         }
+
+        formattedGuests.push({
+            name: guest.name,
+            cpf: guest.cpf,
+            phone: guest.phone,
+        });
     }
+
+    guests = formattedGuests;
 
     const roomIndex = rooms.getRoomIndex(number);
     const room = rooms.getRoomByIndex(roomIndex);
 
     if (roomIndex === -1) {
-        res.status(status.NOT_FOUND).send({ message: msg.ROOM_NOT_FOUND });
+        res.status(status.NOT_FOUND).send({
+            title: msg.TITLE_ROOM_NOT_FOUND,
+            message: msg.MSG_ROOM_NOT_FOUND,
+        });
         return;
     }
 
     if (rooms.isOccupied(room)) {
-        res.status(status.FORBIDDEN).send({ message: msg.ROOM_IS_OCCUPIED });
+        res.status(status.FORBIDDEN).send({
+            title: msg.TITLE_ROOM_IS_OCCUPIED,
+            message: msg.MSG_ROOM_IS_OCCUPIED_RESERVATION
+        });
         return;
     }
 
     if (guests.length === 0) {
-        res.status(status.BAD_REQUEST).send({ message: msg.THERE_MUST_BE_AT_LEAST_ONE_GUEST });
+        res.status(status.BAD_REQUEST).send({
+            title: msg.TITLE_THERE_MUST_BE_AT_LEAST_ONE_GUEST,
+            message: msg.MSG_THERE_MUST_BE_AT_LEAST_ONE_GUEST,
+        });
         return;
     }
 
@@ -131,7 +166,10 @@ function makeReservation(res, number, guests, price, checkOut) {
     ).setHours(...rooms.defaultCheckOutHours);
 
     if (checkOutDate <= new Date(now).setHours(...rooms.defaultCheckOutHours)) {
-        res.status(status.BAD_REQUEST).send({ message: msg.CHECK_OUT_CANNOT_BE_EARLIER });
+        res.status(status.BAD_REQUEST).send({
+            title: msg.TITLE_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY,
+            message: msg.MSG_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY,
+        });
         return;
     }
 
