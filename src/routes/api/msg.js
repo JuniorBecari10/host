@@ -16,6 +16,6 @@ module.exports = {
 
     ROOM_IS_NOT_RESERVED: "Room is not reserved.",
 
-    ROOM_IS_IN_DEBT: "Room is in debt. Pay it first.",
+    ROOM_IS_IN_DEBT: "Room is in debt.",
     ROOMS_CHECK_OUT_NOT_TODAY: "Room's check-out is not today."
 };

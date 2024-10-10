@@ -90,8 +90,8 @@ function setupApiRoutes(app) {
     */
         app.get("/api/check-out-hour", async (_, res) => {
             res.json({
-                raw: rooms.default_check_out_hours,
-                formatted: util.formatCheckOutHour(rooms.default_check_out_hours)
+                raw: rooms.defaultCheckOutHours,
+                formatted: util.formatCheckOutHour(rooms.defaultCheckOutHours)
             });
         });
 
@@ -352,7 +352,7 @@ function setupApiRoutes(app) {
             return;
         }
 
-        if (new Date(Date.now()).setHours(...rooms.default_check_out_hours) !== room.check_out) {
+        if (new Date(Date.now()).setHours(...rooms.defaultCheckOutHours) !== room.check_out) {
             res.status(status.FORBIDDEN).send({ message: msg.ROOMS_CHECK_OUT_NOT_TODAY });
             return;
         }

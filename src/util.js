@@ -2,15 +2,15 @@ const rooms = require("./rooms");
 const status = require("./status");
 const msg = require("./routes/api/msg");
 
-const one_day = 24 * 60 * 60 * 1000;
+const oneDay = 24 * 60 * 60 * 1000;
 
 function diffDays(date_a, date_b) {
-    const diff_millis = date_b - date_a;
-    return Math.ceil(diff_millis / one_day);
+    const diffMillis = date_b - date_a;
+    return Math.ceil(diffMillis / oneDay);
 }
 
 function addDays(date, numDays) {
-    date += one_day * numDays;
+    date += oneDay * numDays;
     return date;
 }
 
@@ -19,9 +19,9 @@ function logMiddleware(req, _, next) {
     next();
 }
 
-function formatCheckOutHour(check_out) {
-    const hours = check_out[0].toString().padStart(2, "0");
-    const minutes = check_out[1].toString().padStart(2, "0");
+function formatCheckOutHour(checkOut) {
+    const hours = checkOut[0].toString().padStart(2, "0");
+    const minutes = checkOut[1].toString().padStart(2, "0");
     return `${hours}:${minutes}`
 }
 
@@ -47,7 +47,7 @@ function logMessage(req) {
 }
 
 
-function reserve(res, number, guests, price, check_out) {
+function reserve(res, number, guests, price, checkOut) {
     const roomIndex = rooms.getRoomIndex(number);
     const room = rooms.getRoomByIndex(roomIndex);
 
@@ -56,10 +56,10 @@ function reserve(res, number, guests, price, check_out) {
         return;
     }
 
-    return makeReservation(res, number, guests, price, check_out);
+    return makeReservation(res, number, guests, price, checkOut);
 }
 
-function editReservation(res, number, guests, price, check_out) {
+function editReservation(res, number, guests, price, checkOut) {
     const roomIndex = rooms.getRoomIndex(number);
     const room = rooms.getRoomByIndex(roomIndex);
 
@@ -68,11 +68,11 @@ function editReservation(res, number, guests, price, check_out) {
         return;
     }
 
-    return makeReservation(res, number, guests, price, check_out);
+    return makeReservation(res, number, guests, price, checkOut);
 }
 
-function makeReservation(res, number, guests, price, check_out) {
-    if (!(number && guests && price && check_out)) {
+function makeReservation(res, number, guests, price, checkOut) {
+    if (!(number && guests && price && checkOut)) {
         res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
         return;
     }
@@ -81,10 +81,28 @@ function makeReservation(res, number, guests, price, check_out) {
         typeof number === "string" &&
         guests instanceof Array &&
         typeof price === "number" &&
-        typeof check_out === "number"
+        typeof checkOut === "number"
     )) {
         res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETER_TYPES });
         return;
+    }
+
+    for (let guest of guests) {
+        // TODO: allow only these fields and ensure they are correctly formatted
+
+        if (!(guest.name && guest.cpf && guest.phone)) {
+            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
+            return;
+        }
+
+        if (!(
+            typeof guest.name === "string" &&
+            typeof guest.cpf === "string" &&
+            typeof guest.phone === "string"
+        )) {
+            res.status(status.BAD_REQUEST).send({ message: msg.INCORRECT_PARAMETERS });
+            return;
+        }
     }
 
     const roomIndex = rooms.getRoomIndex(number);
@@ -106,13 +124,13 @@ function makeReservation(res, number, guests, price, check_out) {
     }
 
     const now = Date.now();
-    const check_out_date = new Date(
-        check_out == -1
-            ? addDays(now, rooms.default_check_out_days)
-            : check_out
-    ).setHours(...rooms.default_check_out_hours);
+    const checkOutDate = new Date(
+        checkOut == -1
+            ? addDays(now, rooms.defaultCheckOutDays)
+            : checkOut
+    ).setHours(...rooms.defaultCheckOutHours);
 
-    if (check_out_date <= new Date(now).setHours(...rooms.default_check_out_hours)) {
+    if (checkOutDate <= new Date(now).setHours(...rooms.defaultCheckOutHours)) {
         res.status(status.BAD_REQUEST).send({ message: msg.CHECK_OUT_CANNOT_BE_EARLIER });
         return;
     }
@@ -126,7 +144,7 @@ function makeReservation(res, number, guests, price, check_out) {
         debt: 0,
     
         check_in: 0,
-        check_out: check_out_date,
+        check_out: checkOutDate,
     };
 
     rooms.setRoom(roomIndex, newRoom);

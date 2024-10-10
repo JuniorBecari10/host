@@ -5,15 +5,15 @@ let hotel = {
     rooms: [],
 
     cash: 0,
-    cash_opening_time: Date.now(),
+    cashOpeningTime: Date.now(),
 };
 
 const AVAILABLE = "available";
 const RESERVED = "reserved";
 const OCCUPIED = "occupied";
 
-const default_check_out_days = 1;
-const default_check_out_hours = [12, 0, 0, 0];
+const defaultCheckOutDays = 1;
+const defaultCheckOutHours = [12, 0, 0, 0];
 
 const DATABASE_LOCATION = "./database.json";
 
@@ -56,7 +56,7 @@ function getHotelCash() {
 }
 
 function getHotelCashOpeningTime() {
-    return hotel.cash_opening_time;
+    return hotel.cashOpeningTime;
 }
 
 function setHotelCash(value) {
@@ -65,7 +65,7 @@ function setHotelCash(value) {
 }
 
 function setHotelCashOpeningTime(value) {
-    hotel.cash_opening_time = value;
+    hotel.cashOpeningTime = value;
     saveData();
 }
 
@@ -155,8 +155,8 @@ function loadData() {
 module.exports = {
     hotel,
 
-    default_check_out_days,
-    default_check_out_hours,
+    defaultCheckOutDays,
+    defaultCheckOutHours,
 
     DATABASE_LOCATION,
 
