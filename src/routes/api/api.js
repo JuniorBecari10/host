@@ -428,6 +428,22 @@ function setupApiRoutes(app) {
             });
             return;
         }
+
+        if (!rooms.allowedPaymentMethods.includes(method)) {
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_INVALID_PAYMENT_METHOD,
+                message: msg.MSG_INVALID_PAYMENT_METHOD,
+            });
+            return;
+        }
+
+        rooms.setRoomField(roomIndex, debt, room.debt - amount);
+        rooms.addHotelPayment({
+            amount,
+            method,
+            room: number,
+        });
+        return rooms.getRoomByIndex(roomIndex);
     });
 
     /*

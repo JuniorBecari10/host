@@ -6,6 +6,7 @@ let hotel = {
 
     cash: 0,
     cashOpeningTime: Date.now(),
+    payments: [],
 };
 
 const AVAILABLE = "available";
@@ -63,6 +64,18 @@ function getHotelCash() {
 
 function getHotelCashOpeningTime() {
     return hotel.cashOpeningTime;
+}
+
+function getHotelPayments() {
+    return hotel.payments;
+}
+
+function addHotelPayment(payment) {
+    hotel.payments.push(payment);
+}
+
+function resetHotelPayments() {
+    hotel.payments = [];
 }
 
 function setHotelCash(value) {
@@ -163,6 +176,7 @@ module.exports = {
 
     defaultCheckOutDays,
     defaultCheckOutHours,
+    allowedPaymentMethods,
 
     DATABASE_LOCATION,
 
@@ -180,6 +194,9 @@ module.exports = {
     getHotelRooms,
     getHotelCash,
     getHotelCashOpeningTime,
+    getHotelPayments,
+    addHotelPayment,
+    resetHotelPayments,
 
     setHotelCash,
     setHotelCashOpeningTime,

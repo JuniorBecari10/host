@@ -20,6 +20,7 @@ module.exports = {
     TITLE_ROOMS_CHECK_OUT_IS_NOT_TODAY: "O check-out deste quarto não está definido para hoje",
 
     TITLE_AMOUNT_MUST_BE_GREATER_THAN_ZERO: "O valor a ser pago precisa ser superior a zero",
+    TITLE_INVALID_PAYMENT_METHOD: "Método de pagamento inválido",
 
     // Messages
     MSG_INCORRECT_DATA: "Certifique-se de que todos os campos estão preenchidos corretamente.",
@@ -51,4 +52,5 @@ module.exports = {
     MSG_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY: "Defina o dia para o check-out para, pelo menos, um dia depois de hoje.",
 
     MSG_AMOUNT_MUST_BE_GREATER_THAN_ZERO: "Altere para um valor que seja superior a zero.",
+    MSG_INVALID_PAYMENT_METHOD: "O método de pagamento seleciondo é inválido.",
 };
