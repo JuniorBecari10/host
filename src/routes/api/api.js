@@ -325,6 +325,22 @@ function setupApiRoutes(app) {
         }
 
         const now = Date.now();
+        const checkOut = room.check_out;
+        
+        const checkOutDate = new Date(
+            checkOut == -1
+                ? addDays(now, rooms.defaultCheckOutDays)
+                : checkOut
+        ).setHours(...rooms.defaultCheckOutHours);
+    
+        if (checkOutDate <= new Date(now).setHours(...rooms.defaultCheckOutHours)) {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY,
+                message: msg.MSG_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY,
+            });
+            return;
+        }
+
         const newRoom = {
             number: room.number,
             state: rooms.OCCUPIED,

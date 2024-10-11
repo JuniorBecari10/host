@@ -60,7 +60,7 @@ function reserve(res, number, guests, price, checkOut) {
     }
 
     if (rooms.isReserved(room)) {
-        res.status(status.NOT_FOUND).send({
+        res.status(status.FORBIDDEN).send({
             title: msg.TITLE_ROOM_IS_ALREADY_RESERVED,
             message: msg.MSG_ROOM_IS_ALREADY_RESERVED,
         });
@@ -94,7 +94,7 @@ function editReservation(res, number, guests, price, checkOut) {
 }
 
 function makeReservation(res, number, guests, price, checkOut) {
-    if (!(number && guests && price && checkOut)) {
+    if (!(number && guests && (price || price !== "0") && checkOut)) {
         res.status(status.BAD_REQUEST).send({
             title: msg.TITLE_INCORRECT_DATA,
             message: msg.MSG_INCORRECT_DATA,
@@ -145,6 +145,10 @@ function makeReservation(res, number, guests, price, checkOut) {
             });
             return;
         }
+
+        // check if name only has letters and spaces
+        // check if cpf has 11 digits and only numbers
+        // check if phone has 10 or 11 digits and only numbers
 
         formattedGuests.push({
             name: guest.name,
