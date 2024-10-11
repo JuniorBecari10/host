@@ -326,7 +326,7 @@ function setupApiRoutes(app) {
 
         const now = Date.now();
         const checkOut = room.check_out;
-        
+
         const checkOutDate = new Date(
             checkOut == -1
                 ? addDays(now, rooms.defaultCheckOutDays)
@@ -355,6 +355,79 @@ function setupApiRoutes(app) {
         
         rooms.setRoom(roomIndex, newRoom);
         res.json(rooms.getRoomByIndex(roomIndex));
+    });
+
+    /*
+        POST /api/pay
+        Performs a payment operation in the specified room.
+        It must be in the occupied state.
+
+        Body:
+
+        number: string
+        amount: number
+        method: string - must be one of the allowed methods
+
+        Returns: the modified room.
+        Return Type: Room (object)
+    */
+    app.post("/api/pay", async (req, res) => {
+        const { number, amount, method } = req.body;
+
+        if (!(number && amount && method)) {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA,
+                message: msg.MSG_INCORRECT_DATA,
+            });
+            return;
+        }
+
+        if (
+            typeof number !== "string" &&
+            typeof amount !== "number" &&
+            typeof method !== "string"
+        ) {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA_TYPES,
+                message: msg.MSG_INCORRECT_DATA_TYPES,
+            });
+            return;
+        }
+
+        const roomIndex = rooms.getRoomIndex(number);
+        const room = rooms.getRoomByIndex(roomIndex);
+
+        if (roomIndex === -1) {
+            res.status(status.NOT_FOUND).send({
+                title: msg.TITLE_ROOM_NOT_FOUND,
+                message: msg.MSG_ROOM_NOT_FOUND,
+            });
+            return;
+        }
+
+        if (rooms.isAvailable(room)) {
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_AVAILABLE,
+                message: msg.MSG_ROOM_IS_AVAILABLE_PAY,
+            });
+            return;
+        }
+
+        if (rooms.isReserved(room)) {
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_RESERVED,
+                message: msg.MSG_ROOM_IS_RESERVED_PAY,
+            });
+            return;
+        }
+
+        if (amount <= 0) {
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_AMOUNT_MUST_BE_GREATER_THAN_ZERO,
+                message: msg.MSG_AMOUNT_MUST_BE_GREATER_THAN_ZERO,
+            });
+            return;
+        }
     });
 
     /*

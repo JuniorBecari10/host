@@ -14,6 +14,12 @@ const OCCUPIED = "occupied";
 
 const defaultCheckOutDays = 1;
 const defaultCheckOutHours = [12, 0, 0, 0];
+const allowedPaymentMethods = [
+    "card",
+    "cash",
+    "pix",
+    "billed",
+];
 
 const DATABASE_LOCATION = "./database.json";
 
