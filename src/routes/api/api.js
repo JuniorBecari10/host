@@ -443,6 +443,9 @@ function setupApiRoutes(app) {
             method,
             room: number,
         });
+
+        // TODO: change cash here and in close-cash close the cash through a function
+
         return rooms.getRoomByIndex(roomIndex);
     });
 

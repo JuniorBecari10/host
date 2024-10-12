@@ -146,6 +146,19 @@ function makeReservation(res, number, guests, price, checkOut) {
             return;
         }
 
+        if (!(
+            guest.name.length > 0 &&
+            !/\d/.test(guest.name) &&
+            guest.cpf.length === 11 &&
+            [10, 11].includes(guest.phone.length)
+        )) {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA,
+                message: msg.MSG_INCORRECT_DATA_GUESTS,
+            });
+            return;
+        }
+
         // check if name only has letters and spaces
         // check if cpf has 11 digits and only numbers
         // check if phone has 10 or 11 digits and only numbers
