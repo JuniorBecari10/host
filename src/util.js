@@ -5,7 +5,7 @@ const msg = require("./routes/api/msg");
 const oneDay = 24 * 60 * 60 * 1000;
 
 function diffDays(date_a, date_b) {
-    const diffMillis = date_b - date_a;
+    const diffMillis = new Date(date_b).setHours(0, 0, 0, 0) - new Date(date_a).setHours(0, 0, 0, 0);
     return Math.floor(diffMillis / oneDay);
 }
 

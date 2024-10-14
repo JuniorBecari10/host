@@ -501,6 +501,7 @@ function setupApiRoutes(app) {
             amount,
             method,
             room: number,
+            time: Date.now(),
         };
 
         rooms.addHotelPayment(payment);
