@@ -11,9 +11,9 @@ function setupApiRoutes(app) {
         Returns: The name of the hotel.
         Return Type: string
     */
-        app.get("/api/name", async (_, res) => {
-            res.json({ name: rooms.getHotelName() });
-        });
+    app.get("/api/name", async (_, res) => {
+        res.json({ name: rooms.getHotelName() });
+    });
 
     /*
         GET /api/rooms
@@ -33,9 +33,9 @@ function setupApiRoutes(app) {
         Returns: All the available rooms, in an array.
         Return Type: Room[]
     */
-        app.get("/api/rooms/available", async (_, res) => {
-            res.json({ rooms: rooms.getHotelRooms().filter(r => rooms.isAvailable(r)) });
-        });
+    app.get("/api/rooms/available", async (_, res) => {
+        res.json({ rooms: rooms.getHotelRooms().filter(r => rooms.isAvailable(r)) });
+    });
     
     /*
         GET /api/rooms/reserved
@@ -44,9 +44,9 @@ function setupApiRoutes(app) {
         Returns: All the reserved rooms, in an array.
         Return Type: Room[]
     */
-        app.get("/api/rooms/reserved", async (_, res) => {
-            res.json({ rooms: rooms.getHotelRooms().filter(r => rooms.isReserved(r)) });
-        });
+    app.get("/api/rooms/reserved", async (_, res) => {
+        res.json({ rooms: rooms.getHotelRooms().filter(r => rooms.isReserved(r)) });
+    });
     
     /*
         GET /api/rooms/occupied
@@ -55,9 +55,9 @@ function setupApiRoutes(app) {
         Returns: All the occupied rooms, in an array.
         Return Type: Room[]
     */
-        app.get("/api/rooms/occupied", async (_, res) => {
-            res.json({ rooms: rooms.getHotelRooms().filter(r => rooms.isOccupied(r)) });
-        });
+    app.get("/api/rooms/occupied", async (_, res) => {
+        res.json({ rooms: rooms.getHotelRooms().filter(r => rooms.isOccupied(r)) });
+    });
 
     /*
         GET /api/cash
@@ -66,9 +66,9 @@ function setupApiRoutes(app) {
         Returns: The current value of the cash.
         Return Type: number
     */
-        app.get("/api/cash", async (_, res) => {
-            res.json({ cash: rooms.getHotelCash() });
-        });
+    app.get("/api/cash", async (_, res) => {
+        res.json({ cash: rooms.getHotelCash() });
+    });
 
     /*
         GET /api/cash-opening-time
@@ -77,9 +77,20 @@ function setupApiRoutes(app) {
         Returns: The time the cash has been opened.
         Return Type: number
     */
-        app.get("/api/cash-opening-time", async (_, res) => {
-            res.json({ time: rooms.getHotelCashOpeningTime() });
-        });
+    app.get("/api/cash-opening-time", async (_, res) => {
+        res.json({ time: rooms.getHotelCashOpeningTime() });
+    });
+
+    /*
+        GET /api/payments
+        Gets the currently listed payments.
+
+        Returns: The currently listed payments.
+        Return Type: Array
+    */
+    app.get("/api/payments", async (_, res) => {
+        res.json({ payments: rooms.getHotelPayments() });
+    });
 
     /*
         GET /api/check-out-hour
@@ -88,12 +99,12 @@ function setupApiRoutes(app) {
         Returns: The check_out hour
         Return Type: { raw: array, formatted: string }
     */
-        app.get("/api/check-out-hour", async (_, res) => {
-            res.json({
-                raw: rooms.defaultCheckOutHours,
-                formatted: util.formatCheckOutHour(rooms.defaultCheckOutHours)
-            });
+    app.get("/api/check-out-hour", async (_, res) => {
+        res.json({
+            raw: rooms.defaultCheckOutHours,
+            formatted: util.formatCheckOutHour(rooms.defaultCheckOutHours)
         });
+    });
 
     /*
         GET /api/room/{number}
@@ -128,6 +139,55 @@ function setupApiRoutes(app) {
         res.json(room);
     });
 
+    /*
+        GET /api/debt/{number}
+        Gets the debt of the specified room.
+
+        Parameters:
+        - number - The room number.
+
+        Returns: The debt of the specified room.
+        Return Type: number
+    */
+    app.get("/api/debt/:number", async (req, res) => {
+        const number = req.params.number;
+        const room = rooms.getRoom(number);
+
+        if (typeof number !== "string") {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA_TYPES,
+                message: msg.MSG_INCORRECT_DATA_TYPES,
+            });
+            return;
+        }
+
+        if (room === undefined) {
+            res.status(status.NOT_FOUND).send({
+                title: msg.TITLE_ROOM_NOT_FOUND,
+                message: msg.MSG_ROOM_NOT_FOUND,
+            });
+            return;
+        }
+
+        if (rooms.isAvailable(room)) {
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_AVAILABLE,
+                message: msg.MSG_ROOM_IS_AVAILABLE_DEBT,
+            });
+            return;
+        }
+
+        if (rooms.isReserved(room)) {
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_RESERVED,
+                message: msg.MSG_ROOM_IS_RESERVED_DEBT,
+            });
+            return;
+        }
+
+        res.json({ debt: util.getDebt(room) });
+    });
+
     // ---
 
     /*
@@ -140,7 +200,7 @@ function setupApiRoutes(app) {
     app.post("/api/close-cash/", async (_, res) => {
         rooms.setHotelCash(0);
         rooms.setHotelCashOpeningTime(Date.now());
-        // TODO: remove all payments (and call the server endpoint to show them all?)
+        rooms.resetHotelPayments();
 
         res.json({
             cash: rooms.getHotelCash(),
@@ -347,7 +407,7 @@ function setupApiRoutes(app) {
         
             guests: room.guests,
             price: room.price,
-            debt: room.price * util.diffDays(now, room.check_out),
+            payments: [],
         
             check_in: now,
             check_out: room.check_out,
@@ -374,7 +434,7 @@ function setupApiRoutes(app) {
     app.post("/api/pay", async (req, res) => {
         const { number, amount, method } = req.body;
 
-        if (!(number && amount && method)) {
+        if (!(number && (amount || amount === 0) && method)) {
             res.status(status.BAD_REQUEST).send({
                 title: msg.TITLE_INCORRECT_DATA,
                 message: msg.MSG_INCORRECT_DATA,
@@ -383,8 +443,8 @@ function setupApiRoutes(app) {
         }
 
         if (
-            typeof number !== "string" &&
-            typeof amount !== "number" &&
+            typeof number !== "string" ||
+            typeof amount !== "number" ||
             typeof method !== "string"
         ) {
             res.status(status.BAD_REQUEST).send({
@@ -437,16 +497,18 @@ function setupApiRoutes(app) {
             return;
         }
 
-        rooms.setRoomField(roomIndex, debt, room.debt - amount);
-        rooms.addHotelPayment({
+        const payment = {
             amount,
             method,
             room: number,
-        });
+        };
+
+        rooms.addHotelPayment(payment);
+        rooms.setRoomField(roomIndex, "payments", room.payments.concat(payment));
 
         // TODO: change cash here and in close-cash close the cash through a function
 
-        return rooms.getRoomByIndex(roomIndex);
+        return res.json(rooms.getRoomByIndex(roomIndex));
     });
 
     /*
@@ -507,7 +569,7 @@ function setupApiRoutes(app) {
             return;
         }
 
-        if (room.debt !== 0) {
+        if (util.getDebt(room) !== 0) {
             res.status(status.FORBIDDEN).send({
                 title: msg.TITLE_ROOM_IS_IN_DEBT,
                 message: msg.MSG_ROOM_IS_IN_DEBT,

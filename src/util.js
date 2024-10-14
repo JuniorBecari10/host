@@ -6,7 +6,7 @@ const oneDay = 24 * 60 * 60 * 1000;
 
 function diffDays(date_a, date_b) {
     const diffMillis = date_b - date_a;
-    return Math.ceil(diffMillis / oneDay);
+    return Math.floor(diffMillis / oneDay);
 }
 
 function addDays(date, numDays) {
@@ -46,6 +46,15 @@ function logMessage(req) {
     return `[${day.join("/")} - ${time.join(":")}] ${req.method} ${req.originalUrl}`;
 }
 
+// assumes the room is valid
+function getDebt(room) {
+    let debt = room.price * diffDays(Date.now(), room.check_out);
+
+    for (let payment of room.payments)
+        debt -= payment.amount;
+
+    return debt;
+}
 
 function reserve(res, number, guests, price, checkOut) {
     const roomIndex = rooms.getRoomIndex(number);
@@ -85,7 +94,7 @@ function editReservation(res, number, guests, price, checkOut) {
     if (rooms.isAvailable(room)) {
         res.status(status.FORBIDDEN).send({
             title: msg.TITLE_ROOM_IS_AVAILABLE,
-            message: msg.MSG_ROOM_IS_AVAILABLE,
+            message: msg.MSG_ROOM_IS_AVAILABLE_EDIT,
         });
         return;
     }
@@ -102,12 +111,12 @@ function makeReservation(res, number, guests, price, checkOut) {
         return;
     }
 
-    if (!(
-        typeof number === "string" &&
-        guests instanceof Array &&
-        typeof price === "number" &&
-        typeof checkOut === "number"
-    )) {
+    if (
+        typeof number !== "string" ||
+        !(guests instanceof Array) ||
+        typeof price !== "number" ||
+        typeof checkOut !== "number"
+    ) {
         res.status(status.BAD_REQUEST).send({
             title: msg.TITLE_INCORRECT_DATA_TYPES,
             message: msg.MSG_INCORRECT_DATA_TYPES,
@@ -148,7 +157,6 @@ function makeReservation(res, number, guests, price, checkOut) {
 
         if (!(
             guest.name.length > 0 &&
-            !/\d/.test(guest.name) &&
             guest.cpf.length === 11 &&
             [10, 11].includes(guest.phone.length)
         )) {
@@ -159,9 +167,13 @@ function makeReservation(res, number, guests, price, checkOut) {
             return;
         }
 
-        // check if name only has letters and spaces
-        // check if cpf has 11 digits and only numbers
-        // check if phone has 10 or 11 digits and only numbers
+        if (/\d/.test(guest.name)) {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA,
+                message: msg.MSG_INCORRECT_DATA_NAME,
+            });
+            return;
+        }
 
         formattedGuests.push({
             name: guest.name,
@@ -212,7 +224,7 @@ function makeReservation(res, number, guests, price, checkOut) {
     
         guests,
         price,
-        debt: 0,
+        payments: [],
     
         check_in: 0,
         check_out: checkOutDate,
@@ -227,6 +239,7 @@ module.exports = {
     addDays,
     logMiddleware,
     formatCheckOutHour,
+    getDebt,
 
     reserve,
     editReservation,
