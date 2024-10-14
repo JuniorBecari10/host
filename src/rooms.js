@@ -58,7 +58,9 @@ function getHotelRooms() {
 }
 
 function getHotelCash() {
-    return hotel.payments.reduce((acc, x) => acc.amount + x.amount, { amount: 0 });
+    return hotel.payments
+        .map(x => x.amount)
+        .reduce((acc, x) => acc + x, 0);
 }
 
 function getHotelCashOpeningTime() {
