@@ -198,7 +198,6 @@ function setupApiRoutes(app) {
         Return Type: { cash: number, time: number }
     */
     app.post("/api/close-cash/", async (_, res) => {
-        rooms.setHotelCash(0);
         rooms.setHotelCashOpeningTime(Date.now());
         rooms.resetHotelPayments();
 
@@ -506,8 +505,6 @@ function setupApiRoutes(app) {
 
         rooms.addHotelPayment(payment);
         rooms.setRoomField(roomIndex, "payments", room.payments.concat(payment));
-
-        // TODO: change cash here and in close-cash close the cash through a function
 
         return res.json(rooms.getRoomByIndex(roomIndex));
     });

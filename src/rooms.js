@@ -4,7 +4,6 @@ let hotel = {
     name: "Antônio's Hotel",
     rooms: [],
 
-    cash: 0,
     cashOpeningTime: Date.now(),
     payments: [],
 };
@@ -59,7 +58,7 @@ function getHotelRooms() {
 }
 
 function getHotelCash() {
-    return hotel.cash;
+    return hotel.payments.reduce((acc, x) => acc.amount + x.amount, { amount: 0 });
 }
 
 function getHotelCashOpeningTime() {
@@ -76,11 +75,6 @@ function addHotelPayment(payment) {
 
 function resetHotelPayments() {
     hotel.payments = [];
-}
-
-function setHotelCash(value) {
-    hotel.cash = value;
-    saveData();
 }
 
 function setHotelCashOpeningTime(value) {
@@ -198,7 +192,6 @@ module.exports = {
     addHotelPayment,
     resetHotelPayments,
 
-    setHotelCash,
     setHotelCashOpeningTime,
 
     getRoom,
