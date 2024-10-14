@@ -212,7 +212,7 @@ function makeReservation(res, number, guests, price, checkOut) {
 
     if (checkOutDate <= new Date(now).setHours(...rooms.defaultCheckOutHours)) {
         res.status(status.BAD_REQUEST).send({
-            title: msg.TITLE_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY,
+            title: msg.TITLE_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY_IN,
             message: msg.MSG_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY,
         });
         return;

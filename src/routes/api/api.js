@@ -395,7 +395,7 @@ function setupApiRoutes(app) {
     
         if (checkOutDate <= new Date(now).setHours(...rooms.defaultCheckOutHours)) {
             res.status(status.BAD_REQUEST).send({
-                title: msg.TITLE_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY,
+                title: msg.TITLE_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY_IN,
                 message: msg.MSG_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY,
             });
             return;
@@ -508,6 +508,95 @@ function setupApiRoutes(app) {
 
         // TODO: change cash here and in close-cash close the cash through a function
 
+        return res.json(rooms.getRoomByIndex(roomIndex));
+    });
+
+    /*
+        POST /api/change-check-out
+        Changes the check-out date of the specified room.
+        It must be in the occupied state.
+
+        Body:
+
+        number: string
+        check_out?: number - set it to -1 to increase one day
+
+        Returns: the modified room.
+        Return Type: Room (object)
+    */
+    app.post("/api/change-check-out", async (req, res) => {
+        const { number, check_out } = req.body;
+
+        if (!(number && check_out)) {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA,
+                message: msg.MSG_INCORRECT_DATA,
+            });
+            return;
+        }
+
+        if (
+            typeof number !== "string" ||
+            typeof check_out !== "number"
+        ) {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA_TYPES,
+                message: msg.MSG_INCORRECT_DATA_TYPES,
+            });
+            return;
+        }
+
+        const roomIndex = rooms.getRoomIndex(number);
+        const room = rooms.getRoomByIndex(roomIndex);
+
+        if (roomIndex === -1) {
+            res.status(status.NOT_FOUND).send({
+                title: msg.TITLE_ROOM_NOT_FOUND,
+                message: msg.MSG_ROOM_NOT_FOUND,
+            });
+            return;
+        }
+
+        if (rooms.isAvailable(room)) {
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_AVAILABLE,
+                message: msg.MSG_ROOM_IS_AVAILABLE_DEF_CHECK_OUT,
+            });
+            return;
+        }
+
+        if (rooms.isReserved(room)) {
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_ROOM_IS_RESERVED,
+                message: msg.MSG_ROOM_IS_RESERVED_DEF_CHECK_OUT,
+            });
+            return;
+        }
+
+        const now = Date.now();
+        const checkOutDate = new Date(
+            check_out == -1
+                ? util.addDays(room.check_out, rooms.defaultCheckOutDays)
+                : check_out
+        ).setHours(...rooms.defaultCheckOutHours);
+
+        if (checkOutDate <= new Date(now).setHours(...rooms.defaultCheckOutHours)) {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY_TODAY,
+                message: msg.MSG_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY,
+            });
+            return;
+        }
+
+        if (checkOutDate <= new Date(room.check_out).setHours(...rooms.defaultCheckOutHours)) {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY_OTHER,
+                message: msg.MSG_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY_OTHER,
+            });
+            return;
+        }
+
+        rooms.setRoomField(roomIndex, "check_out", checkOutDate);
         return res.json(rooms.getRoomByIndex(roomIndex));
     });
 
