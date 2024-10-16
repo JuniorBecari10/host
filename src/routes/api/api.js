@@ -606,12 +606,20 @@ function setupApiRoutes(app) {
         Body:
 
         number: string
+        chargeback_mode?: string - only used when the debt is less than zero.
+                                If the room's debt is zero and this mode is not set, the operation will be cancelled.
+                                Accepted modes: 'keep' and 'reverse'.
+                                
+                                'keep' - will perform the operation and the leftover will be kept on the cash.
+                                'reverse' - will perform the operation and reverse the leftover, removing it from the cash.
+
+                                Use 'none' when you don't want to set this.
 
         Returns: the modified room.
         Return Type: Room (object)
     */
     app.post("/api/checkout", async (req, res) => {
-        const { number } = req.body;
+        const { number, chargeback_mode } = req.body;
 
         if (!number) {
             res.status(status.BAD_REQUEST).send({
@@ -621,7 +629,8 @@ function setupApiRoutes(app) {
             return;
         }
 
-        if (typeof number !== "string") {
+        if (typeof number !== "string" ||
+            typeof chargeback_mode !== "string") {
             res.status(status.BAD_REQUEST).send({
                 title: msg.TITLE_INCORRECT_DATA_TYPES,
                 message: msg.MSG_INCORRECT_DATA_TYPES,
@@ -656,12 +665,34 @@ function setupApiRoutes(app) {
             return;
         }
 
-        if (util.getDebt(room) !== 0) {
+        const debt = util.getDebt(room);
+        let performReverse = false;
+
+        if (debt > 0) {
             res.status(status.FORBIDDEN).send({
                 title: msg.TITLE_ROOM_IS_IN_DEBT,
                 message: msg.MSG_ROOM_IS_IN_DEBT,
             });
             return;
+        }
+
+        else if (debt < 0) {
+            switch (chargeback_mode) {
+                case "keep":
+                    // ok, keep the cash and proceed with the operation.
+                    break;
+                
+                case "reverse":
+                    performReverse = true;
+                    break;
+                
+                default:
+                    res.status(status.FORBIDDEN).send({
+                        title: msg.TITLE_CHARGEBACK_NOT_SET,
+                        message: msg.MSG_CHARGEBACK_NOT_SET,
+                    });
+                    return;
+            }
         }
 
         if (new Date(Date.now()).setHours(...rooms.defaultCheckOutHours) !== new Date(room.check_out).setHours(...rooms.defaultCheckOutHours)) {
@@ -670,6 +701,15 @@ function setupApiRoutes(app) {
                 message: msg.MSG_ROOMS_CHECK_OUT_IS_NOT_TODAY,
             });
             return;
+        }
+
+        if (performReverse) {
+            rooms.addHotelPayment({
+                amount: debt,
+                method: "chargeback",
+                room: room.number,
+                time: Date.now(),
+            });
         }
         
         const newRoom = rooms.defaultRoom(number);

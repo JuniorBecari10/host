@@ -19,6 +19,8 @@ const allowedPaymentMethods = [
     "cash",
     "pix",
     "billed",
+
+    // "chargeback" - for internal use, won't be checked
 ];
 
 const DATABASE_LOCATION = "./database.json";

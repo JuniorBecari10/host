@@ -21,6 +21,8 @@ module.exports = {
     TITLE_ROOM_IS_IN_DEBT: "O quarto está com contas a pagar",
     TITLE_ROOMS_CHECK_OUT_IS_NOT_TODAY: "O check-out deste quarto não está definido para hoje",
 
+    TITLE_CHARGEBACK_NOT_SET: "O modo de estorno não foi definido",
+
     TITLE_AMOUNT_MUST_BE_GREATER_THAN_ZERO: "O valor a ser pago precisa ser superior a zero",
     TITLE_INVALID_PAYMENT_METHOD: "Método de pagamento inválido",
 
@@ -54,6 +56,8 @@ module.exports = {
 
     MSG_ROOM_IS_IN_DEBT: "Pague-a antes de efetuar check-out.",
     MSG_ROOMS_CHECK_OUT_IS_NOT_TODAY: "Espere até que o dia definido para o check-out deste quarto chegue.",
+
+    MSG_CHARGEBACK_NOT_SET: "A conta possui sobras no pagamento, por favor selecione um modo de estorno.",
 
     MSG_THERE_MUST_BE_AT_LEAST_ONE_GUEST: "Adicione pelo menos um hóspede na reserva.",
     MSG_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY: "Defina o dia para o check-out para, pelo menos, um dia depois de hoje.",
