@@ -406,7 +406,6 @@ function setupApiRoutes(app) {
         
             guests: room.guests,
             price: room.price,
-            payments: [],
         
             check_in: now,
             check_out: room.check_out,

@@ -50,7 +50,7 @@ function logMessage(req) {
 function getDebt(room) {
     let debt = room.price * diffDays(Date.now(), room.check_out);
 
-    for (let payment of room.payments)
+    for (let payment of rooms.getHotelPayments().filter(p => p.room === room.number))
         debt -= payment.amount;
 
     return debt;
@@ -224,7 +224,6 @@ function makeReservation(res, number, guests, price, checkOut) {
     
         guests,
         price,
-        payments: [],
     
         check_in: 0,
         check_out: checkOutDate,
