@@ -503,8 +503,6 @@ function setupApiRoutes(app) {
         };
 
         rooms.addHotelPayment(payment);
-        rooms.setRoomField(roomIndex, "payments", room.payments.concat(payment));
-
         return res.json(rooms.getRoomByIndex(roomIndex));
     });
 
