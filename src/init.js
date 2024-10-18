@@ -27,6 +27,13 @@ function readDatabase() {
     else
         console.log("Database file doesn't exist, starting a new one...");
 
+        if (fs.existsSync(rooms.USERS_LOCATION)) {
+            rooms.loadData();
+            console.log("Users database loaded successfully.");
+        }
+        else
+            console.log("Users database file doesn't exist, starting a new one...");
+
     console.log();
 }
 

@@ -9,14 +9,17 @@ let hotel = {
 };
 
 const ROLE_RECEPTIONIST = "receptionist";
+const ROLE_MANAGER = "manager";
+const ROLE_ADMINISTRATOR = "administrator";
 
+// By default, there's a system administrator account.
 let users = [
     {
         id: 0,
-        name: "Antônio Carlos",
-        email: "antonioocarlos@proton.me",
-        password: "$2b$10$CAomNEAZINdM8rmlldWn5uqNKBUJs.dU6AY457VVdt68Ot63kpZDK",
-        role: ROLE_RECEPTIONIST,
+        name: "Administrador",
+        email: "admin@admin.adm",
+        password: "$2b$10$VJ6UICGNvXn6QhfaIrWK9OQ0O/32OO/bK0o4KCgcDgCxzFcvEB8Ea",
+        role: ROLE_ADMINISTRATOR,
     }
 ];
 
@@ -36,6 +39,7 @@ const allowedPaymentMethods = [
 ];
 
 const DATABASE_LOCATION = "./database.json";
+const USERS_LOCATION = "./users.json";
 
 [
     "101",
@@ -167,7 +171,7 @@ function saveData() {
     });
 }
 
-function loadData() {
+function loadDataHotel() {
     fs.readFile(DATABASE_LOCATION, "utf8", (error, data) => {
         if (error) {
             console.log("Couldn't read database.");
@@ -175,6 +179,17 @@ function loadData() {
         }
 
         hotel = JSON.parse(data);
+    });
+}
+
+function loadDataUsers() {
+    fs.readFile(USERS_LOCATION, "utf8", (error, data) => {
+        if (error) {
+            console.log("Couldn't read database.");
+            throw error;
+        }
+
+        users = JSON.parse(data);
     });
 }
 
@@ -191,6 +206,7 @@ module.exports = {
     allowedPaymentMethods,
 
     DATABASE_LOCATION,
+    USERS_LOCATION,
 
     AVAILABLE,
     RESERVED,
@@ -218,5 +234,6 @@ module.exports = {
     setRoom,
 
     defaultRoom,
-    loadData,
+    loadDataHotel,
+    loadDataUsers,
 };
