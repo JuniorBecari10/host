@@ -8,21 +8,6 @@ let hotel = {
     payments: [],
 };
 
-const ROLE_RECEPTIONIST = "receptionist";
-const ROLE_MANAGER = "manager";
-const ROLE_ADMINISTRATOR = "administrator";
-
-// By default, there's a system administrator account.
-let users = [
-    {
-        id: 0,
-        name: "Administrador",
-        email: "admin@admin.adm",
-        password: "$2b$10$VJ6UICGNvXn6QhfaIrWK9OQ0O/32OO/bK0o4KCgcDgCxzFcvEB8Ea",
-        role: ROLE_ADMINISTRATOR,
-    }
-];
-
 const AVAILABLE = "available";
 const RESERVED = "reserved";
 const OCCUPIED = "occupied";
@@ -38,8 +23,7 @@ const allowedPaymentMethods = [
     // "chargeback" - for internal use, won't be checked
 ];
 
-const DATABASE_LOCATION = "./database.json";
-const USERS_LOCATION = "./users.json";
+const HOTEL_DATABASE_FILE_NAME = "./hotel_database.json";
 
 [
     "101",
@@ -172,7 +156,7 @@ function saveData() {
 }
 
 function loadDataHotel() {
-    fs.readFile(DATABASE_LOCATION, "utf8", (error, data) => {
+    fs.readFile(HOTEL_DATABASE_FILE_NAME, "utf8", (error, data) => {
         if (error) {
             console.log("Couldn't read database.");
             throw error;
@@ -182,31 +166,16 @@ function loadDataHotel() {
     });
 }
 
-function loadDataUsers() {
-    fs.readFile(USERS_LOCATION, "utf8", (error, data) => {
-        if (error) {
-            console.log("Couldn't read database.");
-            throw error;
-        }
-
-        users = JSON.parse(data);
-    });
-}
-
 // ---
 
 module.exports = {
     hotel,
-    users,
-
-    ROLE_RECEPTIONIST,
 
     defaultCheckOutDays,
     defaultCheckOutHours,
     allowedPaymentMethods,
 
-    DATABASE_LOCATION,
-    USERS_LOCATION,
+    HOTEL_DATABASE_FILE_NAME,
 
     AVAILABLE,
     RESERVED,
@@ -235,5 +204,4 @@ module.exports = {
 
     defaultRoom,
     loadDataHotel,
-    loadDataUsers,
 };

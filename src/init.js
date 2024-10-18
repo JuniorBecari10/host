@@ -1,7 +1,9 @@
 const express = require("express");
 const fs = require("fs");
-const rooms = require("./rooms");
 const cors = require("cors");
+
+const rooms = require("./rooms");
+const users = require("./users");
 const util = require("./util");
 
 // TODO: prevent crashes when an error occurs inside a handler
@@ -18,21 +20,23 @@ function init(app) {
 }
 
 function readDatabase() {
-    console.log("Reading database...");
+    console.log("Reading database...\n");
 
-    if (fs.existsSync(rooms.DATABASE_LOCATION)) {
-        rooms.loadData();
-        console.log("Database loaded successfully.");
+    if (fs.existsSync(rooms.HOTEL_DATABASE_FILE_NAME)) {
+        rooms.loadDataHotel();
+        console.log("Hotel database loaded successfully.");
     }
     else
-        console.log("Database file doesn't exist, starting a new one...");
+        console.log("Hotel database file doesn't exist, starting a new one...");
 
-        if (fs.existsSync(rooms.USERS_LOCATION)) {
-            rooms.loadData();
-            console.log("Users database loaded successfully.");
-        }
-        else
-            console.log("Users database file doesn't exist, starting a new one...");
+    // ---
+
+    if (fs.existsSync(users.USERS_DATABASE_FILE_NAME)) {
+        users.loadDataUsers();
+        console.log("Users database loaded successfully.");
+    }
+    else
+        console.log("Users database file doesn't exist, starting a new one...");
 
     console.log();
 }

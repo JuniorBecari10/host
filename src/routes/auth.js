@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const status = require("../status");
 const rooms = require("../rooms");
 const msg = require("./api/msg");
+const users = require("../users");
 
 function setupAuthRoutes(app) {
     /*
@@ -36,7 +37,7 @@ function setupAuthRoutes(app) {
             return;
         }
 
-        const user = rooms.users.find(u => u.email === email);
+        const user = users.users.find(u => u.email === email);
 
         if (user === undefined) {
             return res.status(status.UNAUTHORIZED)
@@ -94,12 +95,38 @@ function authorize(req, res, next) {
                 });
         
         req.user = decoded;
-        console.log(decoded);
         next();
     });
+}
+
+/*
+    Middleware generator function that checks the role of an authenticated user.
+    If the role isn't sufficient, it returns 401 Unauthorized as status code.
+    Otherwise, it proceeds with the operation.
+*/
+function checkRole(role) {
+    return (req, res, next) => {
+        const user = req.user;
+
+        if (!user)
+            return res.status(status.UNAUTHORIZED).send({
+                title: "Usuário não identificado",
+                message: "Faça login primeiro.",
+            });
+
+        if (users.getRoleLevel(user.role) < users.getRoleLevel(role)) {
+            return res.status(status.UNAUTHORIZED).send({
+                title: "Permissões insuficientes",
+                message: `Esse usuário não possui permissão suficiente para realizar essa ação. É necessário um cargo de, pelo menos, ${users.formatRole(role)}. Esse usuário possui o cargo ${users.formatRole(user.role)}.`,
+            });
+        }
+
+        next();
+    };
 }
 
 module.exports = {
     setupAuthRoutes,
     authorize,
+    checkRole,
 }
