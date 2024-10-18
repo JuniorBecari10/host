@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const cors = require("cors");
+const path = require("path");
 
 const rooms = require("./rooms");
 const users = require("./users");
@@ -10,7 +11,8 @@ const util = require("./util");
 function init(app) {
     app.set("view engine", "ejs");
 
-    app.use(express.static("./public"));
+    app.use(express.static(path.join(__dirname, "..", "public")));
+
     app.use(util.logMiddleware);
     app.use(express.urlencoded({ extended: false }));
     app.use(cors());

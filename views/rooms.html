@@ -5,94 +5,161 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Host - Apartamentos</title>
 
-        <link rel="shortcut icon" href="../public/assets/favicon.png" type="image/x-icon" />
-        <link rel="stylesheet" href="../public/style.css" />
+        <link rel="shortcut icon" href="assets/favicon.png" type="image/x-icon" />
+        <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="css/output.css">
 
-        <script src="https://cdn.tailwindcss.com"></script>
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script src="js/lib/axios.min.js"></script>
+        <script src="js/lib/alpine.min.js" defer></script>
+        <script src="js/lib/sweetalert.min.js" defer></script>
+        <script src="js/lib/chart.min.js" defer></script>
 
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-        <script defer src="../public/rooms.js"></script>
-        <script defer src="../public/ripple.min.js"></script>
+        <script src="js/util.js"></script>
     </head>
 
-    <body class="overflow-hidden bg-[#111313]" x-data="{ mode: 'none', visible: false }">
+    <body
+        class="overflow-hidden bg-background"
+        x-data="
+            {
+                mode: '',
+                visible: false,
+                room_data: {},
+                reset() {
+                    this.visible = false;
+                    setTimeout(() => {
+                        this.mode = '';
+                        this.room_data = {};
+                    }, 350);
+
+                    document.getElementById('reload-btn').click();
+                }
+            }
+        ">
         <!-- Header -->
         <header class="flex justify-center items-center h-16">
             <!-- Logo -->
-            <a href="#" class="ripple w-12 p-2 ml-4 hover:bg-[#32383a] rounded-md transition-[background] duration-300">
+            <a href=""
+                class="
+                    w-12 p-2 ml-4 hover:brightness-110 focus:brightness-125
+                    hover:bg-background-lighter rounded-md transition-[background, brightness] duration-300
+                ">
                 <img src="assets/logo-h.svg" alt="H" class="w-full" />
             </a>
 
             <!-- Hotel name -->
-            <h1 class="text-sm font-bold uppercase tracking-widest flex-1 text-center">
-                Trajano Palace Hotel
+            <h1
+                class="text-sm font-bold uppercase tracking-widest flex-1 text-center"
+                x-data="{ name: '' }"
+                x-init="name = await getName()"
+                x-text="name">
             </h1>
 
             <!-- Padding to center the hotel name -->
             <div class="w-12 p-2 ml-4"></div>
         </header>
 
-        <main>
+        <main class="flex flex-col h-full-4 overflow-y-auto" x-data="{ rooms: [] }">
             <!-- Options Bar -->
-            <div class="flex justify-center items-center width-full h-14 bg-[#1c1f21] m-4 rounded-lg">
+            <div class="flex justify-center items-center width-full h-14 bg-background-lighter m-4 rounded-lg">
                 <!-- Option Card - Guests -->
-                <a href="#" class="
+                <a href="" class="
                     flex justify-center items-center
-                    w-fit inline bg-[#272c2d]
+                    w-fit bg-background-lightest
                     m-2 my-4 p-4 py-2
-                    font-semibold text-sm ripple
-                    hover:bg-[#32383a] rounded-md transition-[background] duration-300
-                ">
-                    <img class="mr-2" src="assets/icons/guests.png" alt="Hóspedes">
-                    Hóspedes
+                    font-semibold text-sm
+                    hover:brightness-110 rounded-md transition-[background, brightness] duration-300
+                "
+                @click.prevent="
+                    mode = 'occupation';
+                    visible = true;
+                "
+                >
+                    <img class="mr-2 w-6 h-6" src="assets/icons/chart-pie.png" alt="Ocupação">
+                    Ocupação
                 </a>
 
                 <!-- Option Card - Cash -->
-                <a href="#" class="
+                <a href="" class="
                     flex justify-center items-center
-                    w-fit inline bg-[#272c2d]
+                    w-fit bg-background-lightest
                     m-2 my-4 p-4 py-2
-                    font-semibold text-sm ripple
-                    hover:bg-[#32383a] rounded-md transition-[background] duration-300
-                " @click="mode = 'cash'; visible = true">
-                    <img class="mr-2" src="assets/icons/cash.png" alt="Caixa">
+                    font-semibold text-sm
+                    hover:brightness-110 rounded-md transition-[background, brightness] duration-300
+                "
+                @click.prevent="
+                    mode = 'cash';
+                    visible = true;
+                    cash = await getCash();
+                ">
+                    <img class="mr-2 w-5 h-5" src="assets/icons/dollar.png" alt="Caixa">
                     Caixa
                 </a>
             </div>
 
             <!-- Hints -->
             <div class="w-full h-2 p-5 flex items-center text-sm font-medium">
-                <div class="rounded-full bg-[#6dc644] w-1.5 h-1.5 mr-2.5"></div>
+                <div class="rounded-full bg-available w-1.5 h-1.5 mr-2.5"></div>
                 <span class="mr-6">Vago</span>
 
-                <div class="rounded-full bg-[#3976d0] w-1.5 h-1.5 mr-2.5"></div>
+                <div class="rounded-full bg-reserved w-1.5 h-1.5 mr-2.5"></div>
                 <span class="mr-6">Reservado</span>
 
-                <div class="rounded-full bg-[#c64444] w-1.5 h-1.5 mr-2.5"></div>
+                <div class="rounded-full bg-occupied w-1.5 h-1.5 mr-2.5"></div>
                 <span class="mr-6">Ocupado</span>
+
+                <a class="
+                        flex justify-center items-center w-8 h-8 p-2 hover:brightness-110
+                        hover:bg-background-lighter rounded-lg transition-[background, brightness] duration-300
+                    "
+                    href=""
+                    id="reload-btn"
+                    @click.prevent="rooms = await getRooms()"
+                    title="Recarregar">
+                    <img src="assets/icons/reload.png" alt="Recarregar">
+                </a>
             </div>
 
             <!-- Room Area -->
-            <div class="w-full h-screen p-4">
-                <!-- Apartment Group -->
-                <div class="w-full">
-                    <!-- Group Name -->
-                    <div class="mb-5 text-sm font-semibold uppercase tracking-widest">
-                        Térreo
-                    </div>
-    
+            <div class="w-full flex-1 p-4 overflow-y-auto grid grid-rows-hits grid-cols-hits"
+                x-init="rooms = await getRooms()">
+                <template x-for="room in rooms">
                     <!-- Apartment Card -->
-                    <a href="#" class="
-                        flex justify-center items-center inline-block
-                        w-20 h-20
-                        bg-[#6dc644] hover:bg-[#77d64a]
-                        font-bold text-xl rounded-xl ripple
-                        transition-[background] duration-300
-                    " @click="mode = 'reserve'; visible = true">
-                        101
+                    <a href="" class="
+                            flex justify-center items-center
+                            w-20 h-20 mr-4 hover:brightness-110
+                            font-bold text-xl rounded-xl
+                            transition-[background, brightness] duration-300
+                        "
+
+                        :class="room.state === 'available'
+                            ? 'bg-available'
+                            : room.state === 'reserved'
+                                ? 'bg-reserved'
+                                : room.state === 'occupied'
+                                    ? 'bg-occupied'
+                                    : 'bg-red-100'
+                        "
+
+                        @click.prevent="
+                            mode = room.state === 'available'
+                                ? 'room-available'
+                                : room.state === 'reserved'
+                                    ? 'room-reserved'
+                                    : room.state === 'occupied'
+                                        ? 'room-occupied'
+                                        : 'none';
+                            visible = true;
+                            room_data = room;
+                        "
+                        x-data="
+                            {
+                                number: room.number,
+                                state: room.state
+                            }
+                        "
+                        x-text="room.number">
                     </a>
-                </div>
+                </template>
             </div>
         </main>
 
@@ -101,42 +168,896 @@
             absolute top-0 left-0
             flex justify-center items-center
             w-full h-screen
-            bg-black/30
+            bg-black-25
         " x-show="visible" x-transition>
             <!-- Card -->
             <div class="
-                w-4/5 md:w-1/2
-                bg-[#1c1f21] rounded-xl shadow-md top-full
+                w-4/5 md:w-4/5 h-9/10 flex flex-col
+                bg-background-lighter rounded-xl shadow-md top-full
             "
-            :class="mode == 'cash' ? 'h-3/5' : 'h-4/5'"
-            x-transition x-transition.duration.300ms @click.outside="visible = false; setTimeout(() => mode = 'none', 350)">
+            x-transition x-transition.duration.300ms>
                 <!-- Header -->
                 <div class="flex justify-center items-center w-full h-16 p-4">
-                    <div class="w-10"></div>
+                    <a x-show="['payment', 'visualize-payments'].includes(mode)" class="
+                            flex justify-center items-center w-10 h-10 p-2 hover:brightness-110
+                            hover:bg-background-lightest rounded-md transition-[background, brightness] duration-300
+                        "
+                        href=""
+                        @click.prevent="
+                            visible = false;
+                            setTimeout(() => {
+                                mode = 'room-occupied';
+                                visible = true;
+                            }, 350);
+                        ">
+                        <img class="w-5 h-5" src="assets/icons/back.png" alt="Back">
+                    </a>
+                    <div class="w-10" x-show="!['payment', 'visualize-payments'].includes(mode)"></div>
+
                     <span class="flex-1 text-center text-sm font-semibold uppercase tracking-widest" x-transition>
-                        <p x-show="mode == 'cash'">Caixa</p>
-                        <p x-show="mode == 'reserve'">Reservar</p>
+                        <p x-show="mode === 'cash'">Caixa</p>
+                        <p x-show="mode === 'payment'" x-text="'Efetuar Pagamento: ' + room_data.number"></p>
+                        <p x-show="mode === 'visualize-payments'" x-text="'Visualizar Pagamentos: ' + room_data.number"></p>
+                        <p x-show="mode === 'occupation'">Ocupação</p>
+
+                        <p x-show="mode === 'room-available'" x-text="'Reservar: ' + room_data.number"></p>
+                        <p x-show="mode === 'room-reserved'" x-text="'Editar Reserva: ' + room_data.number"></p>
+                        <p x-show="mode === 'room-occupied'" x-text="'Visualizar Apartamento: ' + room_data.number"></p>
                     </span>
 
-                    <a class="flex justify-center items-center w-10 h-10 p-2 ml-4 hover:bg-[#32383a] rounded-md transition-[background] duration-300" href="#" @click="visible = false; setTimeout(() => mode = 'none', 350)">
-                        <img src="assets/icons/close.png" alt="X">
+                    <a class="
+                            flex justify-center items-center w-10 h-10 p-2 ml-4 hover:brightness-110
+                            hover:bg-background-lightest rounded-md transition-[background, brightness] duration-300
+                        "
+                        href=""
+                        @click.prevent="reset()">
+                        <img class="w-6 h-6" src="assets/icons/close.png" alt="X">
                     </a>
                 </div>
 
-                <template x-if="mode == 'cash'">
-                    <div class="w-full h-full p-5" x-data="{ cash: 0 }" x-init="axios.get('http://localhost:8080/api/cash').then(c => cash = c.data.cash)">
-                        <p>Total do caixa:</p>
-                        <h1 class="font-bold text-4xl" x-text="formatCurrency(cash)"></h1>
+                <template x-if="mode === 'cash'">
+                    <div class="w-full h-full p-5 flex-1 flex flex-col basis-0"
+                        x-data="{
+                            cash: 0,
+                            openingTime: 0,
+                            payments: [],
+                            ascending: false,
+                        }"
+                        x-init="
+                            cash = await getCash();
+                            openingTime = await getCashOpeningTime();
+                            payments = await getPayments();
+                            payments.reverse();
+                        ">
+                        <div class="flex flex-col md:flex-row">
+                            <div class="w-full md:w-1/2">
+                                <p>Total do caixa:</p>
+                                <h1 class="font-bold text-4xl" x-text="formatCurrency(cash * 100)"></h1>
+                            </div>
+                
+                            <div class="w-full md:w-1/2 mt-4 md:mt-0 flex md:justify-end">
+                                <div class="w-fit">
+                                    <p class="w-full">Data de abertura:</p>
+                                    <h1 class="font-bold text-4xl w-full" x-text="unixToDateTime(openingTime)"></h1>
+                                </div>
+                            </div>
+                        </div>
+                
+                        <div class="w-full flex">
+                            <a class="
+                                    flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
+                                    hover:bg-background-lightest rounded-lg
+                                    transition-[background, brightness] duration-300
+                                    "
+                                id="reload-cash"
+                                href=""
+                                @click.prevent="
+                                    cash = await getCash();
+                                    openingTime = await getCashOpeningTime();
+                                    payments = await getPayments();
+                                    payments.reverse();
+                                "
+                                title="Recarregar Caixa">
+                                <img src="assets/icons/reload.png" alt="Recarregar">
+                            </a>
+                
+                            <!-- Close Cash confirmation -->
+                            <a class="
+                                    flex justify-center items-center w-8 h-8 p-2 mt-2 ml-2
+                                    hover:brightness-110 hover:bg-background-lightest rounded-lg
+                                    transition-[background, brightness] duration-300"
+                                href=""
+                                @click.prevent="
+                                    swal({
+                                        title: 'Você tem certeza disso?',
+                                        text: payments.length === 0
+                                                ? ' Ainda não foram registrados pagamentos. Deseja fechar o caixa assim mesmo?'
+                                                : 'Você deseja fechar o caixa?',
+                                        icon: 'warning',
+                                        buttons: true,
+                                        dangerMode: 'true',
+                                    })
+                                    .then(async (accepted) => {
+                                        if (accepted) {
+                                            await closeCash();
 
-                        <a class="ripple flex justify-center items-center w-8 h-8 p-2 mt-2 hover:bg-[#32383a] rounded-lg transition-[background] duration-300" href="#" href="#" @click="axios.get('http://localhost:8080/api/cash').then(c => cash = c.data.cash)" title="Recarregar">
-                            <img src="assets/icons/reload.png" alt="Recarregar">
-                        </a>
+                                            cash = await getCash();
+                                            openingTime = await getCashOpeningTime();
+                                            payments = await getPayments();
+
+                                            payments.reverse();
+                                        }
+                                    })
+                                "
+                                title="Fechar Caixa">
+                                <img src="assets/icons/dollar.png" alt="Recarregar">
+                            </a>
+                        </div>
+                
+                        <div class="flex-1 flex flex-col mt-4">
+                            <div class="w-full h-14 flex items-center">
+                                <p class="flex-1">Pagamentos:</p>
+                
+                                <a x-show="payments.length > 0" class="
+                                        flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
+                                        hover:bg-background-lightest rounded-lg
+                                        transition-[background, brightness] duration-300
+                                    "
+                                    href=""
+                                    @click.prevent="
+                                        payments.reverse();
+                                        ascending = !ascending;
+                                    "
+                                    :title="ascending ? 'Ordenar por: mais recentes primeiro' : 'Ordenar por: mais antigas primeiro'">
+                                    <img :src="ascending ? 'assets/icons/order-up.png' : 'assets/icons/order-down.png'" alt="Ordenar">
+                                </a>
+                
+                                <a class="
+                                        flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
+                                        hover:bg-background-lightest rounded-lg
+                                        transition-[background, brightness] duration-300
+                                    "
+                                    href=""
+                                    @click.prevent="
+                                        cash = await getCash();
+                                        openingTime = await getCashOpeningTime();
+                                        payments = await getPayments();
+                                        payments.reverse();
+                                    "
+                                    title="Recarregar Pagamentos">
+                                    <img src="assets/icons/reload.png" alt="Recarregar">
+                                </a>
+                            </div>
+                            <div class="
+                                flex-1 basis-0 h-full max-h-full overflow-y-auto
+                                bg-background-more-lighter rounded-lg p-4
+                            ">
+                            <div x-show="payments.length > 0">
+                                <template x-for="payment in payments">
+                                    <div
+                                        class="
+                                            bg-background-bit-more-lighter rounded-lg
+                                            w-full h-16 mb-4 flex items-center p-4
+                                        ">
+                                        <h1 class="font-bold text-xl flex-1" x-text="formatCurrency(payment.amount * 100)"></h1>
+                
+                                        <div class="w-1/2 flex justify-end">
+                                            <p class="ml-2 mr-2" x-text="formatPaymentMethod(payment.method)"></p> &bull;
+                                            <p class="ml-2 mr-2" x-text="payment.room"></p> &bull;
+                                            <p class="ml-2 mr-2" x-text="unixToDateTime(payment.time)"></p>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="w-full h-full flex flex-col justify-center items-center" x-show="payments.length === 0">
+                                <img class="mb-4" src="assets/icons/no-money.png" alt="Sem pagamentos">
+
+                                <h1 class="font-bold text-2xl">Sem pagamentos</h1>
+                                <p>Não foram encontrados pagamentos.</p>
+                            </div>
+                        </div>
+                    </div>
+                </template>                
+
+                <template x-if="mode === 'payment'">
+                    <div class="w-full h-full max-h-full p-5 pt-0 flex flex-col flex-1 basis-0"
+                    x-data="{
+                        amount: '0',
+                        selectedMethod: 'cash',
+                        debt: 0,
+                    }"
+                    x-init="
+                        debt = await getRoomDebt(room_data.number);
+                    ">
+                        <div class="flex flex-col md:flex-row flex-1 basis-0 w-full">
+                            <!-- Left -->
+                            <div class="md:w-1/2 w-full md:h-full h-1/2 pr-4 pb-4 md:pb-0 overflow-auto">
+                                <p>Valor:</p>
+                                <input class="
+                                    font-bold text-3xl mt-2 w-full p-2
+                                    outline-none border-none bg-background-lightest rounded-lg
+                                "
+                                type="text" x-model="amount"
+                                @input="(e) => {
+                                    formatMoney(e);
+                                    amount = e.target.value;
+                                }"
+                                x-init="amount = formatCurrency(await getRoomDebt(room_data.number) * 100)"
+                                :disabled="mode === 'room-occupied'">
+
+                                <p class="mt-4">Conta atual:</p>
+                                <h1 class="font-bold text-3xl mt-2 w-full"
+                                x-text="formatCurrency(debt * 100)"></h1>
+
+                                <p class="mt-4">Conta após o pagamento:</p>
+                                <h1 class="font-bold text-3xl mt-2 w-full"
+                                x-text="formatCurrency((debt - currencyToFloat(amount)) * 100)"></h1>
+                            </div>
+                            <!-- Right -->
+                            <div class="flex-1 basis-0 max-h-full h-full md:pl-4 pb-4 flex flex-col">
+                                <div class="flex items-center">
+                                    <p class="w-full">Forma de pagamento:</p>
+                                </div>
+
+                                <div class="
+                                    flex-1 grid grid-cols-2 grid-rows-2 basis-0 h-full bg-background-more-lighter
+                                    rounded-lg mt-2 p-4 overflow-y-auto
+                                ">
+                                    <template x-for="method in [
+                                        {
+                                            'method': 'cash',
+                                            'name': 'Dinheiro',
+                                            'icon': 'dollar-50.png'
+                                        },
+                                        {
+                                            'method': 'card',
+                                            'name': 'Cartão',
+                                            'icon': 'card.png'
+                                        },
+                                        {
+                                            'method': 'pix',
+                                            'name': 'Pix',
+                                            'icon': 'pix.png'
+                                        },
+                                        {
+                                            'method': 'billed',
+                                            'name': 'Faturado',
+                                            'icon': 'billed.png'
+                                        }
+                                    ]
+                                    ">
+                                        <a href="" class="
+                                            w-11/12 h-11/12 bg-background-bit-more-lighter
+                                            m-2 rounded-2xl flex flex-col 
+                                            transition-[background, brightness] duration-300
+                                        "
+                                        :class="selectedMethod === method.method ? 'brightness-110 hover:brightness-125 shadow-md' : 'brightness-100 hover:brightness-105'"
+                                        @click.prevent="selectedMethod = method.method">
+                                            <div class="flex-1 flex justify-center items-center">
+                                                <img :src="'assets/icons/' + method.icon" alt="Icon">
+                                            </div>
+                                            <p class="w-full h-12 text-center"
+                                                x-text="method.name">
+                                            </p>
+                                        </a>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Footer -->
+                        <div class="
+                            w-full h-14 flex items-center justify-evenly
+                            rounded-lg bg-background-more-lighter
+                        ">
+                            <!-- Botão Pagar -->
+                            <a href="" class="
+                                w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
+                                rounded-lg bg-background-lightest
+                                hover:brightness-110 transition-[background, brightness] duration-300
+                            "
+                            @click.prevent="
+                                const res = await pay(room_data.number, amount, selectedMethod);
+
+                                if (res.success) {
+                                    visible = false;
+                                    setTimeout(() => {
+                                        mode = 'room-occupied';
+                                        visible = true;
+                                    }, 350);
+                
+                                    const name = 'reload-btn'; // this is because VS Code's coloring complains
+                                    document.getElementById(name).click();
+                                }
+                            ">
+                                Efetuar Pagamento
+                            </a>
+                        </div>
                     </div>
                 </template>
 
-                <template x-if="mode == 'reserve'">
-                    <div class="w-full h-full p-5">
-                        Reservar!
+                <template x-if="mode === 'visualize-payments'">
+                    <div class="w-full h-full max-h-full p-5 pt-0 flex flex-col flex-1 basis-0"
+                        x-data="{ payments: [], ascending: false }"
+                        x-init="
+                            payments = (await getPayments()).filter(p => p.room === room_data.number);
+                            payments.reverse();
+                        ">
+                        <div class="w-full h-14 flex items-center">
+                            <p class="flex-1">Pagamentos:</p>
+            
+                            <a x-show="payments.length > 0" class="
+                                    flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
+                                    hover:bg-background-lightest rounded-lg
+                                    transition-[background, brightness] duration-300
+                                "
+                                href=""
+                                @click.prevent="
+                                    payments.reverse();
+                                    ascending = !ascending;
+                                "
+                                :title="ascending ? 'Ordenar por: mais recentes primeiro' : 'Ordenar por: mais antigas primeiro'">
+                                <img :src="ascending ? 'assets/icons/order-up.png' : 'assets/icons/order-down.png'" alt="Ordenar">
+                            </a>
+            
+                            <a class="
+                                    flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
+                                    hover:bg-background-lightest rounded-lg
+                                    transition-[background, brightness] duration-300
+                                "
+                                href=""
+                                @click.prevent="
+                                    payments = (await getPayments()).filter(p => p.room === room_data.number);
+                                    payments.reverse();
+                                "
+                                title="Recarregar Pagamentos">
+                                <img src="assets/icons/reload.png" alt="Recarregar">
+                            </a>
+                        </div>
+                        <div class="
+                            flex-1 basis-0 h-full max-h-full overflow-y-auto
+                            bg-background-more-lighter rounded-lg p-4
+                        ">
+                            <div x-show="payments.length > 0">
+                                <template x-for="payment in payments">
+                                    <div
+                                        class="
+                                            bg-background-bit-more-lighter rounded-lg
+                                            w-full h-16 mb-4 flex items-center p-4
+                                        ">
+                                        <h1 class="font-bold text-xl flex-1" x-text="formatCurrency(payment.amount * 100)"></h1>
+                
+                                        <div class="w-1/2 flex justify-end">
+                                            <p class="ml-2 mr-2" x-text="formatPaymentMethod(payment.method)"></p> &bull;
+                                            <p class="ml-2 mr-2" x-text="payment.room"></p> &bull;
+                                            <p class="ml-2 mr-2" x-text="unixToDateTime(payment.time)"></p>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+
+                            <div class="w-full h-full flex flex-col justify-center items-center" x-show="payments.length === 0">
+                                <img class="mb-4" src="assets/icons/no-money.png" alt="Sem pagamentos">
+
+                                <h1 class="font-bold text-2xl">Sem pagamentos</h1>
+                                <p>Não foram encontrados pagamentos para este quarto.</p>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template x-if="mode === 'occupation'">
+                    <div class="p-6 flex-1 basis-0 flex flex-col" x-data="{ rooms: [] }"
+                         x-init="
+                            (async () => {
+                                rooms = await getRooms();
+                                const ctx = $el.querySelector('canvas');
+                                new Chart(ctx, {
+                                    type: 'pie',
+                                    data: {
+                                        labels: ['Vago', 'Reservado', 'Ocupado'],
+                                        datasets: [{
+                                            label: 'Quantidade de quartos',
+                                            data: [
+                                                rooms.filter(r => r.state === 'available').length,
+                                                rooms.filter(r => r.state === 'reserved').length,
+                                                rooms.filter(r => r.state === 'occupied').length,
+                                            ],
+                                            backgroundColor: [
+                                                '#6dc644',
+                                                '#3976d0',
+                                                '#c64444',
+                                            ],
+                                            hoverOffset: 4,
+                                        }],
+                                    },
+                                    options: {
+                                        responsive: true,
+                                        maintainAspectRatio: false,
+                                    }
+                                });
+                            })()
+                        ">
+                        <div class="w-full h-26 flex">
+                            <!-- Left -->
+                            <div class="w-1/2 h-full">
+                                <span>Quantidade de quartos:</span>
+                                <span class="font-bold ml-0.5" x-text="rooms.length"></span>
+                            </div>
+
+                            <!-- Right -->
+                            <div class="flex-1 basis-0 flex flex-col items-end">
+                                <div>
+                                    <span>Vagos:</span>
+                                    <span class="font-bold ml-0.5"
+                                        x-text="rooms.filter(r => r.state === 'available').length">
+                                    </span>
+                                    <span class="font-bold ml-0.5"
+                                        x-text="`(${
+                                            Math.round(
+                                                (rooms.filter(r => r.state === 'available').length / rooms.length)
+                                                * 100
+                                            )
+                                        }%)`">
+                                    </span>
+                                </div>
+    
+                                <div>
+                                    <span>Reservados:</span>
+                                    <span class="font-bold ml-0.5"
+                                        x-text="rooms.filter(r => r.state === 'reserved').length">
+                                    </span>
+                                    <span class="font-bold ml-0.5"
+                                        x-text="`(${
+                                            Math.round(
+                                                (rooms.filter(r => r.state === 'reserved').length / rooms.length)
+                                                * 100
+                                            )
+                                        }%)`"></span>
+                                </div>
+    
+                                <div>
+                                    <span>Ocupados:</span>
+                                    <span class="font-bold ml-0.5"
+                                        x-text="rooms.filter(r => r.state === 'occupied').length">
+                                    </span>
+                                    <span class="font-bold ml-0.5"
+                                        x-text="`(${
+                                            Math.round(
+                                                (rooms.filter(r => r.state === 'occupied').length / rooms.length)
+                                                * 100
+                                            )
+                                        }%)`">
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 basis-0 overflow-y-hidden bg-background-more-lighter p-4 rounded-xl">
+                            <canvas class="flex-1"></canvas>
+                        </div>
+                    </div>
+                </template>                
+
+                <!-- TODO: add change tracker, to remind the user to save them -->
+                <template x-if="['room-available', 'room-reserved', 'room-occupied'].includes(mode)">
+                    <div class="w-full h-full max-h-full p-5 pt-0 flex flex-col flex-1 basis-0"
+                    x-data="
+                        {
+                            price: '0',
+                            debt: 0,
+                            check_out: mode === 'room-available'
+                                ? ''
+                                : unixToDate(room_data.check_out),
+
+                            guests: mode === 'room-available'
+                                ? [ { name: '', cpf: '0', phone: '0' } ]
+                                : room_data.guests,
+                            
+                            hasUnsavedData: false,
+                        }"
+                    x-init="
+                        if (mode === 'room-available') {
+                            const tomorrow = new Date();
+                            tomorrow.setDate(tomorrow.getDate() + 1);
+
+                            check_out = tomorrow.toISOString().split('T')[0];
+                        }
+                    ">
+
+                        <div class="flex flex-col md:flex-row flex-1 basis-0 w-full">
+                            <!-- Left -->
+                            <div class="md:w-1/2 w-full md:h-full h-1/2 pr-4 pb-4 md:pb-0 overflow-auto">
+                                <p>Valor da diária:</p>
+                                <input class="
+                                    font-bold text-3xl mt-2 w-full p-2
+                                    outline-none border-none bg-background-lightest rounded-lg
+                                "
+                                type="text" x-model="price"
+                                x-init="
+                                    price = mode === 'room-available'
+                                        ? formatCurrency(price)
+                                        : formatCurrency(room_data.price * 100)
+                                "
+                                @input="(e) => {
+                                    formatMoney(e);
+                                    price = e.target.value;
+                                    
+                                    if (mode === 'room-reserved')
+                                        hasUnsavedData = true;
+                                }"
+                                :disabled="mode === 'room-occupied'">
+
+                                <div x-show="mode === 'room-occupied'">
+                                    <p class="mt-4">Hora do check-in:</p>
+                                    <input type="text" id="date" class="
+                                        font-bold text-3xl mt-2 w-full p-2 brightness-90 cursor-not-allowed
+                                        outline-none border-none bg-background-lightest rounded-lg
+                                    " :value="unixToDateTime(room_data.check_in)" disabled>
+                                </div>
+
+                                <p class="mt-4">Data do check-out:</p>
+                                <input type="date" id="date" class="
+                                    font-bold text-3xl mt-2 w-full p-2
+                                    outline-none border-none bg-background-lightest rounded-lg
+                                "
+                                x-model="check_out"
+                                x-init="
+                                    const tomorrow = mode === 'room-occupied' ? new Date(room_data.check_out) : new Date();
+                                    tomorrow.setDate(tomorrow.getDate() + 1);
+
+                                    const element = document.getElementById('date');
+                                    const parsed = tomorrow.toISOString().split('T')[0];
+
+                                    element.setAttribute('min', parsed);
+                                "
+
+                                @input="
+                                    if (['room-reserved', 'room-occupied'].includes(mode))
+                                        hasUnsavedData = true;
+                                ">
+
+                                <p class="mt-4">Hora do check-out:</p>
+                                <input type="text" id="date" class="
+                                    font-bold text-3xl mt-2 w-full p-2 brightness-90 cursor-not-allowed
+                                    outline-none border-none bg-background-lightest rounded-lg
+                                " :value="(await getCheckOutHour()).formatted" disabled>
+
+                                <div x-show="mode === 'room-occupied'"
+                                    x-init="
+                                        if (mode === 'room-occupied')
+                                            debt = await getRoomDebt(room_data.number) * 100;
+                                    ">
+                                    <p class="mt-4">Conta:</p>
+                                    <p class="font-bold text-4xl mt-2 w-full"
+                                    x-text="formatCurrency(debt)"></p>
+                                </div>
+                            </div>
+                            
+                            <!-- Right -->
+                            <div class="flex-1 basis-0 max-h-full h-full md:pl-4 pb-4 flex flex-col">
+                                <div class="flex items-center">
+                                    <p class="w-full">Hóspedes:</p>
+                                    <a class="
+                                        flex justify-center items-center w-9 h-9 p-2 ml-4
+                                        hover:brightness-110 hover:bg-background-lightest rounded-md
+                                        transition-[background, brightness] duration-300
+                                    "
+                                    href=""
+                                    @click.prevent="
+                                        guests.push(
+                                            {
+                                                name: '',
+                                                cpf: '',
+                                                phone: ''
+                                            }
+                                        );
+
+                                        if (mode === 'room-reserved')
+                                            hasUnsavedData = true;
+                                    "
+                                    x-show="['room-available', 'room-reserved'].includes(mode)"
+                                    title="Adicionar novo hóspede">
+                                        <img src="assets/icons/plus.png" alt="+">
+                                    </a>
+                                </div>
+
+                                <div class="
+                                    flex-1 basis-0 h-full bg-background-more-lighter
+                                    rounded-lg mt-2 p-4 overflow-y-auto
+                                ">
+                                    <template x-for="(guest, index) in guests">
+                                        <div class="w-full h-fit bg-background-bit-more-lighter rounded-lg p-4 mb-4"
+                                            x-data="{
+                                                element_index: index
+                                            }">
+                                            <div class="flex items-center">
+                                                <h1 class="
+                                                    text-sm font-semibold uppercase tracking-widest mb-4
+                                                    flex-1 flex items-center
+                                                "
+                                                x-text="'Hóspede #' + (index + 1)">
+                                                </h1>
+
+                                                <a class="
+                                                    flex justify-center items-center w-8 h-8 p-2 ml-4
+                                                    hover:brightness-110 hover:bg-background-lightest rounded-md
+                                                    transition-[background, brightness] duration-300
+                                                "
+                                                href=""
+                                                x-show="
+                                                    guests.length > 1 &&
+                                                    ['room-available', 'room-reserved'].includes(mode)
+                                                "
+                                                @click.prevent="
+                                                    guests.splice(element_index, 1);
+
+                                                    if (mode === 'room-reserved')
+                                                        hasUnsavedData = true;
+                                                "
+                                                title="Remover hóspede">
+                                                    <img src="assets/icons/close.png" alt="X" >
+                                                </a>
+                                            </div>
+
+                                            <p>Nome:</p>
+                                            <input class="
+                                                font-bold text-3xl mt-2 w-full p-2
+                                                outline-none border-none bg-background-lightest rounded-lg
+                                            "
+                                            type="text"
+                                            x-model="guest.name"
+                                            x-init="
+                                                guest.name = mode === 'room-available' ||
+                                                index >= room_data.guests.length
+                                                    ? ''
+                                                    : room_data.guests[index].name
+                                            "
+
+                                            @input="
+                                                if (mode === 'room-reserved')
+                                                    hasUnsavedData = true;
+                                            "
+
+                                            :disabled="mode === 'room-occupied'">
+                                            
+                                            <p class="mt-4">CPF:</p>
+                                            <input class="
+                                                    font-bold text-xl mt-2 w-full p-2
+                                                    outline-none border-none bg-background-lightest rounded-lg
+                                                "
+                                                type="text" x-model="guest.cpf"
+                                                x-init="
+                                                    guest.cpf = mode === 'room-available' ||
+                                                    index >= room_data.guests.length
+                                                        ? ''
+                                                        : formatStrCPF(room_data.guests[index].cpf)
+                                                "
+                                                @input="e => {
+                                                    formatCPF(e);
+                                                    guest.cpf = e.target.value;
+
+                                                    if (mode === 'room-reserved')
+                                                        hasUnsavedData = true;
+                                                }
+                                                "
+                                                :disabled="mode === 'room-occupied'">
+
+                                            <p class="mt-4">Telefone:</p>
+                                            <input class="
+                                                    font-bold text-xl mt-2 w-full p-2
+                                                    outline-none border-none bg-background-lightest rounded-lg
+                                                "
+                                                type="text"
+                                                x-model="guest.phone"
+                                                x-init="
+                                                    guest.phone = mode === 'room-available' ||
+                                                    index >= room_data.guests.length
+                                                        ? ''
+                                                        : formatStrPhone(room_data.guests[index].phone)
+                                                "
+                                                @input="e => {
+                                                    formatPhone(e);
+                                                    guest.phone = e.target.value;
+
+                                                    if (mode === 'room-reserved')
+                                                        hasUnsavedData = true;
+                                                }
+                                                "
+                                                :disabled="mode === 'room-occupied'">
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div x-show="hasUnsavedData" class="
+                            w-full h-12 mb-4 p-2 flex justify-center
+                            items-center rounded-lg border-occupied border-2
+                        "
+                        x-transition>
+                        <!-- TODO: don't change the flag if the input wasn't accepted -->
+                            <img class="mr-3" src="assets/icons/warning.png" alt="Warning">
+                            Você possui alterações não salvas.
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="
+                            w-full h-14 flex items-center justify-evenly
+                            rounded-lg bg-background-more-lighter
+                        ">
+                            <!-- Botão Reservar - disponível no modo 'room-available' -->
+                            <a x-show="mode === 'room-available'" href="" class="
+                                w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
+                                rounded-lg bg-background-lightest
+                                hover:brightness-110 transition-[background, brightness] duration-300
+                            "
+                            @click.prevent="
+                                const res = await reserve(room_data.number, guests, price, check_out);
+                                if (res.success)
+                                    reset();
+                            ">
+                                Reservar
+                            </a>
+
+                            <!-- --- -->
+
+                            <!-- Botão Cancelar - disponível no modo 'room-reserved' -->
+                            <a x-show="mode === 'room-reserved'" href="" class="
+                                w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
+                                rounded-lg bg-background-lightest
+                                hover:brightness-110 transition-[background, brightness] duration-300
+                            "
+                            @click.prevent="
+                                swal({
+                                    title: 'Você tem certeza disso?',
+                                    text: 'Você deseja cancelar a reserva?',
+                                    icon: 'warning',
+                                    buttons: true,
+                                    dangerMode: 'true',
+                                })
+                                    .then(async (accepted) => {
+                                        if (accepted) {
+                                            const res = await cancel(room_data.number);
+                                            if (res.success)
+                                                reset();
+                                        }
+                                    });
+                            ">
+                                Cancelar Reserva
+                            </a>
+
+                            <!-- Botão Editar Reserva (Salvar Alterações 1) - disponível no modo 'room-reserved' -->
+                            <a x-show="mode === 'room-reserved' && hasUnsavedData" href="" class="
+                                w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
+                                rounded-lg bg-background-lightest
+                                hover:brightness-110 transition-[background, brightness] duration-300
+                            "
+                            @click.prevent="
+                                const res = await editReservation(room_data.number, guests, price, check_out);
+                                
+                                if (res.success) {
+                                    hasUnsavedData = false;
+                                }
+                            "
+                            x-transition>
+                                Salvar Alterações
+                            </a>
+
+                            <!-- Botão Check-In - disponível no modo 'room-reserved' -->
+                            <a x-show="mode === 'room-reserved'" href="" class="
+                                w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
+                                rounded-lg bg-background-lightest
+                                hover:brightness-110 transition-[background, brightness] duration-300
+                            "
+                            @click.prevent="
+                                const res = await checkIn(room_data.number);
+                                if(res.success)
+                                    reset();
+                            ">
+                                Efetuar Check-In
+                            </a>
+
+                            <!-- --- -->
+
+                            <!-- Botão Efetuar Pagamento - disponível no modo 'room-occupied' -->
+                            <a x-show="mode === 'room-occupied'" href="" class="
+                                w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
+                                rounded-lg bg-background-lightest
+                                hover:brightness-110 transition-[background, brightness] duration-300
+                            "
+                            @click.prevent="
+                                visible = false;
+                                setTimeout(() => {
+                                    mode = 'payment'
+                                    visible = true;
+                                }, 350);
+            
+                                document.getElementById('reload-btn').click();
+                            ">
+                                Efetuar Pagamento
+                            </a>
+
+                            <!-- Botão Visualizar Pagamentos - disponível no modo 'room-occupied' -->
+                            <a x-show="mode === 'room-occupied'" href="" class="
+                                w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
+                                rounded-lg bg-background-lightest
+                                hover:brightness-110 transition-[background, brightness] duration-300
+                            "
+                            @click.prevent="
+                                visible = false;
+                                setTimeout(() => {
+                                    mode = 'visualize-payments'
+                                    visible = true;
+                                }, 350);
+            
+                                document.getElementById('reload-btn').click();
+                            ">
+                                Visualizar Pagamentos
+                            </a>
+
+                            <!-- Botão Mudar Check-Out (Salvar Alterações 2) - disponível no modo 'room-reserved' -->
+                            <a x-show="mode === 'room-occupied' && hasUnsavedData" href="" class="
+                                w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
+                                rounded-lg bg-background-lightest
+                                hover:brightness-110 transition-[background, brightness] duration-300
+                            "
+                            @click.prevent="
+                                const res = await changeCheckOut(room_data.number, check_out);
+                                
+                                if (res.success) {
+                                    hasUnsavedData = false;
+                                    debt = await getRoomDebt(room_data.number) * 100;
+                                }
+                            "
+                            x-transition>
+                                Salvar Alterações
+                            </a>
+
+                            <!-- Botão Check-Out - disponível no modo 'room-occupied' -->
+                            <a x-show="mode === 'room-occupied'" href="" class="
+                                w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
+                                rounded-lg bg-background-lightest
+                                hover:brightness-110 transition-[background, brightness] duration-300
+                            "
+                            @click.prevent="
+                                if (debt < 0) {
+                                    swal({
+                                        title: 'O quarto possui sobras na conta',
+                                        text: 'Selecione um modo para que o check-out possa ser efetuado.',
+                                        icon: 'warning',
+                                        buttons: {
+                                            reverse: {
+                                                text: 'Estornar sobras',
+                                                value: 'reverse',
+                                            },
+
+                                            keep: {
+                                                text: 'Deixar no caixa',
+                                                value: 'keep',
+                                            }
+                                        },
+                                    })
+                                    .then(async (value) => {
+                                        if (!['reverse', 'keep'].includes(value)) return;
+
+                                        const res = await checkOut(room_data.number, value);
+
+                                        if (res.success)
+                                            reset();
+                                    });
+                                }
+                                else {
+                                    const res = await checkOut(room_data.number, 'none');
+
+                                    if (res.success)
+                                        reset();
+                                }
+                            ">
+                                
+                                Efetuar Check-Out
+                            </a>
+                        </div>
                     </div>
                 </template>
             </div>

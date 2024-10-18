@@ -1,0 +1,47 @@
+* {
+    margin: 0;
+    padding: 0;
+
+    box-sizing: border-box;
+    color: #fff;
+    font-family: "Montserrat", sans-serif;
+
+    -webkit-user-drag: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    
+}
+
+input {
+    color-scheme: dark;
+}
+
+.swal-modal {
+    background: #24292b;
+    border-radius: 0.5rem;
+    padding: 0.5rem;
+}
+
+.swal-title,
+.swal-text {
+    color: #fff;
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #383e3f;
+    border-radius: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #474f51;
+}

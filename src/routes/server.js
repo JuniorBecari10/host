@@ -1,11 +1,22 @@
+const path = require("path");
+
 function setupServerRoutes(app) {
     /*
         GET /rooms
         Returns a page with the rooms.
+        It's the main page of the system.
     */
     app.get("/rooms", (_, res) => {
-        res.render("hello.ejs");
+        res.sendFile(path.join(__dirname, "..", "..", "views", "rooms.html"));
     });
+
+    /*
+        GET /login
+        Returns a login page.
+    */
+        app.get("/login", (_, res) => {
+            res.sendFile(path.join(__dirname, "..", "..", "views", "login.html"));
+        });
 
     // TODO: make endpoint to generate a list of all payments in a page to be printed
 }

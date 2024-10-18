@@ -1,28 +1,28 @@
 {
-  "name": "host",
-  "version": "1.0.0",
-  "description": "",
-  "main": "main.js",
-  "scripts": {
-    "start": "node src/main.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/JuniorBecari10/hotel.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/JuniorBecari10/hotel/issues"
-  },
-  "homepage": "https://github.com/JuniorBecari10/hotel#readme",
-  "dependencies": {
-    "bcrypt": "^5.1.1",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.20.0",
-    "host": "file:",
-    "jsonwebtoken": "^9.0.2"
-  }
+    "name": "host",
+    "version": "1.0.0",
+    "description": "",
+    "main": "main.js",
+    "scripts": {
+        "start": "node src/main.js",
+        "watch:css": "npx tailwindcss -o public/output.css --watch"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/JuniorBecari10/hotel.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/JuniorBecari10/hotel/issues"
+    },
+    "homepage": "https://github.com/JuniorBecari10/hotel#readme",
+    "dependencies": {
+        "bcrypt": "^5.1.1",
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "express": "^4.20.0",
+        "jsonwebtoken": "^9.0.2"
+    }
 }
