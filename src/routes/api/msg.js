@@ -4,6 +4,11 @@ module.exports = {
     TITLE_INCORRECT_DATA_TYPES: "Tipos dos dados incorretos",
     TITLE_ROOM_NOT_FOUND: "Quarto não encontrado",
 
+    TITLE_USER_NOT_FOUND: "Usuário não encontrado",
+    TITLE_INCORRECT_PASSWORD: "Senha incorreta",
+    TITLE_MISSING_AUTH_TOKEN: "Token de autorização faltando",
+    TITLE_INVALID_OR_EXPIRED_AUTH_TOKEN: "Token de autorização inválido ou expirado",
+
     TITLE_THERE_MUST_BE_AT_LEAST_ONE_GUEST: "Deve ter pelo menos um hóspede na reserva",
     TITLE_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY_IN: "Data do check-out não pode ser antes ou no mesmo dia do check-in",
     TITLE_CHECK_OUT_CANNOT_BE_EARLIER_OR_SAME_DAY_TODAY: "Data do check-out não pode ser antes ou no mesmo dia de hoje",
@@ -30,6 +35,11 @@ module.exports = {
     MSG_INCORRECT_DATA: "Certifique-se de que todos os campos estão preenchidos corretamente.",
     MSG_INCORRECT_DATA_GUESTS: "Certifique-se de que todos os campos dos dados dos hóspedes estão preenchidos corretamente.",
     MSG_INCORRECT_DATA_NAME: "O nome de um hóspede apenas pode ter letras e espaços.",
+
+    MSG_USER_NOT_FOUND: "Não há usuários com esse e-mail. Verifique se o e-mail digitado está correto.",
+    MSG_INCORRECT_PASSWORD: "Verifique se digitou a senha corretamente.",
+    MSG_MISSING_AUTH_TOKEN: "Por favor providencie um token de autorização.",
+    MSG_INVALID_OR_EXPIRED_AUTH_TOKEN: "Providencie um token de autorização válido ou faça login novamente.",
 
     MSG_INCORRECT_DATA_TYPES: "Certifique-se de que todos os tipos dos dados estão corretos.",
     MSG_INCORRECT_DATA_TYPES_GUESTS: "Certifique-se de que todos os tipos dos dados dos hóspedes estão corretos.",

@@ -8,6 +8,18 @@ let hotel = {
     payments: [],
 };
 
+const ROLE_RECEPTIONIST = "receptionist";
+
+let users = [
+    {
+        id: 0,
+        name: "Antônio Carlos",
+        email: "antonioocarlos@proton.me",
+        password: "$2b$10$CAomNEAZINdM8rmlldWn5uqNKBUJs.dU6AY457VVdt68Ot63kpZDK",
+        role: ROLE_RECEPTIONIST,
+    }
+];
+
 const AVAILABLE = "available";
 const RESERVED = "reserved";
 const OCCUPIED = "occupied";
@@ -170,6 +182,9 @@ function loadData() {
 
 module.exports = {
     hotel,
+    users,
+
+    ROLE_RECEPTIONIST,
 
     defaultCheckOutDays,
     defaultCheckOutHours,

@@ -2,8 +2,27 @@ const rooms = require("../../rooms");
 const util = require("../../util");
 const status = require("../../status");
 const msg = require("./msg");
+const auth = require("../auth");
 
 function setupApiRoutes(app) {
+    /*
+        GET /api/user
+        Gets the logged user's data.
+
+        Returns: The logged user's data.
+        Return Type: User
+    */
+    app.get("/api/user", auth.authorize, async (req, res) => {
+        res.json({
+            user: {
+                id: req.user.id,
+                name: req.user.name,
+                email: req.user.email,
+                role: req.user.role,
+            }
+        });
+    });
+
     /*
         GET /api/name
         Gets the name of the hotel.
@@ -11,7 +30,7 @@ function setupApiRoutes(app) {
         Returns: The name of the hotel.
         Return Type: string
     */
-    app.get("/api/name", async (_, res) => {
+    app.get("/api/name", auth.authorize, async (_, res) => {
         res.json({ name: rooms.getHotelName() });
     });
 
@@ -22,7 +41,7 @@ function setupApiRoutes(app) {
         Returns: All the rooms, in an array.
         Return Type: Room[]
     */
-    app.get("/api/rooms", async (_, res) => {
+    app.get("/api/rooms", auth.authorize, async (_, res) => {
         res.json({ rooms: rooms.getHotelRooms() });
     });
 
@@ -33,7 +52,7 @@ function setupApiRoutes(app) {
         Returns: All the available rooms, in an array.
         Return Type: Room[]
     */
-    app.get("/api/rooms/available", async (_, res) => {
+    app.get("/api/rooms/available", auth.authorize, async (_, res) => {
         res.json({ rooms: rooms.getHotelRooms().filter(r => rooms.isAvailable(r)) });
     });
     
@@ -44,7 +63,7 @@ function setupApiRoutes(app) {
         Returns: All the reserved rooms, in an array.
         Return Type: Room[]
     */
-    app.get("/api/rooms/reserved", async (_, res) => {
+    app.get("/api/rooms/reserved", auth.authorize, async (_, res) => {
         res.json({ rooms: rooms.getHotelRooms().filter(r => rooms.isReserved(r)) });
     });
     
@@ -55,7 +74,7 @@ function setupApiRoutes(app) {
         Returns: All the occupied rooms, in an array.
         Return Type: Room[]
     */
-    app.get("/api/rooms/occupied", async (_, res) => {
+    app.get("/api/rooms/occupied", auth.authorize, async (_, res) => {
         res.json({ rooms: rooms.getHotelRooms().filter(r => rooms.isOccupied(r)) });
     });
 
@@ -66,7 +85,7 @@ function setupApiRoutes(app) {
         Returns: The current value of the cash.
         Return Type: number
     */
-    app.get("/api/cash", async (_, res) => {
+    app.get("/api/cash", auth.authorize, async (_, res) => {
         res.json({ cash: rooms.getHotelCash() });
     });
 
@@ -77,7 +96,7 @@ function setupApiRoutes(app) {
         Returns: The time the cash has been opened.
         Return Type: number
     */
-    app.get("/api/cash-opening-time", async (_, res) => {
+    app.get("/api/cash-opening-time", auth.authorize, async (_, res) => {
         res.json({ time: rooms.getHotelCashOpeningTime() });
     });
 
@@ -88,7 +107,7 @@ function setupApiRoutes(app) {
         Returns: The currently listed payments.
         Return Type: Array
     */
-    app.get("/api/payments", async (_, res) => {
+    app.get("/api/payments", auth.authorize, async (_, res) => {
         res.json({ payments: rooms.getHotelPayments() });
     });
 
@@ -99,7 +118,7 @@ function setupApiRoutes(app) {
         Returns: The check_out hour
         Return Type: { raw: array, formatted: string }
     */
-    app.get("/api/check-out-hour", async (_, res) => {
+    app.get("/api/check-out-hour", auth.authorize, async (_, res) => {
         res.json({
             raw: rooms.defaultCheckOutHours,
             formatted: util.formatCheckOutHour(rooms.defaultCheckOutHours)
@@ -116,7 +135,7 @@ function setupApiRoutes(app) {
         Returns: The specified room.
         Return Type: Room (object)
     */
-    app.get("/api/room/:number", async (req, res) => {
+    app.get("/api/room/:number", auth.authorize, async (req, res) => {
         const number = req.params.number;
         const room = rooms.getRoom(number);
 
@@ -149,7 +168,7 @@ function setupApiRoutes(app) {
         Returns: The debt of the specified room.
         Return Type: number
     */
-    app.get("/api/debt/:number", async (req, res) => {
+    app.get("/api/debt/:number", auth.authorize, async (req, res) => {
         const number = req.params.number;
         const room = rooms.getRoom(number);
 
@@ -197,7 +216,7 @@ function setupApiRoutes(app) {
         Returns: The new cash value and opening time.
         Return Type: { cash: number, time: number }
     */
-    app.post("/api/close-cash/", async (_, res) => {
+    app.post("/api/close-cash/", auth.authorize, async (_, res) => {
         rooms.setHotelCashOpeningTime(Date.now());
         rooms.resetHotelPayments();
 
@@ -222,7 +241,7 @@ function setupApiRoutes(app) {
         Returns: the modified room.
         Return Type: Room (object)
     */
-    app.post("/api/reserve/", async (req, res) => {
+    app.post("/api/reserve/", auth.authorize, async (req, res) => {
         const {
             number,
             guests,
@@ -249,7 +268,7 @@ function setupApiRoutes(app) {
         Returns: the modified room.
         Return Type: Room (object)
     */
-        app.post("/api/edit-reservation/", async (req, res) => {
+        app.post("/api/edit-reservation/", auth.authorize, async (req, res) => {
             const {
                 number,
                 guests,
@@ -273,7 +292,7 @@ function setupApiRoutes(app) {
         Returns: the modified room.
         Return Type: Room (object)
     */
-    app.post("/api/cancel", async (req, res) => {
+    app.post("/api/cancel", auth.authorize, async (req, res) => {
         const { number } = req.body;
 
         if (!number) {
@@ -337,7 +356,7 @@ function setupApiRoutes(app) {
         Returns: the modified room.
         Return Type: Room (object)
     */
-    app.post("/api/checkin", async (req, res) => {
+    app.post("/api/checkin", auth.authorize, async (req, res) => {
         const { number } = req.body;
 
         if (!number) {
@@ -429,7 +448,7 @@ function setupApiRoutes(app) {
         Returns: the modified room.
         Return Type: Room (object)
     */
-    app.post("/api/pay", async (req, res) => {
+    app.post("/api/pay", auth.authorize, async (req, res) => {
         const { number, amount, method } = req.body;
 
         if (!(number && (amount || amount === 0) && method)) {
@@ -519,7 +538,7 @@ function setupApiRoutes(app) {
         Returns: the modified room.
         Return Type: Room (object)
     */
-    app.post("/api/change-check-out", async (req, res) => {
+    app.post("/api/change-check-out", auth.authorize, async (req, res) => {
         const { number, check_out } = req.body;
 
         if (!(number && check_out)) {
@@ -615,7 +634,7 @@ function setupApiRoutes(app) {
         Returns: the modified room.
         Return Type: Room (object)
     */
-    app.post("/api/checkout", async (req, res) => {
+    app.post("/api/checkout", auth.authorize, async (req, res) => {
         const { number, chargeback_mode } = req.body;
 
         if (!number) {
