@@ -5,10 +5,13 @@ module.exports = {
   theme: {
     colors: {
       "background": "#111313",
+      "background-slightly-lighter": "#141616",
       "background-lighter": "#1c1f21",
       "background-more-lighter": "#202426",
       "background-bit-more-lighter": "#24292b",
       "background-lightest": "#272c2d",
+
+      "placeholder": "#5b6568",
 
       "available": "#6dc644",
       "reserved": "#3976d0",

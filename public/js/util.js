@@ -1,5 +1,3 @@
-const API_URL = "localhost:8080";
-
 function formatCurrency(number) {
     return (number / 100).toLocaleString("pt-BR", {
         style: "currency",
@@ -188,25 +186,6 @@ async function getRoom(number) {
 }
 
 // ---
-
-async function sendApiRequest(endpoint, data = {}) {
-    try {
-        const response = await axios.post(`http://${API_URL}/api/${endpoint}`, data, {
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        return { success: true, data: response.data };
-    } catch (e) {
-        try {
-            const { title, message } = JSON.parse(e.request.responseText);
-            swal(title, message, "error");
-        } catch (parseError) {
-            swal("Erro", "Um erro inesperado ocorreu. O servidor pode estar desligado.", "error");
-        }
-        return { success: false, error: e.message };
-    }
-}
 
 async function reserve(number, guests, price, check_out) {
     price = currencyToFloat(price);

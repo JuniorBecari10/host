@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
 * {
     margin: 0;
     padding: 0;
@@ -44,4 +46,39 @@ input {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #474f51;
+}
+
+.entry input {
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+
+    border: 1px solid transparent;
+    outline: none;
+}
+
+.entry input:focus {
+    border: 1px solid #3976d0;
+}
+
+.entry label {
+    position: absolute;
+    cursor: text;
+
+    margin-top: 0.5rem;
+    margin-left: 1.2rem;
+    
+    color: #5b6568;
+    background: #1c1f21;
+
+    border-radius: 9999px;
+    transition: 0.3s;
+}
+
+.entry input:focus ~ .entry label {
+    margin-top: -0.5rem;
+    color: #3976d0;
+}
+
+.entry input::placeholder {
+    visibility: hidden;
 }

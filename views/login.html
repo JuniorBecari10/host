@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Host - Login</title>
+
+        <link rel="shortcut icon" href="assets/favicon.png" type="image/x-icon">
+        <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="css/output.css" />
+
+        <script src="js/lib/axios.min.js"></script>
+        <script src="js/lib/alpine.min.js" defer></script>
+        <script src="js/lib/sweetalert.min.js" defer></script>
+
+        <script src="js/send.js"></script>
+    </head>
+    <body class="w-full h-screen bg-background flex flex-col items-center justify-center">
+        <img class="md:w-1/4 w-1/2 mb-10" src="assets/logo-host.svg" alt="H">
+
+        <div x-data="
+            {
+                email: '',
+                password: '',
+
+                emailFocused: false,
+                passwordFocused: false,
+            }
+        "
+            class="md:w-1/3 w-4/5 bg-background-slightly-lighter rounded-xl flex flex-col justify-center items-center">
+            <h1 class="font-bold uppercase tracking-widest m-4">Acesso ao Sistema</h1>
+
+            <form class="w-full h-full flex flex-col justify-center p-4" action="/api/login" method="post">
+                <div class="entry mb-6 w-full">
+                    <label
+                        class="placeholder" for="email"
+                        :style="{
+                            marginTop: email ? '-0.8rem' : '0.5rem',
+                            marginLeft: email ? '0.7rem' : '1.2rem',
+
+                            color: emailFocused ? '#3976d0' : '#5b6568',
+                            padding: email ? '0 0.5rem' : '0',
+                        }">
+                        E-mail
+                    </label>
+                    <input
+                        class="w-full bg-background-lighter"
+
+                        title="E-mail"
+                        id="email" type="email"
+
+                        autocomplete="email" required autofocus
+
+                        @focus="emailFocused = true"
+                        @blur="emailFocused = false"
+
+                        x-model="email" />
+                </div>
+
+                <div class="entry w-full">
+                    <label
+                        class="placeholder" for="password"
+                        :style="{
+                            marginTop: password ? '-0.8rem' : '0.5rem',
+                            marginLeft: password ? '0.7rem' : '1.2rem',
+
+                            color: passwordFocused ? '#3976d0' : '#5b6568',
+                            padding: password ? '0 0.5rem' : '0',
+                        }">
+                        Senha
+                    </label>
+                    <input
+                        class="w-full bg-background-lighter"
+
+                        title="Senha"
+                        id="password" type="password"
+
+                        autocomplete="current-password" required
+
+                        @focus="passwordFocused = true"
+                        @blur="passwordFocused = false"
+
+                        x-model="password" />
+                </div>
+
+                <button
+                    class="
+                        w-full mt-5 p-2
+                        bg-reserved rounded-xl hover:brightness-105
+                        transition-[background, brightness] duration-300"
+                    title="Entrar" type="submit"
+                    
+                    @click.prevent="
+                        const data = await sendApiRequest('login', { email, password });
+                        const token = data.data.token;
+                        
+                        
+                    ">
+                    Entrar
+                </button>
+            </form>
+        </div>
+    </body>
+</html>
