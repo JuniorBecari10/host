@@ -128,61 +128,49 @@ function currencyToFloat(str) {
         .trim());
 }
 
+// ---
+
 async function getName() {
-    return axios.get(`http://${API_URL}/api/name`)
-        .then(res => res.data.name)
-        .catch(e => console.error(JSON.parse(e.request.responseText).message));
+    return (await sendGet('name')).name;
 }
 
 async function getCash() {
-    return axios.get(`http://${API_URL}/api/cash`)
-        .then(res => res.data.cash)
-        .catch(e => console.error(JSON.parse(e.request.responseText).message));
+    return (await sendGet('cash')).cash;
 }
 
 async function getCashOpeningTime() {
-    return axios.get(`http://${API_URL}/api/cash-opening-time`)
-        .then(res => res.data.time)
-        .catch(e => console.error(JSON.parse(e.request.responseText).message));
+    return (await sendGet('cash-opening-time')).time;
 }
 
 async function getPayments() {
-    return axios.get(`http://${API_URL}/api/payments`)
-        .then(res => res.data.payments)
-        .catch(e => console.error(JSON.parse(e.request.responseText).message));
+    return (await sendGet('payments')).payments;
 }
 
 async function getRooms() {
-    return axios.get(`http://${API_URL}/api/rooms`)
-        .then(res => res.data.rooms)
-        .catch(e => console.error(JSON.parse(e.request.responseText).message));
+    return (await sendGet('rooms')).rooms;
 }
 
 async function getRoomDebt(number) {
-    return axios.get(`http://${API_URL}/api/debt/${number}`)
-        .then(res => res.data.debt)
-        .catch(e => console.error(JSON.parse(e.request.responseText).message));
+    return (await sendGet(`debt/${number}`)).debt;
 }
 
 async function getCheckOutHour() {
-    return axios.get(`http://${API_URL}/api/check-out-hour`)
-        .then(res => res.data)
-        .catch(e => console.error(JSON.parse(e.request.responseText).message));
+    return await sendGet('check-out-hour');
 }
-
 async function getRoom(number) {
-    return axios.get(`http://${API_URL}/api/name`,
-        {
-            number
-        },
-        {
+    const token = localStorage.getItem("token") || "";
+    try {
+        const response = await axios.get(`http://${API_URL}/api/name`, {
+            params: { number },
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
             }
-        }
-    )
-        .then(res => res.data.name)
-        .catch(e => console.error(JSON.parse(e.request.responseText).message));
+        });
+        return response.data.name;
+    } catch (e) {
+        console.error(JSON.parse(e.request.responseText).message);
+    }
 }
 
 // ---
@@ -196,7 +184,7 @@ async function reserve(number, guests, price, check_out) {
         phone: guest.phone.replace(/\D/g, '')
     }));
 
-    return sendApiRequest('reserve', { number, guests, price, check_out });
+    return sendPost('reserve', { number, guests, price, check_out });
 }
 
 async function editReservation(number, guests, price, check_out) {
@@ -208,32 +196,32 @@ async function editReservation(number, guests, price, check_out) {
         phone: guest.phone.replace(/\D/g, '')
     }));
     
-    return sendApiRequest('edit-reservation', { number, guests, price, check_out });
+    return sendPost('edit-reservation', { number, guests, price, check_out });
 }
 
 async function changeCheckOut(number, check_out) {
     check_out = check_out ? dateToUnix(check_out) : -1;
-    return sendApiRequest('change-check-out', { number, check_out });
+    return sendPost('change-check-out', { number, check_out });
 }
 
 async function cancel(number) {
-    return sendApiRequest('cancel', { number });
+    return sendPost('cancel', { number });
 }
 
 async function checkIn(number) {
-    return sendApiRequest('checkin', { number });
+    return sendPost('checkin', { number });
 }
 
 async function checkOut(number, chargeback_mode) {
-    return sendApiRequest('checkout', { number, chargeback_mode });
+    return sendPost('checkout', { number, chargeback_mode });
 }
 
 async function pay(number, amount, method) {
     amount = currencyToFloat(amount);
-    return sendApiRequest('pay', { number, amount, method });
+    return sendPost('pay', { number, amount, method });
 }
 
 async function closeCash() {
-    return sendApiRequest('close-cash');
+    return sendPost('close-cash');
 }
 
