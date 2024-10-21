@@ -18,7 +18,7 @@
         <script src="js/util.js"></script>
 
         <script>
-            
+
         </script>
     </head>
 
@@ -45,22 +45,43 @@
             <!-- Logo -->
             <a href=""
                 class="
-                    w-12 p-2 ml-4 hover:brightness-110 focus:brightness-125
+                    w-12 h-12 p-2 ml-4 hover:brightness-110 focus:brightness-125
                     hover:bg-background-lighter rounded-md transition-[background, brightness] duration-300
                 ">
-                <img src="assets/logo-h.svg" alt="H" class="w-full" />
+                <img src="assets/logo-h.svg" alt="H" class="w-full h-full" />
             </a>
 
             <!-- Hotel name -->
             <h1
                 class="text-sm font-bold uppercase tracking-widest flex-1 text-center"
                 x-data="{ name: '' }"
-                x-init="name = await getName()"
+                x-init="name = await getHotelName()"
                 x-text="name">
             </h1>
 
-            <!-- Padding to center the hotel name -->
-            <div class="w-12 p-2 ml-4"></div>
+            <!-- Account info -->
+            <div
+                class="w-12 h-12 p-2 mr-4"
+                x-data="
+                    {
+                        bg: stringToColor(localStorage.getItem('token') || ''),
+                        contrasting: '',
+                        user: {},
+                        
+                    }"
+                
+                x-init="
+                    contrasting = getContrastingColor(bg);
+                    user = await getUser();
+                ">
+                <a href :title="user.name" class="w-full h-full rounded-full flex justify-center items-center"
+                    x-init="$el.style.backgroundColor = bg">
+                    <span
+                        x-init="$el.style.color = contrasting"
+                        x-text="user.name[0]">
+                    </span>
+                </a>
+            </div>
         </header>
 
         <main class="flex flex-col h-full-4 overflow-y-auto" x-data="{ rooms: [] }">

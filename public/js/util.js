@@ -74,6 +74,62 @@ function formatStrPhone(value) {
     return value;
 }
 
+function stringToColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++)
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+
+    const r = (hash & 0xFF0000) >> 16;
+    const g = (hash & 0x00FF00) >> 8;
+    const b = hash & 0x0000FF;
+
+    const toHex = (value) => {
+        const hex = value.toString(16);
+        return hex.length === 1 ? '0' + hex : hex;
+    };
+
+    return `#${toHex((r + 255) % 256)}${toHex((g + 255) % 256)}${toHex((b + 255) % 256)}`;
+}
+
+function getContrastingColor(color) {
+    let r, g, b;
+
+    // Check if the color is in hex format
+    if (color.startsWith('#')) {
+        // Remove the '#' and parse the hex color
+        const hex = color.slice(1);
+        
+        // Convert hex to RGB
+        if (hex.length === 3) {
+            // Handle shorthand hex (e.g., #abc)
+            r = parseInt(hex[0] + hex[0], 16);
+            g = parseInt(hex[1] + hex[1], 16);
+            b = parseInt(hex[2] + hex[2], 16);
+        } else if (hex.length === 6) {
+            // Handle full hex (e.g., #aabbcc)
+            r = parseInt(hex.slice(0, 2), 16);
+            g = parseInt(hex.slice(2, 4), 16);
+            b = parseInt(hex.slice(4, 6), 16);
+        } else {
+            // Invalid hex format
+            return 'rgb(0, 0, 0)';
+        }
+    } else {
+        // Handle RGB format if the color is not in hex
+        const rgbValues = color.replace(/[^\d,]/g, '').split(',');
+        if (rgbValues.length !== 3) return 'rgb(0, 0, 0)';
+
+        r = parseInt(rgbValues[0], 10);
+        g = parseInt(rgbValues[1], 10);
+        b = parseInt(rgbValues[2], 10);
+    }
+
+    // Calculate luminance (perceived brightness)
+    const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    
+    // Return black for light colors and white for dark colors
+    return luminance > 128 ? '#000' : '#fff';
+}
 
 // ---
 
@@ -130,7 +186,11 @@ function currencyToFloat(str) {
 
 // ---
 
-async function getName() {
+async function getUser() {
+    return (await sendGet('user')).user;
+}
+
+async function getHotelName() {
     return (await sendGet('name')).name;
 }
 
@@ -178,7 +238,7 @@ async function getRoom(number) {
 async function reserve(number, guests, price, check_out) {
     price = currencyToFloat(price);
     check_out = check_out ? dateToUnix(check_out) : -1;
-    
+
     guests = guests.map(guest => ({
         name: guest.name,
         cpf: guest.cpf.replace(/\D/g, ''),
