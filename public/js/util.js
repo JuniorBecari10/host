@@ -178,6 +178,7 @@ async function getRoom(number) {
 async function reserve(number, guests, price, check_out) {
     price = currencyToFloat(price);
     check_out = check_out ? dateToUnix(check_out) : -1;
+    
     guests = guests.map(guest => ({
         name: guest.name,
         cpf: guest.cpf.replace(/\D/g, ''),
@@ -190,6 +191,7 @@ async function reserve(number, guests, price, check_out) {
 async function editReservation(number, guests, price, check_out) {
     price = currencyToFloat(price);
     check_out = check_out ? dateToUnix(check_out) : -1;
+
     guests = guests.map(guest => ({
         name: guest.name,
         cpf: guest.cpf.replace(/\D/g, ''),

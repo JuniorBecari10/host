@@ -147,7 +147,7 @@ function defaultRoom(number) {
 
 function saveData() {
     const json = JSON.stringify(hotel);
-    fs.writeFile(DATABASE_LOCATION, json, "utf8", error => {
+    fs.writeFile(HOTEL_DATABASE_FILE_NAME, json, "utf8", error => {
         if (error) {
             console.log("Couldn't write database to file.");
             throw error;
