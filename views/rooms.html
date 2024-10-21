@@ -9,6 +9,12 @@
         <link rel="stylesheet" href="css/style.css" />
         <link rel="stylesheet" href="css/output.css" />
 
+        <!-- Redirect Script to login if the user isn't authenticated -->
+        <script>
+            if (!localStorage.getItem("token"))
+                window.location.href = `http://${API_URL}/login`;
+        </script>
+
         <script src="js/lib/axios.min.js"></script>
         <script src="js/lib/alpine.min.js" defer></script>
         <script src="js/lib/sweetalert.min.js" defer></script>
@@ -16,10 +22,6 @@
 
         <script src="js/send.js"></script>
         <script src="js/util.js"></script>
-
-        <script>
-
-        </script>
     </head>
 
     <body
@@ -37,17 +39,25 @@
                     }, 350);
 
                     document.getElementById('reload-btn').click();
-                }
+                },
+
+                show_user_card: false,
+
+                user: {},
+                userInitial: '',
+                userBg: '',
+                contrasting: '',
             }
         ">
         <!-- Header -->
         <header class="flex justify-center items-center h-16">
             <!-- Logo -->
-            <a href=""
+            <a href
                 class="
                     w-12 h-12 p-2 ml-4 hover:brightness-110 focus:brightness-125
                     hover:bg-background-lighter rounded-md transition-[background, brightness] duration-300
-                ">
+                "
+                title="Página Inicial">
                 <img src="assets/logo-h.svg" alt="H" class="w-full h-full" />
             </a>
 
@@ -55,40 +65,73 @@
             <h1
                 class="text-sm font-bold uppercase tracking-widest flex-1 text-center"
                 x-data="{ name: '' }"
-                x-init="name = await getHotelName()"
+                x-init="
+                    name = await getHotelName();
+                    user = await getUser();
+                    userInitial = user.name[0];
+
+                    userBg = stringToColor(user.email);
+                    contrasting = getContrastingColor(userBg);
+                "
                 x-text="name">
             </h1>
 
             <!-- Account info -->
             <div
-                class="w-12 h-12 p-2 mr-4"
-                x-data="
-                    {
-                        bg: stringToColor(localStorage.getItem('token') || ''),
-                        contrasting: '',
-                        user: {},
-                        
-                    }"
-                
-                x-init="
-                    contrasting = getContrastingColor(bg);
-                    user = await getUser();
-                ">
+                class="w-12 h-12 p-2 mr-4">
                 <a href :title="user.name" class="w-full h-full rounded-full flex justify-center items-center"
-                    x-init="$el.style.backgroundColor = bg">
+                    @click.prevent = "show_user_card = !show_user_card;"
+                    x-init="$el.style.backgroundColor = userBg; console.log($el.style.backgroundColor, userBg)">
                     <span
                         x-init="$el.style.color = contrasting"
-                        x-text="user.name[0]">
+                        x-text="userInitial">
                     </span>
                 </a>
             </div>
         </header>
 
+        <!-- User Card -->
+        <div class="
+            absolute right-0 top-16 mr-2 p-4
+            bg-background-more-lighter w-80 h-64 flex flex-col items-center rounded-xl
+        "
+        x-show="show_user_card"
+        x-transition.scale.origin.top
+        @click.outside="show_user_card = false;">
+            <div class="w-full h-20 mt-4 flex justify-center items-center">
+                <div href :title="user.name"
+                    class="w-20 h-20 aspect-auto rounded-full flex justify-center items-center"
+                    @click.prevent = "show_user_card = !show_user_card;"
+                    x-init="$el.style.backgroundColor = userBg">
+                    <span class="font-bold text-2xl"
+                        x-init="$el.style.color = contrasting"
+                        x-text="userInitial">
+                    </span>
+                </div>
+            </div>
+
+            <h1 class="font-bold text-lg mt-3" x-text="user.name"></h1>
+            <h2 class="font-normal text-sm" x-text="user.email"></h2>
+
+            <div class="flex-1"></div>
+
+            <a class="
+                w-full h-10 rounded-xl flex justify-center items-center bg-background-lightest
+                hover:brightness-105 transition-[background, brightness] duration-300" href
+                @click.prevent="
+                    localStorage.removeItem('token');
+                    window.location.href = `http://${API_URL}/login`;
+                ">
+                <img class="w-5 mr-2" src="assets/icons/logout.png" alt="">
+                <span>Sair</span>
+            </a>
+         </div>
+
         <main class="flex flex-col h-full-4 overflow-y-auto" x-data="{ rooms: [] }">
             <!-- Options Bar -->
             <div class="flex justify-center items-center width-full h-14 bg-background-lighter m-4 rounded-lg">
                 <!-- Option Card - Guests -->
-                <a href="" class="
+                <a href class="
                     flex justify-center items-center
                     w-fit bg-background-lightest
                     m-2 my-4 p-4 py-2
@@ -105,7 +148,7 @@
                 </a>
 
                 <!-- Option Card - Cash -->
-                <a href="" class="
+                <a href class="
                     flex justify-center items-center
                     w-fit bg-background-lightest
                     m-2 my-4 p-4 py-2
@@ -137,7 +180,7 @@
                         flex justify-center items-center w-8 h-8 p-2 hover:brightness-110
                         hover:bg-background-lighter rounded-lg transition-[background, brightness] duration-300
                     "
-                    href=""
+                    href
                     id="reload-btn"
                     @click.prevent="rooms = await getRooms()"
                     title="Recarregar">
@@ -150,7 +193,7 @@
                 x-init="rooms = await getRooms()">
                 <template x-for="room in rooms">
                     <!-- Apartment Card -->
-                    <a href="" class="
+                    <a href class="
                             flex justify-center items-center
                             w-20 h-20 mr-4 hover:brightness-110
                             font-bold text-xl rounded-xl
@@ -208,7 +251,7 @@
                             flex justify-center items-center w-10 h-10 p-2 hover:brightness-110
                             hover:bg-background-lightest rounded-md transition-[background, brightness] duration-300
                         "
-                        href=""
+                        href
                         @click.prevent="
                             visible = false;
                             setTimeout(() => {
@@ -235,7 +278,7 @@
                             flex justify-center items-center w-10 h-10 p-2 ml-4 hover:brightness-110
                             hover:bg-background-lightest rounded-md transition-[background, brightness] duration-300
                         "
-                        href=""
+                        href
                         @click.prevent="reset()">
                         <img class="w-6 h-6" src="assets/icons/close.png" alt="X">
                     </a>
@@ -276,7 +319,7 @@
                                     transition-[background, brightness] duration-300
                                     "
                                 id="reload-cash"
-                                href=""
+                                href
                                 @click.prevent="
                                     cash = await getCash();
                                     openingTime = await getCashOpeningTime();
@@ -292,7 +335,7 @@
                                     flex justify-center items-center w-8 h-8 p-2 mt-2 ml-2
                                     hover:brightness-110 hover:bg-background-lightest rounded-lg
                                     transition-[background, brightness] duration-300"
-                                href=""
+                                href
                                 @click.prevent="
                                     swal({
                                         title: 'Você tem certeza disso?',
@@ -329,7 +372,7 @@
                                         hover:bg-background-lightest rounded-lg
                                         transition-[background, brightness] duration-300
                                     "
-                                    href=""
+                                    href
                                     @click.prevent="
                                         payments.reverse();
                                         ascending = !ascending;
@@ -343,7 +386,7 @@
                                         hover:bg-background-lightest rounded-lg
                                         transition-[background, brightness] duration-300
                                     "
-                                    href=""
+                                    href
                                     @click.prevent="
                                         cash = await getCash();
                                         openingTime = await getCashOpeningTime();
@@ -453,7 +496,7 @@
                                         }
                                     ]
                                     ">
-                                        <a href="" class="
+                                        <a href class="
                                             w-11/12 h-11/12 bg-background-bit-more-lighter
                                             m-2 rounded-2xl flex flex-col 
                                             transition-[background, brightness] duration-300
@@ -477,7 +520,7 @@
                             rounded-lg bg-background-more-lighter
                         ">
                             <!-- Botão Pagar -->
-                            <a href="" class="
+                            <a href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-lg bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -517,7 +560,7 @@
                                     hover:bg-background-lightest rounded-lg
                                     transition-[background, brightness] duration-300
                                 "
-                                href=""
+                                href
                                 @click.prevent="
                                     payments.reverse();
                                     ascending = !ascending;
@@ -531,7 +574,7 @@
                                     hover:bg-background-lightest rounded-lg
                                     transition-[background, brightness] duration-300
                                 "
-                                href=""
+                                href
                                 @click.prevent="
                                     payments = (await getPayments()).filter(p => p.room === room_data.number);
                                     payments.reverse();
@@ -660,7 +703,7 @@
                         </div>
 
                         <div class="flex-1 basis-0 overflow-y-hidden bg-background-more-lighter p-4 rounded-xl">
-                            <canvas class="flex-1"></canvas>
+                            <canvas class="flex-1 basis-0"></canvas>
                         </div>
                     </div>
                 </template>                
@@ -769,7 +812,7 @@
                                         hover:brightness-110 hover:bg-background-lightest rounded-md
                                         transition-[background, brightness] duration-300
                                     "
-                                    href=""
+                                    href
                                     @click.prevent="
                                         guests.push(
                                             {
@@ -810,7 +853,7 @@
                                                     hover:brightness-110 hover:bg-background-lightest rounded-md
                                                     transition-[background, brightness] duration-300
                                                 "
-                                                href=""
+                                                href
                                                 x-show="
                                                     guests.length > 1 &&
                                                     ['room-available', 'room-reserved'].includes(mode)
@@ -913,7 +956,7 @@
                             rounded-lg bg-background-more-lighter
                         ">
                             <!-- Botão Reservar - disponível no modo 'room-available' -->
-                            <a x-show="mode === 'room-available'" href="" class="
+                            <a x-show="mode === 'room-available'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-lg bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -929,7 +972,7 @@
                             <!-- --- -->
 
                             <!-- Botão Cancelar - disponível no modo 'room-reserved' -->
-                            <a x-show="mode === 'room-reserved'" href="" class="
+                            <a x-show="mode === 'room-reserved'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-lg bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -954,7 +997,7 @@
                             </a>
 
                             <!-- Botão Editar Reserva (Salvar Alterações 1) - disponível no modo 'room-reserved' -->
-                            <a x-show="mode === 'room-reserved' && hasUnsavedData" href="" class="
+                            <a x-show="mode === 'room-reserved' && hasUnsavedData" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-lg bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -971,7 +1014,7 @@
                             </a>
 
                             <!-- Botão Check-In - disponível no modo 'room-reserved' -->
-                            <a x-show="mode === 'room-reserved'" href="" class="
+                            <a x-show="mode === 'room-reserved'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-lg bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -987,7 +1030,7 @@
                             <!-- --- -->
 
                             <!-- Botão Efetuar Pagamento - disponível no modo 'room-occupied' -->
-                            <a x-show="mode === 'room-occupied'" href="" class="
+                            <a x-show="mode === 'room-occupied'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-lg bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -1005,7 +1048,7 @@
                             </a>
 
                             <!-- Botão Visualizar Pagamentos - disponível no modo 'room-occupied' -->
-                            <a x-show="mode === 'room-occupied'" href="" class="
+                            <a x-show="mode === 'room-occupied'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-lg bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -1023,7 +1066,7 @@
                             </a>
 
                             <!-- Botão Mudar Check-Out (Salvar Alterações 2) - disponível no modo 'room-reserved' -->
-                            <a x-show="mode === 'room-occupied' && hasUnsavedData" href="" class="
+                            <a x-show="mode === 'room-occupied' && hasUnsavedData" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-lg bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -1041,7 +1084,7 @@
                             </a>
 
                             <!-- Botão Check-Out - disponível no modo 'room-occupied' -->
-                            <a x-show="mode === 'room-occupied'" href="" class="
+                            <a x-show="mode === 'room-occupied'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-lg bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300

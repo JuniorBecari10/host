@@ -79,6 +79,7 @@ function addHotelPayment(payment) {
 
 function resetHotelPayments() {
     hotel.payments = [];
+    saveData();
 }
 
 function setHotelCashOpeningTime(value) {
@@ -145,6 +146,7 @@ function defaultRoom(number) {
 
 // ---
 
+// TODO: the payments aren't being saved
 function saveData() {
     const json = JSON.stringify(hotel);
     fs.writeFile(HOTEL_DATABASE_FILE_NAME, json, "utf8", error => {

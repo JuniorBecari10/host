@@ -48,7 +48,7 @@ function logMessage(req) {
 
 // assumes the room is valid
 function getDebt(room) {
-    let debt = room.price * diffDays(Date.now(), room.check_out);
+    let debt = room.price * diffDays(room.check_in, room.check_out);
 
     for (let payment of rooms.getHotelPayments().filter(p => p.room === room.number))
         debt -= payment.amount;

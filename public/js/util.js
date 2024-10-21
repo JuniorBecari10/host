@@ -94,40 +94,30 @@ function stringToColor(str) {
 function getContrastingColor(color) {
     let r, g, b;
 
-    // Check if the color is in hex format
     if (color.startsWith('#')) {
-        // Remove the '#' and parse the hex color
         const hex = color.slice(1);
         
-        // Convert hex to RGB
         if (hex.length === 3) {
-            // Handle shorthand hex (e.g., #abc)
             r = parseInt(hex[0] + hex[0], 16);
             g = parseInt(hex[1] + hex[1], 16);
             b = parseInt(hex[2] + hex[2], 16);
         } else if (hex.length === 6) {
-            // Handle full hex (e.g., #aabbcc)
             r = parseInt(hex.slice(0, 2), 16);
             g = parseInt(hex.slice(2, 4), 16);
             b = parseInt(hex.slice(4, 6), 16);
-        } else {
-            // Invalid hex format
-            return 'rgb(0, 0, 0)';
-        }
+        } else
+            return '#000';
+        
     } else {
-        // Handle RGB format if the color is not in hex
         const rgbValues = color.replace(/[^\d,]/g, '').split(',');
-        if (rgbValues.length !== 3) return 'rgb(0, 0, 0)';
+        if (rgbValues.length !== 3) return '#000';
 
         r = parseInt(rgbValues[0], 10);
         g = parseInt(rgbValues[1], 10);
         b = parseInt(rgbValues[2], 10);
     }
 
-    // Calculate luminance (perceived brightness)
     const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    
-    // Return black for light colors and white for dark colors
     return luminance > 128 ? '#000' : '#fff';
 }
 
