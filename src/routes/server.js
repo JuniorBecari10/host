@@ -2,12 +2,20 @@ const path = require("path");
 
 function setupServerRoutes(app) {
     /*
+        GET /
+        Returns the main page.
+    */
+        app.get("/", (_, res) => {
+            res.sendFile(path.join(__dirname, "..", "..", "views", "index.html"));
+        });
+
+    /*
         GET /login
         Returns a login page.
     */
-        app.get("/login", (_, res) => {
-            res.sendFile(path.join(__dirname, "..", "..", "views", "login.html"));
-        });
+    app.get("/login", (_, res) => {
+        res.sendFile(path.join(__dirname, "..", "..", "views", "login.html"));
+    });
     
 
     /*

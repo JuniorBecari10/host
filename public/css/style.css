@@ -50,7 +50,7 @@ input {
 
 .entry input {
     padding: 0.5rem 1rem;
-    border-radius: 1rem;
+    border-radius: 9999px;
 
     border: 2px solid transparent;
     outline: none;

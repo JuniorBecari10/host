@@ -61,6 +61,7 @@
                     this.contrasting = getContrastingColor(this.userBg);
 
                     $refs.userIconBg.style.backgroundColor = this.userBg;
+                    $refs.userIconBg.title = this.user.name;
                     $refs.userIconLabel.style.color = this.contrasting;
 
                     $refs.userIconCardBg.style.backgroundColor = this.userBg;
@@ -74,12 +75,12 @@
         <!-- Header -->
         <header class="flex justify-center items-center h-16">
             <!-- Logo -->
-            <a href
+            <a href="/"
                 class="
                     w-12 h-12 p-2 ml-4 hover:brightness-110 focus:brightness-125
                     hover:bg-background-lighter rounded-md transition-[background, brightness] duration-300
                 "
-                title="Página Inicial">
+                title="Retornar à página inicial">
                 <img src="assets/logo-h.svg" alt="H" class="w-full h-full" />
             </a>
 
@@ -94,7 +95,10 @@
             <!-- Account info -->
             <div
                 class="w-12 h-12 p-2 mr-4">
-                <a href="#" title="a" :title="user.name" class="w-full h-full rounded-full flex justify-center items-center"
+                <a href="#" title="Usuário" class="
+                    w-full h-full rounded-full flex justify-center items-center
+                    hover:brightness-110 transition-[background, brightness] duration-300
+                "
                     @click.prevent="showUserCard = !showUserCard;"
                     x-ref="userIconBg">
                     <span x-ref="userIconLabel" x-text="user.name ? user.name[0] : ''"></span>
@@ -128,7 +132,7 @@
 
             <a class="
                 w-full h-10 rounded-xl flex justify-center items-center bg-background-lightest
-                hover:brightness-105 transition-[background, brightness] duration-300" href
+                hover:brightness-110 transition-[background, brightness] duration-300" href
                 @click.prevent="
                     localStorage.removeItem('token');
                     window.location.href = `http://${API_URL}/login`;
@@ -512,7 +516,7 @@
                                             m-2 rounded-2xl flex flex-col 
                                             transition-[background, brightness] duration-300
                                         "
-                                        :class="selectedMethod === method.method ? 'brightness-110 hover:brightness-125 shadow-md' : 'brightness-100 hover:brightness-105'"
+                                        :class="selectedMethod === method.method ? 'brightness-110 hover:brightness-125 shadow-md' : 'brightness-100 hover:brightness-110'"
                                         @click.prevent="selectedMethod = method.method">
                                             <div class="flex-1 flex justify-center items-center">
                                                 <img :src="'assets/icons/' + method.icon" alt="Icon">

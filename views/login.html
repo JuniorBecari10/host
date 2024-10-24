@@ -16,7 +16,12 @@
         <script src="js/send.js"></script>
     </head>
     <body class="w-full h-screen bg-background flex flex-col items-center justify-center">
-        <img class="md:w-1/4 w-1/2 mb-10" src="assets/logo-host.svg" alt="H">
+        <a class="
+            md:w-1/5 w-1/2 mb-10 p-4 rounded-2xl
+            hover:bg-background-lighter transition=[background] duration-300
+        " href="/" title="Retornar à página inicial">
+            <img class="w-full h-full" src="assets/logo-host.svg" alt="H">
+        </a>
 
         <div x-data="
             {
@@ -31,7 +36,7 @@
             <h1 class="font-bold uppercase tracking-widest m-4">Acesso ao Sistema</h1>
 
             <form class="w-full h-full flex flex-col justify-center p-4" action="/api/login" method="post">
-                <div class="entry mb-6 w-full">
+                <div class="entry mb-5 w-full">
                     <label
                         class="placeholder" for="email"
                         :style="{
@@ -57,7 +62,7 @@
                         x-model="email" />
                 </div>
 
-                <div class="entry w-full">
+                <div class="entry w-full mb-6">
                     <label
                         class="placeholder" for="password"
                         :style="{
@@ -85,8 +90,8 @@
 
                 <button
                     class="
-                        w-full mt-5 p-2
-                        bg-reserved rounded-xl hover:brightness-105
+                        w-full p-2
+                        bg-reserved rounded-full hover:brightness-110
                         transition-[background, brightness] duration-300"
                     title="Entrar" type="submit"
                     
@@ -103,8 +108,8 @@
                 <a :href="`http://${API_URL}/rooms`"
                     class="
                         w-full mt-2 p-2
-                        border-reserved border-2 rounded-xl hover:brightness-105 text-center
-                        transition-[background, brightness] duration-300">
+                        border-reserved border-2 rounded-full text-center
+                        hover:bg-background-lighter transition-[background] duration-300">
                     Já está logado? Acesse o sistema
                 </a>
             </form>

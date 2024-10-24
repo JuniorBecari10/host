@@ -29,6 +29,10 @@ module.exports = {
         "hits": "repeat(auto-fill, minmax(100px, 1fr))"
       },
 
+      backgroundImage: {
+        "hotel": "url('/assets/images/hotel-bg.png')",
+      },
+
       height: {
         "9/10": "90vh",
         "full-4": "calc(100vh - 4rem)",
