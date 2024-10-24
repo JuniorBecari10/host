@@ -11,4 +11,5 @@ const app = express();
 init(app);
 setupRoutes(app);
 
+console.log(`URL: http://localhost:${PORT}`);
 app.listen(PORT, () => console.log(`Running on port ${PORT}`));

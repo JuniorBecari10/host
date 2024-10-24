@@ -30,24 +30,39 @@
             {
                 mode: '',
                 visible: false,
-                room_data: {},
+                roomData: {},
                 reset() {
                     this.visible = false;
                     setTimeout(() => {
                         this.mode = '';
-                        this.room_data = {};
+                        this.roomData = {};
                     }, 350);
 
                     document.getElementById('reload-btn').click();
                 },
 
-                show_user_card: false,
+                showUserCard: false,
 
                 user: {},
-                userInitial: '',
                 userBg: '',
                 contrasting: '',
+
+                async getUser() {
+                    this.user = await getUser();
+
+                    this.userBg = stringToColor(this.user.email);
+                    this.contrasting = getContrastingColor(this.userBg);
+
+                    $refs.userIconBg.style.backgroundColor = this.userBg;
+                    $refs.userIconLabel.style.color = this.contrasting;
+
+                    $refs.userIconCardBg.style.backgroundColor = this.userBg;
+                    $refs.userIconCardLabel.style.color = this.contrasting;
+                }
             }
+        "
+        x-init="
+            await getUser();
         ">
         <!-- Header -->
         <header class="flex justify-center items-center h-16">
@@ -65,27 +80,17 @@
             <h1
                 class="text-sm font-bold uppercase tracking-widest flex-1 text-center"
                 x-data="{ name: '' }"
-                x-init="
-                    name = await getHotelName();
-                    user = await getUser();
-                    userInitial = user.name[0];
-
-                    userBg = stringToColor(user.email);
-                    contrasting = getContrastingColor(userBg);
-                "
+                x-init="name = await getHotelName();"
                 x-text="name">
             </h1>
 
             <!-- Account info -->
             <div
                 class="w-12 h-12 p-2 mr-4">
-                <a href :title="user.name" class="w-full h-full rounded-full flex justify-center items-center"
-                    @click.prevent = "show_user_card = !show_user_card;"
-                    x-init="$el.style.backgroundColor = userBg; console.log($el.style.backgroundColor, userBg)">
-                    <span
-                        x-init="$el.style.color = contrasting"
-                        x-text="userInitial">
-                    </span>
+                <a href="#" :title="user.name" class="w-full h-full rounded-full flex justify-center items-center"
+                    @click.prevent="showUserCard = !showUserCard;"
+                    x-ref="userIconBg">
+                    <span x-ref="userIconLabel" x-text="user.name ? user.name[0] : ''"></span>
                 </a>
             </div>
         </header>
@@ -95,17 +100,16 @@
             absolute right-0 top-16 mr-2 p-4
             bg-background-more-lighter w-80 h-64 flex flex-col items-center rounded-xl
         "
-        x-show="show_user_card"
+        x-show="showUserCard"
         x-transition.scale.origin.top
-        @click.outside="show_user_card = false;">
+        @click.outside="showUserCard = false;">
             <div class="w-full h-20 mt-4 flex justify-center items-center">
                 <div href :title="user.name"
                     class="w-20 h-20 aspect-auto rounded-full flex justify-center items-center"
-                    @click.prevent = "show_user_card = !show_user_card;"
-                    x-init="$el.style.backgroundColor = userBg">
+                    x-ref="userIconCardBg">
                     <span class="font-bold text-2xl"
-                        x-init="$el.style.color = contrasting"
-                        x-text="userInitial">
+                        x-ref="userIconCardLabel"
+                        x-text="user.name ? user.name[0] : ''">
                     </span>
                 </div>
             </div>
@@ -218,7 +222,7 @@
                                         ? 'room-occupied'
                                         : 'none';
                             visible = true;
-                            room_data = room;
+                            roomData = room;
                         "
                         x-data="
                             {
@@ -265,13 +269,13 @@
 
                     <span class="flex-1 text-center text-sm font-semibold uppercase tracking-widest" x-transition>
                         <p x-show="mode === 'cash'">Caixa</p>
-                        <p x-show="mode === 'payment'" x-text="'Efetuar Pagamento: ' + room_data.number"></p>
-                        <p x-show="mode === 'visualize-payments'" x-text="'Visualizar Pagamentos: ' + room_data.number"></p>
+                        <p x-show="mode === 'payment'" x-text="'Efetuar Pagamento: ' + roomData.number"></p>
+                        <p x-show="mode === 'visualize-payments'" x-text="'Visualizar Pagamentos: ' + roomData.number"></p>
                         <p x-show="mode === 'occupation'">Ocupação</p>
 
-                        <p x-show="mode === 'room-available'" x-text="'Reservar: ' + room_data.number"></p>
-                        <p x-show="mode === 'room-reserved'" x-text="'Editar Reserva: ' + room_data.number"></p>
-                        <p x-show="mode === 'room-occupied'" x-text="'Visualizar Apartamento: ' + room_data.number"></p>
+                        <p x-show="mode === 'room-available'" x-text="'Reservar: ' + roomData.number"></p>
+                        <p x-show="mode === 'room-reserved'" x-text="'Editar Reserva: ' + roomData.number"></p>
+                        <p x-show="mode === 'room-occupied'" x-text="'Visualizar Apartamento: ' + roomData.number"></p>
                     </span>
 
                     <a class="
@@ -437,7 +441,7 @@
                         debt: 0,
                     }"
                     x-init="
-                        debt = await getRoomDebt(room_data.number);
+                        debt = await getRoomDebt(roomData.number);
                     ">
                         <div class="flex flex-col md:flex-row flex-1 basis-0 w-full">
                             <!-- Left -->
@@ -452,7 +456,7 @@
                                     formatMoney(e);
                                     amount = e.target.value;
                                 }"
-                                x-init="amount = formatCurrency(await getRoomDebt(room_data.number) * 100)"
+                                x-init="amount = formatCurrency(await getRoomDebt(roomData.number) * 100)"
                                 :disabled="mode === 'room-occupied'">
 
                                 <p class="mt-4">Conta atual:</p>
@@ -526,7 +530,7 @@
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
-                                const res = await pay(room_data.number, amount, selectedMethod);
+                                const res = await pay(roomData.number, amount, selectedMethod);
 
                                 if (res.success) {
                                     visible = false;
@@ -549,7 +553,7 @@
                     <div class="w-full h-full max-h-full p-5 pt-0 flex flex-col flex-1 basis-0"
                         x-data="{ payments: [], ascending: false }"
                         x-init="
-                            payments = (await getPayments()).filter(p => p.room === room_data.number);
+                            payments = (await getPayments()).filter(p => p.room === roomData.number);
                             payments.reverse();
                         ">
                         <div class="w-full h-14 flex items-center">
@@ -576,7 +580,7 @@
                                 "
                                 href
                                 @click.prevent="
-                                    payments = (await getPayments()).filter(p => p.room === room_data.number);
+                                    payments = (await getPayments()).filter(p => p.room === roomData.number);
                                     payments.reverse();
                                 "
                                 title="Recarregar Pagamentos">
@@ -717,11 +721,11 @@
                             debt: 0,
                             check_out: mode === 'room-available'
                                 ? ''
-                                : unixToDate(room_data.check_out),
+                                : unixToDate(roomData.check_out),
 
                             guests: mode === 'room-available'
                                 ? [ { name: '', cpf: '0', phone: '0' } ]
-                                : room_data.guests,
+                                : roomData.guests,
                             
                             hasUnsavedData: false,
                         }"
@@ -746,7 +750,7 @@
                                 x-init="
                                     price = mode === 'room-available'
                                         ? formatCurrency(price)
-                                        : formatCurrency(room_data.price * 100)
+                                        : formatCurrency(roomData.price * 100)
                                 "
                                 @input="(e) => {
                                     formatMoney(e);
@@ -762,7 +766,7 @@
                                     <input type="text" id="date" class="
                                         font-bold text-3xl mt-2 w-full p-2 brightness-90 cursor-not-allowed
                                         outline-none border-none bg-background-lightest rounded-lg
-                                    " :value="unixToDateTime(room_data.check_in)" disabled>
+                                    " :value="unixToDateTime(roomData.check_in)" disabled>
                                 </div>
 
                                 <p class="mt-4">Data do check-out:</p>
@@ -772,7 +776,7 @@
                                 "
                                 x-model="check_out"
                                 x-init="
-                                    const tomorrow = mode === 'room-occupied' ? new Date(room_data.check_out) : new Date();
+                                    const tomorrow = mode === 'room-occupied' ? new Date(roomData.check_out) : new Date();
                                     tomorrow.setDate(tomorrow.getDate() + 1);
 
                                     const element = document.getElementById('date');
@@ -795,7 +799,7 @@
                                 <div x-show="mode === 'room-occupied'"
                                     x-init="
                                         if (mode === 'room-occupied')
-                                            debt = await getRoomDebt(room_data.number) * 100;
+                                            debt = await getRoomDebt(roomData.number) * 100;
                                     ">
                                     <p class="mt-4">Conta:</p>
                                     <p class="font-bold text-4xl mt-2 w-full"
@@ -878,9 +882,9 @@
                                             x-model="guest.name"
                                             x-init="
                                                 guest.name = mode === 'room-available' ||
-                                                index >= room_data.guests.length
+                                                index >= roomData.guests.length
                                                     ? ''
-                                                    : room_data.guests[index].name
+                                                    : roomData.guests[index].name
                                             "
 
                                             @input="
@@ -898,9 +902,9 @@
                                                 type="text" x-model="guest.cpf"
                                                 x-init="
                                                     guest.cpf = mode === 'room-available' ||
-                                                    index >= room_data.guests.length
+                                                    index >= roomData.guests.length
                                                         ? ''
-                                                        : formatStrCPF(room_data.guests[index].cpf)
+                                                        : formatStrCPF(roomData.guests[index].cpf)
                                                 "
                                                 @input="e => {
                                                     formatCPF(e);
@@ -921,9 +925,9 @@
                                                 x-model="guest.phone"
                                                 x-init="
                                                     guest.phone = mode === 'room-available' ||
-                                                    index >= room_data.guests.length
+                                                    index >= roomData.guests.length
                                                         ? ''
-                                                        : formatStrPhone(room_data.guests[index].phone)
+                                                        : formatStrPhone(roomData.guests[index].phone)
                                                 "
                                                 @input="e => {
                                                     formatPhone(e);
@@ -962,7 +966,7 @@
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
-                                const res = await reserve(room_data.number, guests, price, check_out);
+                                const res = await reserve(roomData.number, guests, price, check_out);
                                 if (res.success)
                                     reset();
                             ">
@@ -987,7 +991,7 @@
                                 })
                                     .then(async (accepted) => {
                                         if (accepted) {
-                                            const res = await cancel(room_data.number);
+                                            const res = await cancel(roomData.number);
                                             if (res.success)
                                                 reset();
                                         }
@@ -1003,7 +1007,7 @@
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
-                                const res = await editReservation(room_data.number, guests, price, check_out);
+                                const res = await editReservation(roomData.number, guests, price, check_out);
                                 
                                 if (res.success) {
                                     hasUnsavedData = false;
@@ -1020,7 +1024,7 @@
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
-                                const res = await checkIn(room_data.number);
+                                const res = await checkIn(roomData.number);
                                 if(res.success)
                                     reset();
                             ">
@@ -1072,11 +1076,11 @@
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
-                                const res = await changeCheckOut(room_data.number, check_out);
+                                const res = await changeCheckOut(roomData.number, check_out);
                                 
                                 if (res.success) {
                                     hasUnsavedData = false;
-                                    debt = await getRoomDebt(room_data.number) * 100;
+                                    debt = await getRoomDebt(roomData.number) * 100;
                                 }
                             "
                             x-transition>
@@ -1110,14 +1114,14 @@
                                     .then(async (value) => {
                                         if (!['reverse', 'keep'].includes(value)) return;
 
-                                        const res = await checkOut(room_data.number, value);
+                                        const res = await checkOut(roomData.number, value);
 
                                         if (res.success)
                                             reset();
                                     });
                                 }
                                 else {
-                                    const res = await checkOut(room_data.number, 'none');
+                                    const res = await checkOut(roomData.number, 'none');
 
                                     if (res.success)
                                         reset();
