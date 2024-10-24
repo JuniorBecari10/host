@@ -10,7 +10,7 @@ async function sendGet(endpoint) {
         });
         return response.data;
     } catch (e) {
-        console.error(JSON.parse(e.request.responseText).message);
+        console.error(e);
     }
 }
 

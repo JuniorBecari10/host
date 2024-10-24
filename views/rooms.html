@@ -9,12 +9,6 @@
         <link rel="stylesheet" href="css/style.css" />
         <link rel="stylesheet" href="css/output.css" />
 
-        <!-- Redirect Script to login if the user isn't authenticated -->
-        <script>
-            if (!localStorage.getItem("token"))
-                window.location.href = `http://${API_URL}/login`;
-        </script>
-
         <script src="js/lib/axios.min.js"></script>
         <script src="js/lib/alpine.min.js" defer></script>
         <script src="js/lib/sweetalert.min.js" defer></script>
@@ -22,6 +16,19 @@
 
         <script src="js/send.js"></script>
         <script src="js/util.js"></script>
+
+        <!-- Redirect Script to login if the user isn't authenticated -->
+        <script>
+            // if the token is missing or is invalid, redirect to login, since this request will fail if that happens
+            getUser()
+                .catch((e) => {
+                    window.location.href = `http://${API_URL}/login`;
+                });
+
+            // fallback to redirect to login if the token is missing
+            if (!localStorage.getItem("token"))
+                window.location.href = `http://${API_URL}/login`;
+        </script>
     </head>
 
     <body
@@ -87,7 +94,7 @@
             <!-- Account info -->
             <div
                 class="w-12 h-12 p-2 mr-4">
-                <a href="#" :title="user.name" class="w-full h-full rounded-full flex justify-center items-center"
+                <a href="#" title="a" :title="user.name" class="w-full h-full rounded-full flex justify-center items-center"
                     @click.prevent="showUserCard = !showUserCard;"
                     x-ref="userIconBg">
                     <span x-ref="userIconLabel" x-text="user.name ? user.name[0] : ''"></span>

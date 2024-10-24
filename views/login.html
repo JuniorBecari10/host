@@ -35,7 +35,7 @@
                     <label
                         class="placeholder" for="email"
                         :style="{
-                            marginTop: email ? '-0.8rem' : '0.5rem',
+                            marginTop: email ? '-0.8rem' : '0.6rem',
                             marginLeft: email ? '0.7rem' : '1.2rem',
 
                             color: emailFocused ? '#3976d0' : '#5b6568',
@@ -61,7 +61,7 @@
                     <label
                         class="placeholder" for="password"
                         :style="{
-                            marginTop: password ? '-0.8rem' : '0.5rem',
+                            marginTop: password ? '-0.8rem' : '0.6rem',
                             marginLeft: password ? '0.7rem' : '1.2rem',
 
                             color: passwordFocused ? '#3976d0' : '#5b6568',
@@ -95,10 +95,18 @@
                         const token = data.data.token;
                         
                         localStorage.setItem('token', token);
-                        window.location.href = 'http://localhost:8080/rooms';
+                        window.location.href = `http://${API_URL}/rooms`;
                     ">
                     Entrar
                 </button>
+
+                <a :href="`http://${API_URL}/rooms`"
+                    class="
+                        w-full mt-2 p-2
+                        border-reserved border-2 rounded-xl hover:brightness-105 text-center
+                        transition-[background, brightness] duration-300">
+                    Já está logado? Acesse o sistema
+                </a>
             </form>
         </div>
     </body>

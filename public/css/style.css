@@ -52,20 +52,17 @@ input {
     padding: 0.5rem 1rem;
     border-radius: 1rem;
 
-    border: 1px solid transparent;
+    border: 2px solid transparent;
     outline: none;
 }
 
 .entry input:focus {
-    border: 1px solid #3976d0;
+    border: 2px solid #3976d0;
 }
 
 .entry label {
     position: absolute;
     cursor: text;
-
-    margin-top: 0.5rem;
-    margin-left: 1.2rem;
     
     color: #5b6568;
     background: #1c1f21;
