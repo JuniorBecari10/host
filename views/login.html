@@ -16,12 +16,19 @@
         <script src="js/send.js"></script>
     </head>
     <body class="w-full h-screen bg-background flex flex-col items-center justify-center">
-        <a class="
-            md:w-1/5 w-1/2 mb-10 p-4 rounded-2xl
-            hover:bg-background-lighter transition=[background] duration-300
-        " href="/" title="Retornar à página inicial">
-            <img class="w-full h-full" src="assets/logo-host.svg" alt="H">
-        </a>
+        <nav class="absolute top-0 left-0 w-full h-16 flex justify-start items-center">
+            <!-- Logo -->
+            <a href="/"
+                class="
+                    w-12 h-12 p-2 ml-4 hover:brightness-110 focus:brightness-125
+                    hover:bg-background-lighter rounded-md transition-[background, brightness] duration-300
+                "
+                title="Retornar à página inicial">
+                <img src="assets/logo-h.svg" alt="H" class="w-full h-full" />
+            </a>
+        </nav>
+
+        <img class="md:w-1/5 w-1/2 mb-10 p-4" src="/assets/logo-host.svg" alt="H">
 
         <div x-data="
             {

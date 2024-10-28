@@ -14,23 +14,23 @@
             <!-- Logo -->
             <a href
                 class="
-                    w-12 h-12 p-2 ml-4 hover:brightness-110 focus:brightness-125
+                    w-12 h-12 p-2 ml-4 hover:brightness-110 hidden sm:inline focus:brightness-125
                     hover:bg-background-lighter/30 rounded-md transition-[background, brightness] duration-300
                 "
                 title="Página inicial">
                 <img src="assets/logo-h.svg" alt="H" class="w-full h-full" />
             </a>
 
-            <div class="flex-1"></div>
+            <div class="flex-1 hidden sm:block"></div>
 
             <a class="
-                bg-reserved border-reserved border-2 px-4 py-1 rounded-full
+                bg-reserved border-reserved border-2 px-4 py-1 rounded-full mx-2
                 hover:brightness-110 transition-[background, brightness] duration-300" href="/login">
                 Login
             </a>
 
             <a class="
-                border-reserved border-2 px-4 py-1 rounded-full mx-4
+                border-reserved border-2 px-4 py-1 rounded-full mx-2 sm:mx-4
                 hover:bg-background-lightest/30 transition-[background] duration-300" href="/rooms">
                 Acesse o sistema
             </a>
@@ -40,23 +40,23 @@
             <div class="absolute w-full h-full bg-gradient-to-b from-background via-background/5 to-background z-[-1]"></div>
 
             <div class="w-full h-full flex flex-col justify-center items-center text-center ">
-                <h1 class="text-6xl font-bold w-1/2 mb-4">Simplifique a gestão do seu hotel.</h1>
+                <h1 class="md:text-6xl text-4xl font-bold w-1/2 mb-4">Simplifique a gestão do seu hotel.</h1>
                 <h2 class="text-xl mb-6">Conheça a Host, uma solução simples e completa.</h2>
 
                 <a class="
                     bg-reserved border-reserved border-2 px-6 py-2 rounded-full text-xl
-                    hover:brightness-110 transition-[background, brightness] duration-300" href="/login">
+                    hover:brightness-110 transition-[background, brightness] duration-300" href="/contact">
                     Contate-nos
                 </a>
             </div>
         </header>
 
-        <main class="w-full h-96 flex flex-col justify-start items-center mt-24">
-            <h1 class="font-bold text-xl uppercase tracking-widest mb-14">Por quê usar a Host?</h1>
+        <main class="w-full h-fit flex flex-col justify-start items-center mt-24">
+            <h1 class="font-bold sm:text-xl text-lg uppercase tracking-widest mb-14">Por quê usar a Host?</h1>
 
             <!-- Card -->
             <div class="w-2/3 flex mb-8">
-                <div class="w-1/6 p-12 pt-5 pr-3">
+                <div class="w-1/6 p-12 pt-5 pr-3 hidden md:block">
                     <img class="w-8/12" src="/assets/icons/stars.png" alt="">
                 </div>
 
@@ -74,7 +74,7 @@
 
             <!-- Card -->
             <div class="w-2/3 flex mb-8">
-                <div class="w-1/6 p-12 pt-5 pr-3">
+                <div class="w-1/6 p-12 pt-5 pr-3 hidden md:block">
                     <img class="w-8/12" src="/assets/icons/past.png" alt="">
                 </div>
 
@@ -92,7 +92,7 @@
 
             <!-- Card -->
             <div class="w-2/3 flex mb-8">
-                <div class="w-1/6 p-12 pt-5 pr-3">
+                <div class="w-1/6 p-12 pt-5 pr-3 hidden md:block">
                     <img class="w-8/12" src="/assets/icons/chart-grow.png" alt="">
                 </div>
 
@@ -108,7 +108,125 @@
                 </div>
             </div>
 
-            <h1 class="font-bold text-xl uppercase tracking-widest mb-14">Por quê usar a Host?</h1>
+            <h1 class="font-bold text-xl uppercase tracking-widest mb-14 mt-10">Nossa missão é transformar vidas</h1>
+
+            <div class="w-2/3 flex justify-evenly items-center">
+                <div class="text-center">
+                    <h1 class="text-6xl font-bold mb-2">
+                        64%
+                    </h1>
+
+                    <p>Ganho de produtividade</p>
+                </div>
+
+                <div class="text-center">
+                    <h1 class="text-6xl font-bold mb-2">
+                        87%
+                    </h1>
+
+                    <p>Melhora no aprendizado</p>
+                </div>
+
+                <div class="text-center">
+                    <h1 class="text-6xl font-bold mb-2">
+                        59%
+                    </h1>
+
+                    <p>Aumento de eficiência</p>
+                </div>
+            </div>
+
+            <h1 class="font-bold text-xl uppercase tracking-widest mb-14 mt-20">O que nossos clientes dizem</h1>
+
+            <div class="w-10/12 flex justify-evenly items-center">
+                <!-- Card -->
+                <div class="bg-background-lighter w-80 h-85 rounded-xl p-5 flex flex-col">
+                    <p class="flex-1">
+                        Adotar a Host como o sistema de controle para o meu hotel foi a melhor decisão que eu já
+                        tomei para ele! É um sistema tão simples e fácil de entender, que a minha produtividade
+                        praticamente dobrou!
+                    </p>
+
+                    <div class="my-4">
+                        <h1 class="font-bold text-xl">Antônio Carlos</h1>
+                        <h2 class="text-sm tracking-widest uppercase">Antônio's Hotel</h2>
+
+                        <div class="w-full h-4 mt-2 flex">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card -->
+                <div class="bg-background-lighter w-80 h-85 rounded-xl p-5 flex flex-col">
+                    <p>
+                        Desde que comecei a usar o sistema da Host, ganhei mais tempo para focar no que
+                        realmente importa: proporcionar uma experiência incrível para os meus hóspedes.
+                        É intuitivo e me ajuda a organizar tudo com eficiência!
+                    </p>
+
+                    <div class="flex-1"></div>
+
+                    <div class="my-4">
+                        <h1 class="font-bold text-xl">Rodolfo Neto</h1>
+                        <h2 class="text-sm tracking-widest uppercase">Pousada Chic</h2>
+
+                        <div class="w-full h-4 mt-2 flex">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card -->
+                <div class="bg-background-lighter w-80 h-85 rounded-xl p-5 flex flex-col">
+                    <p>
+                        Com o sistema da Host, a gestão do meu hotel nunca foi tão
+                        prática! As tarefas são automatizadas, e agora posso tomar decisões
+                        com mais segurança e rapidez.
+                    </p>
+
+                    <div class="flex-1"></div>
+
+                    <div class="my-4">
+                        <h1 class="font-bold text-xl">Guilherme Dias</h1>
+                        <h2 class="text-sm tracking-widest uppercase">Franca Palace Hotel</h2>
+
+                        <div class="w-full h-4 mt-2 flex">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                            <img class="h-full" src="/assets/icons/star.png" alt="Star">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h1 class="font-bold text-xl uppercase tracking-widest mb-10 mt-20">Traga seu hotel para a Host também</h1>
+
+            <a class="
+                bg-reserved border-reserved border-2 px-6 py-2 rounded-full text-xl
+                hover:brightness-110 transition-[background, brightness] duration-300" href="/contact">
+                Contate-nos
+            </a>
         </main>
+
+        <footer class="
+            bg-gradient-to-b from-background to-[#000] w-full h-96
+            flex justify-center items-center flex-col
+        ">
+            <img class="h-14 mb-6" src="/assets/logo-host.svg" alt="">
+
+            <p>Copyright &copy; 2024 Host.</p>
+            <p>Todos os direitos reservados.</p>
+        </footer>
     </body>
 </html>

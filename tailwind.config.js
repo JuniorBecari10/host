@@ -17,7 +17,7 @@ module.exports = {
       "reserved": "#3976d0",
       "occupied": "#c64444",
 
-      "black-25": "rgba(17, 19, 19, 25%)"
+      "black-25": "rgba(17, 19, 19, 25%)",
     },
 
     extend: {
@@ -37,6 +37,7 @@ module.exports = {
         "9/10": "90vh",
         "full-4": "calc(100vh - 4rem)",
         "26": "6.5rem",
+        "85": "21.5rem",
       },
     }
   },

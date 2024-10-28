@@ -11,11 +11,19 @@ function setupServerRoutes(app) {
 
     /*
         GET /login
-        Returns a login page.
+        Returns the login page.
     */
     app.get("/login", (_, res) => {
         res.sendFile(path.join(__dirname, "..", "..", "views", "login.html"));
     });
+
+    /*
+        GET /login
+        Returns the contact page.
+    */
+        app.get("/contact", (_, res) => {
+            res.sendFile(path.join(__dirname, "..", "..", "views", "contact.html"));
+        });
     
 
     /*

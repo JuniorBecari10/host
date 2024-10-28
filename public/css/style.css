@@ -54,6 +54,8 @@ input {
 
     border: 2px solid transparent;
     outline: none;
+
+    transition: border 0.3s;
 }
 
 .entry input:focus {

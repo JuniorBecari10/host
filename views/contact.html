@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Host - Contato</title>
+
+        <link rel="shortcut icon" href="assets/favicon.png" type="image/x-icon">
+        <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="css/output.css" />
+    </head>
+    <body class="bg-background">
+        <nav class="absolute top-0 flex justify-center items-center w-full h-16">
+            <!-- Logo -->
+            <a href="/"
+                class="
+                    w-12 h-12 p-2 ml-4 hover:brightness-110 hidden sm:inline focus:brightness-125
+                    hover:bg-background-lighter rounded-md transition-[background, brightness] duration-300
+                "
+                title="Página inicial">
+                <img src="assets/logo-h.svg" alt="H" class="w-full h-full" />
+            </a>
+
+            <div class="flex-1 hidden sm:block"></div>
+
+            <a class="
+                bg-reserved border-reserved border-2 px-4 py-1 rounded-full mx-2
+                hover:brightness-110 transition-[background, brightness] duration-300" href="/login">
+                Login
+            </a>
+
+            <a class="
+                border-reserved border-2 px-4 py-1 rounded-full mx-2 sm:mx-4
+                hover:bg-background-lightest/30 transition-[background] duration-300" href="/rooms">
+                Acesse o sistema
+            </a>
+        </nav>
+
+        <main class="mt-16 p-4 flex justify-start items-center flex-col">
+            <h1 class="font-bold text-3xl">Contate-nos</h1>
+            <p class="text-xl">Traga seu hotel para a Host!</p>
+
+            <div class="w-1/2 p-4 bg-background-lighter rounded-xl mt-10">
+                <h2 class="uppercase font-bold tracking-widest text-sm ml-2">E-mail</h2>
+                <a class="
+                    block w-full rounded-full bg-background-more-lighter p-2 mt-2
+                    hover:bg-background-bit-more-lighter transition-[background] duration-300
+                "
+                href="mailto:antonioocarlos@proton.me">
+                    antonioocarlos@proton.me
+                </a>
+
+                <div class="mt-4 w-full rounded-xl bg-background-more-lighter p-2">
+                    <p class="text-[#c0c0c0]">
+                        Nos envie um e-mail dizendo o nome do seu hotel, e suas respectivas informações.
+                        Em pouco tempo nós entraremos em contato com você.
+                    </p>
+                    
+                    <span class="block w-full mt-2">Clique no endereço de e-mail acima para enviar o e-mail.</span>
+                </div>
+            </div>
+        </main>
+    </body>
+</html>
