@@ -1027,10 +1027,6 @@ video {
   border-width: 2px;
 }
 
-.border-none {
-  border-style: none;
-}
-
 .border-background-lightest {
   --tw-border-opacity: 1;
   border-color: rgb(39 44 45 / var(--tw-border-opacity));

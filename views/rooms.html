@@ -259,6 +259,11 @@
                 w-4/5 md:w-4/5 h-9/10 flex flex-col
                 bg-background-lighter rounded-2xl shadow-md top-full
             "
+            x-data="
+                {
+                    hasUnsavedData: false,
+                }
+            "
             x-transition x-transition.duration.300ms>
                 <!-- Header -->
                 <div class="flex justify-center items-center w-full h-16 p-4">
@@ -295,7 +300,26 @@
                             hover:bg-background-lightest rounded-full transition-[background, brightness] duration-300
                         "
                         href
-                        @click.prevent="reset()">
+                        @click.prevent="
+                            if (['room-available', 'room-reserved', 'room-occupied'].includes(mode) && hasUnsavedData) {
+                                swal({
+                                    title: 'Você tem certeza disso?',
+                                    text: 'Você deseja fechar a tela e perder as alterações?',
+                                    icon: 'warning',
+                                    buttons: true,
+                                    dangerMode: 'true',
+                                })
+                                    .then(async (accepted) => {
+                                        if (accepted) {
+                                            hasUnsavedData = false;
+                                            reset();
+                                        }
+                                    });
+                            }
+
+                            else
+                                reset();
+                        ">
                         <img class="w-6 h-6" src="assets/icons/close.png" alt="X">
                     </a>
                 </div>
@@ -782,8 +806,6 @@
                             guests: mode === 'room-available'
                                 ? [ { name: '', cpf: '0', phone: '0' } ]
                                 : roomData.guests,
-                            
-                            hasUnsavedData: false,
                         }"
                     x-init="
                         if (mode === 'room-available') {
