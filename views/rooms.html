@@ -459,31 +459,70 @@
                         <div class="flex flex-col md:flex-row flex-1 basis-0 w-full">
                             <!-- Left -->
                             <div class="md:w-1/2 w-full md:h-full h-1/2 pr-4 pb-4 md:pb-0 overflow-auto">
-                                <p>Valor:</p>
-                                <input class="
-                                    font-bold text-3xl mt-2 w-full p-2
-                                    outline-none border-none bg-background-lightest rounded-full
-                                "
-                                type="text" x-model="amount"
-                                @input="(e) => {
-                                    formatMoney(e);
-                                    amount = e.target.value;
-                                }"
-                                x-init="amount = formatCurrency(await getRoomDebt(roomData.number) * 100)"
-                                :disabled="mode === 'room-occupied'">
+                                <div x-data="
+                                    {
+                                        focused: false,
+                                    }
+                                ">
+                                    <label class="
+                                        relative top-4 left-3 bg-background-more-lighter p-1 px-2 rounded-t-xl
+                                        text-md transition-[color] duration-300
+                                    "
+                                    :class="focused ? 'text-reserved' : 'text-label'">
+                                        Valor
+                                    </label>
+                                    <input class="
+                                        font-bold text-2xl mt-2 w-full p-2 px-4 transition-[border] duration-300
+                                        outline-none bg-background-more-lighter rounded-full border-2
+                                    "
+                                    :class="focused ? 'border-reserved' : 'border-background-more-lighter'"
+                                    type="text" x-model="amount"
 
-                                <p class="mt-4">Conta atual:</p>
-                                <h1 class="font-bold text-3xl mt-2 w-full"
-                                x-text="formatCurrency(debt * 100)"></h1>
+                                    @input="(e) => {
+                                        formatMoney(e);
+                                        amount = e.target.value;
+                                    }"
 
-                                <p class="mt-4">Conta após o pagamento:</p>
-                                <h1 class="font-bold text-3xl mt-2 w-full"
-                                x-text="formatCurrency((debt - currencyToFloat(amount)) * 100)"></h1>
+                                    @focus="focused = true"
+                                    @blur="focused = false"
+
+                                    x-init="amount = formatCurrency(await getRoomDebt(roomData.number) * 100)"
+                                    :disabled="mode === 'room-occupied'">
+                                </div>
+
+                                <div class="flex w-full">
+                                    <div class="w-1/2 mr-4">
+                                        <label class="
+                                            relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                            text-md text-label z-10
+                                        ">
+                                            Conta atual
+                                        </label>
+                                        <p class="font-bold text-2xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                        x-text="formatCurrency(debt * 100)"></p>
+                                    </div>
+
+                                    <div class="w-1/2 ml-4">
+                                        <label class="
+                                            relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                            text-md text-label z-10
+                                        ">
+                                            Restante
+                                        </label>
+                                        <p class="font-bold text-2xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                        x-text="formatCurrency((debt - currencyToFloat(amount)) * 100)"></p>
+                                    </div>
+                                </div>
                             </div>
                             <!-- Right -->
                             <div class="flex-1 basis-0 max-h-full h-full md:pl-4 pb-4 flex flex-col">
-                                <div class="flex items-center">
-                                    <p class="w-full">Forma de pagamento:</p>
+                                <div>
+                                    <label class="
+                                        relative top-4 left-3 bg-background-more-lighter p-1 px-2 rounded-t-xl
+                                        text-md transition-[color] duration-300 text-label
+                                    ">
+                                        Forma de pagamento
+                                    </label>
                                 </div>
 
                                 <div class="
@@ -518,7 +557,11 @@
                                             m-2 rounded-2xl flex flex-col 
                                             transition-[background, brightness] duration-300
                                         "
-                                        :class="selectedMethod === method.method ? 'brightness-110 hover:brightness-125 shadow-md' : 'brightness-100 hover:brightness-110'"
+                                        :class="
+                                            selectedMethod === method.method
+                                                ? 'brightness-110 hover:brightness-125'
+                                                : 'brightness-100 hover:brightness-105'
+                                            "
                                         @click.prevent="selectedMethod = method.method">
                                             <div class="flex-1 flex justify-center items-center">
                                                 <img :src="'assets/icons/' + method.icon" alt="Icon">
@@ -873,7 +916,15 @@
                             <!-- Right -->
                             <div class="flex-1 basis-0 max-h-full h-full md:pl-4 pb-4 flex flex-col">
                                 <div class="flex items-center">
-                                    <p class="w-full">Hóspedes:</p>
+                                    <label class="
+                                        relative top-4 left-3 bg-background-more-lighter p-1 px-2 rounded-t-xl
+                                        text-md transition-[color] duration-300 text-label
+                                    ">
+                                        Hóspedes
+                                    </label>
+
+                                    <div class="flex-1"></div>
+
                                     <a class="
                                         flex justify-center items-center w-9 h-9 p-2 ml-4
                                         hover:brightness-110 hover:bg-background-lightest rounded-full
@@ -900,10 +951,10 @@
 
                                 <div class="
                                     flex-1 basis-0 h-full bg-background-more-lighter
-                                    rounded-lg mt-2 p-4 overflow-y-auto
+                                    rounded-xl mt-2 p-4 overflow-y-auto
                                 ">
                                     <template x-for="(guest, index) in guests">
-                                        <div class="w-full h-fit bg-background-bit-more-lighter rounded-lg p-4 mb-4"
+                                        <div class="w-full h-fit bg-background-bit-more-lighter rounded-xl p-4 mb-4"
                                             x-data="{
                                                 element_index: index
                                             }">
@@ -917,7 +968,7 @@
 
                                                 <a class="
                                                     flex justify-center items-center w-8 h-8 p-2 ml-4
-                                                    hover:brightness-110 hover:bg-background-lightest rounded-md
+                                                    hover:brightness-110 hover:bg-background-lightest rounded-full
                                                     transition-[background, brightness] duration-300
                                                 "
                                                 href
@@ -936,71 +987,116 @@
                                                 </a>
                                             </div>
 
-                                            <p>Nome:</p>
-                                            <input class="
-                                                font-bold text-3xl mt-2 w-full p-2
-                                                outline-none border-none bg-background-lightest rounded-lg
-                                            "
-                                            type="text"
-                                            x-model="guest.name"
-                                            x-init="
-                                                guest.name = mode === 'room-available' ||
-                                                index >= roomData.guests.length
-                                                    ? ''
-                                                    : roomData.guests[index].name
-                                            "
-
-                                            @input="
-                                                if (mode === 'room-reserved')
-                                                    hasUnsavedData = true;
-                                            "
-
-                                            :disabled="mode === 'room-occupied'">
-                                            
-                                            <p class="mt-4">CPF:</p>
-                                            <input class="
-                                                    font-bold text-xl mt-2 w-full p-2
-                                                    outline-none border-none bg-background-lightest rounded-lg
-                                                "
-                                                type="text" x-model="guest.cpf"
-                                                x-init="
-                                                    guest.cpf = mode === 'room-available' ||
-                                                    index >= roomData.guests.length
-                                                        ? ''
-                                                        : formatStrCPF(roomData.guests[index].cpf)
-                                                "
-                                                @input="e => {
-                                                    formatCPF(e);
-                                                    guest.cpf = e.target.value;
-
-                                                    if (mode === 'room-reserved')
-                                                        hasUnsavedData = true;
+                                            <div x-data="
+                                                {
+                                                    focused: false,
                                                 }
+                                            ">
+                                                <label class="
+                                                    relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
+                                                    text-md transition-[color] duration-300
                                                 "
-                                                :disabled="mode === 'room-occupied'">
-
-                                            <p class="mt-4">Telefone:</p>
-                                            <input class="
-                                                    font-bold text-xl mt-2 w-full p-2
-                                                    outline-none border-none bg-background-lightest rounded-lg
+                                                :class="focused ? 'text-reserved' : 'text-label'">
+                                                    Nome
+                                                </label>
+                                                <input class="
+                                                    font-bold text-xl mt-2 w-full p-2 px-4 transition-[border] duration-300
+                                                    outline-none border-2 bg-background-lightest rounded-full
                                                 "
+                                                :class="focused ? 'border-reserved' : 'border-background-lightest'"
                                                 type="text"
-                                                x-model="guest.phone"
+                                                x-model="guest.name"
                                                 x-init="
-                                                    guest.phone = mode === 'room-available' ||
+                                                    guest.name = mode === 'room-available' ||
                                                     index >= roomData.guests.length
                                                         ? ''
-                                                        : formatStrPhone(roomData.guests[index].phone)
+                                                        : roomData.guests[index].name
                                                 "
-                                                @input="e => {
-                                                    formatPhone(e);
-                                                    guest.phone = e.target.value;
-
+                                                @input="
                                                     if (mode === 'room-reserved')
                                                         hasUnsavedData = true;
-                                                }
                                                 "
+
+                                                @focus="focused = true"
+                                                @blur="focused = false"
+
                                                 :disabled="mode === 'room-occupied'">
+                                            </div>
+                                            
+                                            <div x-data="
+                                                {
+                                                    focused: false,
+                                                }
+                                            ">
+                                                <label class="
+                                                        relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
+                                                        text-md transition-[color] duration-300
+                                                    "
+                                                    :class="focused ? 'text-reserved' : 'text-label'">CPF</label>
+                                                <input class="
+                                                        font-bold text-xl mt-2 w-full p-2 px-4 transition-[border] duration-300
+                                                        outline-none border-2 bg-background-lightest rounded-full
+                                                    "
+                                                    :class="focused ? 'border-reserved' : 'border-background-lightest'"
+                                                    type="text" x-model="guest.cpf"
+                                                    x-init="
+                                                        guest.cpf = mode === 'room-available' ||
+                                                        index >= roomData.guests.length
+                                                            ? ''
+                                                            : formatStrCPF(roomData.guests[index].cpf)
+                                                    "
+                                                    @input="e => {
+                                                        formatCPF(e);
+                                                        guest.cpf = e.target.value;
+                                                        if (mode === 'room-reserved')
+                                                            hasUnsavedData = true;
+                                                    }
+                                                    "
+
+                                                    @focus="focused = true"
+                                                    @blur="focused = false"
+
+                                                    :disabled="mode === 'room-occupied'">
+                                            </div>
+
+                                            <div x-data="
+                                                {
+                                                    focused: false,
+                                                }
+                                            ">
+                                                <label class="
+                                                        relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
+                                                        text-md transition-[color] duration-300
+                                                    "
+                                                    :class="focused ? 'text-reserved' : 'text-label'">
+                                                    Telefone
+                                                </label>
+                                                <input class="
+                                                        font-bold text-xl mt-2 w-full p-2 px-4 transition-[border] duration-300
+                                                        outline-none border-2 bg-background-lightest rounded-full
+                                                    "
+                                                    :class="focused ? 'border-reserved' : 'border-background-lightest'"
+                                                    type="text"
+                                                    x-model="guest.phone"
+                                                    x-init="
+                                                        guest.phone = mode === 'room-available' ||
+                                                        index >= roomData.guests.length
+                                                            ? ''
+                                                            : formatStrPhone(roomData.guests[index].phone)
+                                                    "
+                                                    @input="e => {
+                                                        formatPhone(e);
+                                                        guest.phone = e.target.value;
+                                                        if (mode === 'room-reserved')
+                                                            hasUnsavedData = true;
+                                                    }
+                                                    "
+
+                                                    @focus="focused = true"
+                                                    @blur="focused = false"
+
+                                                    :disabled="mode === 'room-occupied'">
+                                            </div>
                                         </div>
                                     </template>
                                 </div>
