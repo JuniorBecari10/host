@@ -1,0 +1,33 @@
+.entry input {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+
+    border: 2px solid transparent;
+    outline: none;
+
+    transition: border 0.3s;
+}
+
+.entry input:focus {
+    border: 2px solid #3976d0;
+}
+
+.entry label {
+    position: absolute;
+    cursor: text;
+    
+    color: #5b6568;
+    background: #1c1f21;
+
+    border-radius: 9999px;
+    transition: 0.3s;
+}
+
+.entry input:focus ~ .entry label {
+    margin-top: -0.5rem;
+    color: #3976d0;
+}
+
+.entry input::placeholder {
+    visibility: hidden;
+}

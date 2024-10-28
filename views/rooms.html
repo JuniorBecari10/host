@@ -144,14 +144,14 @@
 
         <main class="flex flex-col h-full-4 overflow-y-auto" x-data="{ rooms: [] }">
             <!-- Options Bar -->
-            <div class="flex justify-center items-center width-full h-14 bg-background-lighter m-4 rounded-lg">
+            <div class="flex justify-center items-center width-full h-14 bg-background-lighter m-4 rounded-full">
                 <!-- Option Card - Guests -->
                 <a href class="
                     flex justify-center items-center
                     w-fit bg-background-lightest
                     m-2 my-4 p-4 py-2
                     font-semibold text-sm
-                    hover:brightness-110 rounded-md transition-[background, brightness] duration-300
+                    hover:brightness-110 rounded-full transition-[background, brightness] duration-300
                 "
                 @click.prevent="
                     mode = 'occupation';
@@ -168,7 +168,7 @@
                     w-fit bg-background-lightest
                     m-2 my-4 p-4 py-2
                     font-semibold text-sm
-                    hover:brightness-110 rounded-md transition-[background, brightness] duration-300
+                    hover:brightness-110 rounded-full transition-[background, brightness] duration-300
                 "
                 @click.prevent="
                     mode = 'cash';
@@ -193,7 +193,7 @@
 
                 <a class="
                         flex justify-center items-center w-8 h-8 p-2 hover:brightness-110
-                        hover:bg-background-lighter rounded-lg transition-[background, brightness] duration-300
+                        hover:bg-background-lighter rounded-full transition-[background, brightness] duration-300
                     "
                     href
                     id="reload-btn"
@@ -204,45 +204,45 @@
             </div>
 
             <!-- Room Area -->
-            <div class="w-full flex-1 p-4 overflow-y-auto grid grid-rows-hits grid-cols-hits"
+            <div class="w-full flex-1 p-4 overflow-y-auto grid grid-rows-auto-fill grid-cols-auto-fill aspect-square"
                 x-init="rooms = await getRooms()">
                 <template x-for="room in rooms">
-                    <!-- Apartment Card -->
-                    <a href class="
-                            flex justify-center items-center
-                            w-20 h-20 mr-4 hover:brightness-110
-                            font-bold text-xl rounded-xl
-                            transition-[background, brightness] duration-300
-                        "
-
-                        :class="room.state === 'available'
-                            ? 'bg-available'
-                            : room.state === 'reserved'
-                                ? 'bg-reserved'
-                                : room.state === 'occupied'
-                                    ? 'bg-occupied'
-                                    : 'bg-red-100'
-                        "
-
-                        @click.prevent="
-                            mode = room.state === 'available'
-                                ? 'room-available'
+                    <div class="w-full h-full flex justify-center items-center">
+                        <!-- Apartment Card -->
+                        <a href class="
+                                flex justify-center items-center
+                                w-20 h-20 hover:brightness-110
+                                font-bold text-xl rounded-2xl
+                                transition-[background, brightness] duration-300
+                            "
+                            :class="room.state === 'available'
+                                ? 'bg-available'
                                 : room.state === 'reserved'
-                                    ? 'room-reserved'
+                                    ? 'bg-reserved'
                                     : room.state === 'occupied'
-                                        ? 'room-occupied'
-                                        : 'none';
-                            visible = true;
-                            roomData = room;
-                        "
-                        x-data="
-                            {
-                                number: room.number,
-                                state: room.state
-                            }
-                        "
-                        x-text="room.number">
-                    </a>
+                                        ? 'bg-occupied'
+                                        : 'bg-red-100'
+                            "
+                            @click.prevent="
+                                mode = room.state === 'available'
+                                    ? 'room-available'
+                                    : room.state === 'reserved'
+                                        ? 'room-reserved'
+                                        : room.state === 'occupied'
+                                            ? 'room-occupied'
+                                            : 'none';
+                                visible = true;
+                                roomData = room;
+                            "
+                            x-data="
+                                {
+                                    number: room.number,
+                                    state: room.state
+                                }
+                            "
+                            x-text="room.number">
+                        </a>
+                    </div>
                 </template>
             </div>
         </main>
@@ -257,14 +257,14 @@
             <!-- Card -->
             <div class="
                 w-4/5 md:w-4/5 h-9/10 flex flex-col
-                bg-background-lighter rounded-xl shadow-md top-full
+                bg-background-lighter rounded-2xl shadow-md top-full
             "
             x-transition x-transition.duration.300ms>
                 <!-- Header -->
                 <div class="flex justify-center items-center w-full h-16 p-4">
                     <a x-show="['payment', 'visualize-payments'].includes(mode)" class="
                             flex justify-center items-center w-10 h-10 p-2 hover:brightness-110
-                            hover:bg-background-lightest rounded-md transition-[background, brightness] duration-300
+                            hover:bg-background-lightest rounded-full transition-[background, brightness] duration-300
                         "
                         href
                         @click.prevent="
@@ -276,6 +276,7 @@
                         ">
                         <img class="w-5 h-5" src="assets/icons/back.png" alt="Back">
                     </a>
+
                     <div class="w-10" x-show="!['payment', 'visualize-payments'].includes(mode)"></div>
 
                     <span class="flex-1 text-center text-sm font-semibold uppercase tracking-widest" x-transition>
@@ -291,7 +292,7 @@
 
                     <a class="
                             flex justify-center items-center w-10 h-10 p-2 ml-4 hover:brightness-110
-                            hover:bg-background-lightest rounded-md transition-[background, brightness] duration-300
+                            hover:bg-background-lightest rounded-full transition-[background, brightness] duration-300
                         "
                         href
                         @click.prevent="reset()">
@@ -330,7 +331,7 @@
                         <div class="w-full flex">
                             <a class="
                                     flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
-                                    hover:bg-background-lightest rounded-lg
+                                    hover:bg-background-lightest rounded-full
                                     transition-[background, brightness] duration-300
                                     "
                                 id="reload-cash"
@@ -348,7 +349,7 @@
                             <!-- Close Cash confirmation -->
                             <a class="
                                     flex justify-center items-center w-8 h-8 p-2 mt-2 ml-2
-                                    hover:brightness-110 hover:bg-background-lightest rounded-lg
+                                    hover:brightness-110 hover:bg-background-lightest rounded-full
                                     transition-[background, brightness] duration-300"
                                 href
                                 @click.prevent="
@@ -380,11 +381,12 @@
                 
                         <div class="flex-1 flex flex-col mt-4">
                             <div class="w-full h-14 flex items-center">
-                                <p class="flex-1">Pagamentos:</p>
-                
-                                <a x-show="payments.length > 0" class="
+                                <label class="relative top-4 left-4 bg-background-more-lighter p-1 px-2 rounded-t-xl text-md text-label">Pagamentos</label>
+                                <div class="flex-1"></div>
+
+                                <a x-show="payments.length > 1" class="
                                         flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
-                                        hover:bg-background-lightest rounded-lg
+                                        hover:bg-background-lightest rounded-full
                                         transition-[background, brightness] duration-300
                                     "
                                     href
@@ -398,7 +400,7 @@
                 
                                 <a class="
                                         flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
-                                        hover:bg-background-lightest rounded-lg
+                                        hover:bg-background-lightest rounded-full
                                         transition-[background, brightness] duration-300
                                     "
                                     href
@@ -414,14 +416,14 @@
                             </div>
                             <div class="
                                 flex-1 basis-0 h-full max-h-full overflow-y-auto
-                                bg-background-more-lighter rounded-lg p-4
+                                bg-background-more-lighter rounded-xl p-4
                             ">
                             <div x-show="payments.length > 0">
                                 <template x-for="payment in payments">
                                     <div
                                         class="
-                                            bg-background-bit-more-lighter rounded-lg
-                                            w-full h-16 mb-4 flex items-center p-4
+                                            bg-background-bit-more-lighter rounded-full
+                                            w-full h-16 mb-4 flex items-center p-4 px-6
                                         ">
                                         <h1 class="font-bold text-xl flex-1" x-text="formatCurrency(payment.amount * 100)"></h1>
                 
@@ -460,7 +462,7 @@
                                 <p>Valor:</p>
                                 <input class="
                                     font-bold text-3xl mt-2 w-full p-2
-                                    outline-none border-none bg-background-lightest rounded-lg
+                                    outline-none border-none bg-background-lightest rounded-full
                                 "
                                 type="text" x-model="amount"
                                 @input="(e) => {
@@ -486,7 +488,7 @@
 
                                 <div class="
                                     flex-1 grid grid-cols-2 grid-rows-2 basis-0 h-full bg-background-more-lighter
-                                    rounded-lg mt-2 p-4 overflow-y-auto
+                                    rounded-xl mt-2 p-4 overflow-y-auto
                                 ">
                                     <template x-for="method in [
                                         {
@@ -532,12 +534,12 @@
                         <!-- Footer -->
                         <div class="
                             w-full h-14 flex items-center justify-evenly
-                            rounded-lg bg-background-more-lighter
+                            rounded-full bg-background-more-lighter
                         ">
                             <!-- Botão Pagar -->
                             <a href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
-                                rounded-lg bg-background-lightest
+                                rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
@@ -568,11 +570,12 @@
                             payments.reverse();
                         ">
                         <div class="w-full h-14 flex items-center">
-                            <p class="flex-1">Pagamentos:</p>
+                            <label class="relative top-4 left-4 bg-background-more-lighter p-1 px-2 rounded-t-xl text-md text-label">Pagamentos</label>
+                            <div class="flex-1"></div>
             
-                            <a x-show="payments.length > 0" class="
+                            <a x-show="payments.length > 1" class="
                                     flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
-                                    hover:bg-background-lightest rounded-lg
+                                    hover:bg-background-lightest rounded-full
                                     transition-[background, brightness] duration-300
                                 "
                                 href
@@ -586,7 +589,7 @@
             
                             <a class="
                                     flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
-                                    hover:bg-background-lightest rounded-lg
+                                    hover:bg-background-lightest rounded-full
                                     transition-[background, brightness] duration-300
                                 "
                                 href
@@ -606,8 +609,8 @@
                                 <template x-for="payment in payments">
                                     <div
                                         class="
-                                            bg-background-bit-more-lighter rounded-lg
-                                            w-full h-16 mb-4 flex items-center p-4
+                                            bg-background-bit-more-lighter rounded-full
+                                            w-full h-16 mb-4 flex items-center p-4 px-6
                                         ">
                                         <h1 class="font-bold text-xl flex-1" x-text="formatCurrency(payment.amount * 100)"></h1>
                 
@@ -717,13 +720,12 @@
                             </div>
                         </div>
 
-                        <div class="flex-1 basis-0 overflow-y-hidden bg-background-more-lighter p-4 rounded-xl">
+                        <div class="flex-1 basis-0 overflow-y-hidden bg-background-more-lighter p-6 rounded-2xl">
                             <canvas class="flex-1 basis-0"></canvas>
                         </div>
                     </div>
                 </template>                
 
-                <!-- TODO: add change tracker, to remind the user to save them -->
                 <template x-if="['room-available', 'room-reserved', 'room-occupied'].includes(mode)">
                     <div class="w-full h-full max-h-full p-5 pt-0 flex flex-col flex-1 basis-0"
                     x-data="
@@ -752,69 +754,119 @@
                         <div class="flex flex-col md:flex-row flex-1 basis-0 w-full">
                             <!-- Left -->
                             <div class="md:w-1/2 w-full md:h-full h-1/2 pr-4 pb-4 md:pb-0 overflow-auto">
-                                <p>Valor da diária:</p>
-                                <input class="
-                                    font-bold text-3xl mt-2 w-full p-2
-                                    outline-none border-none bg-background-lightest rounded-lg
-                                "
-                                type="text" x-model="price"
-                                x-init="
-                                    price = mode === 'room-available'
-                                        ? formatCurrency(price)
-                                        : formatCurrency(roomData.price * 100)
-                                "
-                                @input="(e) => {
-                                    formatMoney(e);
-                                    price = e.target.value;
+                                <!-- Entry -->
+                                <div x-data="
+                                    {
+                                        focused: false,
+                                    }
+                                ">
+                                    <label class="
+                                        relative top-4 left-2 bg-background-more-lighter p-1 px-2 rounded-t-xl
+                                        text-md transition-[color] duration-300
+                                    "
+                                    :class="focused ? 'text-reserved' : 'text-label'">
+                                        Valor da diária
+                                    </label>
                                     
-                                    if (mode === 'room-reserved')
-                                        hasUnsavedData = true;
-                                }"
-                                :disabled="mode === 'room-occupied'">
+                                    <input class="
+                                        font-bold text-2xl mt-2 w-full p-2 px-4
+                                        outline-none bg-background-more-lighter rounded-full
+                                        transition-[border] duration-300 border-2
+                                    "
+                                    :class="focused ? 'border-reserved' : 'border-background-more-lighter'"
 
-                                <div x-show="mode === 'room-occupied'">
-                                    <p class="mt-4">Hora do check-in:</p>
-                                    <input type="text" id="date" class="
-                                        font-bold text-3xl mt-2 w-full p-2 brightness-90 cursor-not-allowed
-                                        outline-none border-none bg-background-lightest rounded-lg
-                                    " :value="unixToDateTime(roomData.check_in)" disabled>
+                                    type="text" x-model="price"
+                                    x-init="
+                                        price = mode === 'room-available'
+                                            ? formatCurrency(price)
+                                            : formatCurrency(roomData.price * 100)
+                                    "
+                                    @input="(e) => {
+                                        formatMoney(e);
+                                        price = e.target.value;
+                                    
+                                        if (mode === 'room-reserved')
+                                            hasUnsavedData = true;
+                                    }"
+
+                                    @focus="focused = true"
+                                    @blur="focused = false"
+
+                                    :disabled="mode === 'room-occupied'">
                                 </div>
 
-                                <p class="mt-4">Data do check-out:</p>
-                                <input type="date" id="date" class="
-                                    font-bold text-3xl mt-2 w-full p-2
-                                    outline-none border-none bg-background-lightest rounded-lg
-                                "
-                                x-model="check_out"
-                                x-init="
-                                    const tomorrow = mode === 'room-occupied' ? new Date(roomData.check_out) : new Date();
-                                    tomorrow.setDate(tomorrow.getDate() + 1);
-
-                                    const element = document.getElementById('date');
-                                    const parsed = tomorrow.toISOString().split('T')[0];
-
-                                    element.setAttribute('min', parsed);
-                                "
-
-                                @input="
-                                    if (['room-reserved', 'room-occupied'].includes(mode))
-                                        hasUnsavedData = true;
+                                <!-- Entry -->
+                                <div x-data="
+                                    {
+                                        focused: false,
+                                    }
                                 ">
+                                    <label class="
+                                        relative top-4 left-2 bg-background-more-lighter p-1 px-2
+                                        rounded-t-xl text-md text-label z-10 transition-[color] duration-300"
+                                        :class="focused ? 'text-reserved' : 'text-label'">
+                                        Data do check-out
+                                    </label>
+                                    <input type="date" id="date" class="
+                                        font-bold text-2xl mt-2 w-full p-2 px-4 transition-[border] duration-300
+                                        outline-none bg-background-more-lighter rounded-full border-2
+                                    "
+                                    :class="focused ? 'border-reserved' : 'border-background-more-lighter'"
+                                    x-model="check_out"
+                                    x-init="
+                                        const tomorrow = new Date();
+                                        tomorrow.setDate(tomorrow.getDate() + 1);
 
-                                <p class="mt-4">Hora do check-out:</p>
-                                <input type="text" id="date" class="
-                                    font-bold text-3xl mt-2 w-full p-2 brightness-90 cursor-not-allowed
-                                    outline-none border-none bg-background-lightest rounded-lg
-                                " :value="(await getCheckOutHour()).formatted" disabled>
+                                        const element = document.getElementById('date');
+                                        const parsed = tomorrow.toISOString().split('T')[0];
+                                        element.setAttribute('min', parsed);
+                                    "
+                                    @input="
+                                        if (['room-reserved', 'room-occupied'].includes(mode))
+                                            hasUnsavedData = true;
+                                    "
+                                    @focus="focused = true"
+                                    @blur="focused = false">
+                                </div>
 
                                 <div x-show="mode === 'room-occupied'"
                                     x-init="
                                         if (mode === 'room-occupied')
                                             debt = await getRoomDebt(roomData.number) * 100;
                                     ">
-                                    <p class="mt-4">Conta:</p>
-                                    <p class="font-bold text-4xl mt-2 w-full"
-                                    x-text="formatCurrency(debt)"></p>
+                                    <label class="
+                                        relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                        text-md text-label z-10
+                                    ">Hora do check-in</label>
+                                    <p class="font-bold text-2xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                    x-text="unixToDateTime(roomData.check_in)"></p>
+                                </div>
+
+                                <div class="w-full flex">
+                                    <!-- Info -->
+                                    <div class="w-1/2 mr-3">
+                                        <label class="
+                                            relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                            text-md text-label z-10
+                                        ">
+                                            Hora do check-out
+                                        </label>
+                                        <p class="font-bold text-2xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                        x-text="(await getCheckOutHour()).formatted"></p>
+                                    </div>
+
+                                    <div class="w-1/2 ml-3" x-show="mode === 'room-occupied'"
+                                        x-init="
+                                            if (mode === 'room-occupied')
+                                                debt = await getRoomDebt(roomData.number) * 100;
+                                        ">
+                                        <label class="
+                                            relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                            text-md text-label z-10
+                                        ">Conta</label>
+                                        <p class="font-bold text-2xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                        x-text="formatCurrency(debt)"></p>
+                                    </div>
                                 </div>
                             </div>
                             
@@ -824,7 +876,7 @@
                                     <p class="w-full">Hóspedes:</p>
                                     <a class="
                                         flex justify-center items-center w-9 h-9 p-2 ml-4
-                                        hover:brightness-110 hover:bg-background-lightest rounded-md
+                                        hover:brightness-110 hover:bg-background-lightest rounded-full
                                         transition-[background, brightness] duration-300
                                     "
                                     href
@@ -968,12 +1020,12 @@
                         <!-- Footer -->
                         <div class="
                             w-full h-14 flex items-center justify-evenly
-                            rounded-lg bg-background-more-lighter
+                            rounded-full bg-background-more-lighter
                         ">
                             <!-- Botão Reservar - disponível no modo 'room-available' -->
                             <a x-show="mode === 'room-available'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
-                                rounded-lg bg-background-lightest
+                                rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
@@ -989,7 +1041,7 @@
                             <!-- Botão Cancelar - disponível no modo 'room-reserved' -->
                             <a x-show="mode === 'room-reserved'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
-                                rounded-lg bg-background-lightest
+                                rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
@@ -1014,7 +1066,7 @@
                             <!-- Botão Editar Reserva (Salvar Alterações 1) - disponível no modo 'room-reserved' -->
                             <a x-show="mode === 'room-reserved' && hasUnsavedData" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
-                                rounded-lg bg-background-lightest
+                                rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
@@ -1031,7 +1083,7 @@
                             <!-- Botão Check-In - disponível no modo 'room-reserved' -->
                             <a x-show="mode === 'room-reserved'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
-                                rounded-lg bg-background-lightest
+                                rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
@@ -1047,7 +1099,7 @@
                             <!-- Botão Efetuar Pagamento - disponível no modo 'room-occupied' -->
                             <a x-show="mode === 'room-occupied'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
-                                rounded-lg bg-background-lightest
+                                rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
@@ -1065,7 +1117,7 @@
                             <!-- Botão Visualizar Pagamentos - disponível no modo 'room-occupied' -->
                             <a x-show="mode === 'room-occupied'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
-                                rounded-lg bg-background-lightest
+                                rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
@@ -1083,7 +1135,7 @@
                             <!-- Botão Mudar Check-Out (Salvar Alterações 2) - disponível no modo 'room-reserved' -->
                             <a x-show="mode === 'room-occupied' && hasUnsavedData" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
-                                rounded-lg bg-background-lightest
+                                rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
@@ -1101,7 +1153,7 @@
                             <!-- Botão Check-Out - disponível no modo 'room-occupied' -->
                             <a x-show="mode === 'room-occupied'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
-                                rounded-lg bg-background-lightest
+                                rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="

@@ -11,6 +11,7 @@ module.exports = {
       "background-bit-more-lighter": "#24292b",
       "background-lightest": "#272c2d",
 
+      "label": "#747d80",
       "placeholder": "#5b6568",
 
       "available": "#6dc644",
@@ -22,11 +23,11 @@ module.exports = {
 
     extend: {
       gridTemplateColumns: {
-        "hits": "repeat(auto-fill, minmax(100px, 1fr))"
+        "auto-fill": "repeat(auto-fill, 100px)"
       },
 
       gridTemplateRows: {
-        "hits": "repeat(auto-fill, minmax(100px, 1fr))"
+        "auto-fill": "repeat(auto-fill, 100px)"
       },
 
       backgroundImage: {
