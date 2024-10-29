@@ -32,10 +32,67 @@ function setupApiRoutes(app) {
         Return Type: User[]
         Required Role: Manager
     */
-        app.get("/api/users", auth.authorize, auth.checkRole(users.ROLE_MANAGER), async (req, res) => {
-            res.json({
-                users: users.users,
-            });
+    app.get("/api/users", auth.authorize, auth.checkRole(users.ROLE_MANAGER), async (_, res) => {
+        res.json({
+            users: users.users.map(
+                u => ({
+                    id: u.id,
+                    name: u.name,
+                    email: u.email,
+                    role: u.role,
+                    password: "", // we won't send the hash, but make the field present
+                })
+            ),
+        });
+    });
+
+    /*
+        POST /api/users
+        Sets the database users.
+
+        Parameters:
+            users: [
+                id: number
+                name: string
+                email: string
+                password: string (leave blank if you don't want to change)
+                role: string
+            ]
+
+        Returns: All the users, modified
+        Return Type: User[]
+        Required Role: Manager
+    */
+        app.get("/api/users", auth.authorize, auth.checkRole(users.ROLE_MANAGER), async (_, res) => {
+            const { users } = req.body;
+
+            if (!users) {
+                res.status(status.BAD_REQUEST).send({
+                    title: msg.TITLE_INCORRECT_DATA,
+                    message: msg.MSG_INCORRECT_DATA,
+                });
+                return;
+            }
+
+            if (!(users instanceof Array)) {
+                res.status(status.BAD_REQUEST).send({
+                    title: msg.TITLE_INCORRECT_DATA_TYPES,
+                    message: msg.MSG_INCORRECT_DATA_TYPES,
+                });
+                return;
+            }
+
+            for (let user of users) {
+                if (!(user.id && user.name && user.email && (user.password || user.password !== "") && user.role)) {
+                    res.status(status.BAD_REQUEST).send({
+                        title: msg.TITLE_INCORRECT_DATA,
+                        message: msg.MSG_INCORRECT_DATA,
+                    });
+                    return;
+                }
+            }
+
+            
         });
 
     /*

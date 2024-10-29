@@ -269,7 +269,7 @@
         </main>
 
         <!-- Popup Card Background -->
-        < class="
+        <div class="
             absolute top-0 left-0
             flex justify-center items-center
             w-full h-screen
@@ -770,8 +770,15 @@
                         <div class="w-full h-26 flex">
                             <!-- Left -->
                             <div class="w-1/2 h-full">
-                                <span>Quantidade de quartos:</span>
-                                <span class="font-bold ml-0.5" x-text="rooms.length"></span>
+                                <div class="w-72">
+                                    <label class="
+                                        relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                        text-md text-label z-10
+                                    ">Quantidade de quartos</label>
+
+                                    <p class="font-bold text-2xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                    x-text="rooms.length"></p>
+                                </div>
                             </div>
 
                             <!-- Right -->
@@ -829,47 +836,228 @@
                 </template>
 
                 <template x-if="mode === 'manage-users'">
-                    <div class="flex items-center flex-1 basis-0">
-                        <label class="
-                            relative top-4 left-3 bg-background-more-lighter p-1 px-2 rounded-t-xl
-                            text-md transition-[color] duration-300 text-label
+                    <div class="flex-1 basis-0 overflow-auto flex"
+                        x-data="
+                            {
+                                users: [],
+                                hasUnsavedData: false,
+                            }
+                        "
+                        x-init="
+                            users = await getUsers();
                         ">
-                            Hóspedes
-                        </label>
+                        <div class="flex-1 basis-0 overflow-auto flex flex-col justify-start items-center p-4">
+                            <template x-for="(iuser, index) in users" :key="iuser.id">
+                                <!-- User Card -->
+                                <div class="w-2/3 flex flex-col justify-start items-center bg-background-more-lighter p-4 rounded-2xl mb-4"
+                                    x-data="
+                                        {
+                                            canChange: getRoleLevel(iuser.role) < getRoleLevel(user.role),
+                                        }
+                                    ">
+                                    <div class="w-full flex">
+                                        <span class="font-bold uppercase tracking-widest text-sm ml-2 w-fit" x-text="'Id: ' + index"></span>
+                                        <div class="flex-1"></div>
+                                        <a class="
+                                            flex justify-center items-center w-8 h-8 p-2 ml-4
+                                            hover:brightness-110 hover:bg-background-lightest rounded-full
+                                            transition-[background, brightness] duration-300
+                                        "
+                                        href
+                                        x-show="
+                                            users.length > 1 &&
+                                            canChange
+                                        "
+                                        @click.prevent="
+                                            users.splice(index, 1);
+                                        "
+                                        title="Remover usuário">
+                                            <img src="assets/icons/close.png" alt="X" >
+                                        </a>
+                                    </div>
+                                    <div class="w-full">
+                                        <div x-data="
+                                            {
+                                                focused: false,
+                                            }
+                                        ">
+                                            <label class="
+                                                relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
+                                                text-md transition-[color] duration-300
+                                            "
+                                            :class="focused ? 'text-reserved' : 'text-label'">
+                                                Nome
+                                            </label>
+                                            <input class="
+                                                font-bold text-xl mt-2 w-full p-2 px-4 transition-[border] duration-300
+                                                outline-none border-2 bg-background-lightest rounded-full
+                                            "
+                                            :class="focused ? 'border-reserved' : 'border-background-lightest'"
+                                            type="text"
+                                            x-model="iuser.name"
+                                            @input="hasUnsavedData = true"
+                                            @focus="focused = true"
+                                            @blur="focused = false"
+                                            :disabled="mode === 'room-occupied'">
+                                        </div>
+                                        <div x-data="
+                                            {
+                                                focused: false,
+                                            }
+                                        ">
+                                            <label class="
+                                                relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
+                                                text-md transition-[color] duration-300
+                                            "
+                                            :class="focused ? 'text-reserved' : 'text-label'">
+                                                E-mail
+                                            </label>
+                                            <input class="
+                                                font-bold text-xl mt-2 w-full p-2 px-4 transition-[border] duration-300
+                                                outline-none border-2 bg-background-lightest rounded-full
+                                            "
+                                            :class="focused ? 'border-reserved' : 'border-background-lightest'"
+                                            type="text"
+                                            x-model="iuser.email"
+                            
+                                            @input="hasUnsavedData = true"
+                                            @focus="focused = true"
+                                            @blur="focused = false"
+                                            :disabled="mode === 'room-occupied'">
+                                        </div>
+                                        <div x-data="
+                                            {
+                                                focused: false,
+                                            }
+                                        ">
+                                            <label class="
+                                                relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
+                                                text-md transition-[color] duration-300
+                                            "
+                                            :class="focused ? 'text-reserved' : 'text-label'">
+                                                Redefinir senha
+                                            </label>
+                                            <label class="
+                                                relative top-11 -left-[8.4rem] bg-background-lightest p-1 px-2 rounded-t-xl
+                                                text-md transition-[opacity] duration-300 cursor-text text-placeholder
+                                            "
+                                            :class="focused || $refs.password.value !== '' ? 'opacity-0' : 'opacity-100'"
+                                            @click="$refs.password.focus()">
+                                                Deixe em branco para manter a senha atual
+                                            </label>
+                                            <input class="
+                                                font-bold text-xl mt-2 w-full p-2 px-4 transition-[border] duration-300
+                                                outline-none border-2 bg-background-lightest rounded-full
+                                            "
+                                            :class="focused ? 'border-reserved' : 'border-background-lightest'"
+                                            type="password"
+                                            x-model="iuser.password"
+                                            x-ref="password"
+                            
+                                            @input="hasUnsavedData = true"
+                                            @focus="focused = true"
+                                            @blur="focused = false"
+                                            :disabled="mode === 'room-occupied'">
+                                        </div>
+                                        <div class="w-full">
+                                            <label class="
+                                                relative top-5 left-2 bg-background-more-lighter p-1 px-2 rounded-t-xl
+                                                text-md text-label z-10 w-full
+                                            ">
+                                                <span>Cargo</span>
+                                                <span class="text-occupied" x-show="!canChange">
+                                                    • Bloqueado - Esse usuário possui um cargo igual ou superior ao seu
+                                                </span>
+                                            </label>
+                                            <div>
+                                                <div class="mt-2 w-full p-4 rounded-full border-2 border-background-lightest flex justify-center">
+                                                    <template x-for="
+                                                        role in [
+                                                            {
+                                                                name: 'Recepcionista',
+                                                                roleId: 'receptionist',
+                                                                color: 'bg-available',
+                                                            },
+                                                            {
+                                                                name: 'Gerente',
+                                                                roleId: 'manager',
+                                                                color: 'bg-reserved',
+                                                            },
+                                                            {
+                                                                name: 'Administrador',
+                                                                roleId: 'administrator',
+                                                                color: 'bg-occupied',
+                                                            },
+                                                        ]
+                                                    ">
+                                                        <a class="
+                                                            font-bold text-lg bg-background-lightest p-2 px-4 rounded-full
+                                                            mr-4 transition-[background, brightness] duration-300
+                                                            flex justify-center items-center
+                                                        " href
+                                                            :class="
+                                                                canChange
+                                                                ? getRoleLevel(role.roleId) >= getRoleLevel(user.role)
+                                                                    ? 'brightness-90 cursor-default'
+                                                                    : iuser.role === role.roleId
+                                                                        ? 'brightness-125 hover:brightness-150'
+                                                                        : 'hover:brightness-110'
+                                                                : 'brightness-90 cursor-default'
+                                                            "
+                                                            @click.prevent="
+                                                                if (canChange && getRoleLevel(role.roleId) < getRoleLevel(user.role)) {
+                                                                    iuser.role = role.roleId;
+                                                                    hasUnsavedData = true;
+                                                                }
+                                                            ">
+                                                            <div class="rounded-full w-1.5 h-1.5 mr-2.5" :class="role.color"></div>
+                                                            <span x-text="role.name"></span>
+                                                        </a>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                            <a
+                                class="
+                                    w-1/2 p-4 bg-background-more-lighter rounded-full
+                                    flex justify-center items-center hover:brightness-110
+                                    transition-[background, brightness] duration-300
+                                "
+                                href
+                                @click.prevent="
+                                    users.push({
+                                        id: users.length,
+                                        name: '',
+                                        email: '',
+                                        role: 'receptionist',
+                                        password: '',
+                                    });
+                                ">
+                                <img class="w-5 mr-4" src="/assets/icons/plus.png" alt="">
+                                Adicionar usuário
+                            </a>
+                        </div>
 
-                        <div class="flex-1"></div>
-
-                        <a class="
-                            flex justify-center items-center w-9 h-9 p-2 ml-4
-                            hover:brightness-110 hover:bg-background-lightest rounded-full
-                            transition-[background, brightness] duration-300
+                        <div x-show="hasUnsavedData" class="
+                            w-full h-12 mb-4 p-2 flex justify-center
+                            items-center rounded-lg border-occupied border-2
                         "
-                        href
-                        @click.prevent="
-                            guests.push(
-                                {
-                                    name: '',
-                                    cpf: '',
-                                    phone: ''
-                                }
-                            );
+                        x-transition>
+                        <!-- TODO: don't change the flag if the input wasn't accepted -->
+                            <img class="mr-3" src="assets/icons/warning.png" alt="Warning">
+                            Você possui alterações não salvas.
+                        </div>
 
-                            if (mode === 'room-reserved')
-                                hasUnsavedData = true;
-                        "
-                        x-show="['room-available', 'room-reserved'].includes(mode)"
-                        title="Adicionar novo hóspede">
-                            <img src="assets/icons/plus.png" alt="+">
-                        </a>
-                    </div>
-
-                    <div class="
-                        flex-1 basis-0 h-full bg-background-more-lighter
-                        rounded-xl mt-2 p-4 overflow-y-auto
-                    ">
-                        <template x-for="(guest, index) in guests">
-
-                        </template>
+                        <!-- Footer -->
+                        <div class="
+                            w-full h-14 flex items-center justify-evenly
+                            rounded-full bg-background-more-lighter
+                        ">
+                    
+                        </div>
                     </div>
                 </template>
 
@@ -1185,7 +1373,7 @@
                                                             guest.cpf = mode === 'room-available' ||
                                                             index >= roomData.guests.length
                                                                 ? ''
-                                                                : formatStrCPF(roomData.guests[index].cpf)
+                                                                : formatStrCPF(roomData.guests[index].cpf);
                                                         "
                                                         @input="e => {
                                                             formatCPF(e);

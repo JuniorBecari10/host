@@ -165,6 +165,18 @@ function formatUserRole(role) {
     }
 }
 
+function getRoleLevel(role) {
+    switch (role) {
+        case "receptionist": return 0;
+        case "manager": return 1;
+        case "administrator": return 2;
+
+        default:
+            console.error(`Cargo desconhecido: ${role}`);
+            break;
+    }
+}
+
 function unixToDateTime(epoch) {
     const date = new Date(epoch);
 
@@ -190,6 +202,10 @@ function currencyToFloat(str) {
 
 async function getUser() {
     return (await sendGet('user')).user;
+}
+
+async function getUsers() {
+    return (await sendGet('users')).users;
 }
 
 async function getHotelName() {
