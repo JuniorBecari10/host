@@ -66,6 +66,8 @@
 
                     $refs.userIconCardBg.style.backgroundColor = this.userBg;
                     $refs.userIconCardLabel.style.color = this.contrasting;
+
+                    $refs.userRole.innerText = formatUserRole(this.user.role);
                 }
             }
         "
@@ -109,7 +111,7 @@
         <!-- User Card -->
         <div class="
             absolute right-0 top-16 mr-2 p-4
-            bg-background-more-lighter w-80 h-64 flex flex-col items-center rounded-xl
+            bg-background-more-lighter w-80 flex flex-col items-center rounded-xl
         "
         x-show="showUserCard"
         x-transition.scale.origin.top
@@ -127,11 +129,12 @@
 
             <h1 class="font-bold text-lg mt-3" x-text="user.name"></h1>
             <h2 class="font-normal text-sm" x-text="user.email"></h2>
+            <h2 class="uppercase tracking-widest font-semibold text-xs m-2 bg-background-lightest brightness-125 p-1 px-2 rounded-full" x-ref="userRole"></h2>
 
             <div class="flex-1"></div>
 
             <a class="
-                w-full h-10 rounded-xl flex justify-center items-center bg-background-lightest
+                w-full h-10 rounded-full flex justify-center items-center bg-background-lightest mt-2
                 hover:brightness-110 transition-[background, brightness] duration-300" href
                 @click.prevent="
                     localStorage.removeItem('token');
@@ -177,6 +180,24 @@
                 ">
                     <img class="mr-2 w-5 h-5" src="assets/icons/dollar.png" alt="Caixa">
                     Caixa
+                </a>
+
+                <a href class="
+                    flex justify-center items-center
+                    w-fit bg-background-lightest
+                    m-2 my-4 p-4 py-2
+                    font-semibold text-sm
+                    hover:brightness-110 rounded-full transition-[background, brightness] duration-300
+                "
+                @click.prevent="
+                    mode = 'manage-users';
+                    visible = true;
+                "
+                >
+                    <img class="mr-2 w-6 h-6" src="assets/icons/user.png" alt="Ocupação">
+                    
+                    <span>Gerenciar Usuários</span>
+                    <span class="ml-2 uppercase tracking-widest font-semibold text-xs bg-background-lightest brightness-125 p-1 px-2 rounded-full">Gerente +</span>
                 </a>
             </div>
 
@@ -248,7 +269,7 @@
         </main>
 
         <!-- Popup Card Background -->
-        <div class="
+        < class="
             absolute top-0 left-0
             flex justify-center items-center
             w-full h-screen
@@ -289,6 +310,10 @@
                         <p x-show="mode === 'payment'" x-text="'Efetuar Pagamento: ' + roomData.number"></p>
                         <p x-show="mode === 'visualize-payments'" x-text="'Visualizar Pagamentos: ' + roomData.number"></p>
                         <p x-show="mode === 'occupation'">Ocupação</p>
+                        <p x-show="mode === 'manage-users'">
+                            <span>Gerenciar Usuários</span>
+                            <span class="ml-2 uppercase tracking-widest font-semibold text-xs bg-background-lightest brightness-125 p-1 px-2 rounded-full">Gerente +</span>
+                        </p>
 
                         <p x-show="mode === 'room-available'" x-text="'Reservar: ' + roomData.number"></p>
                         <p x-show="mode === 'room-reserved'" x-text="'Editar Reserva: ' + roomData.number"></p>
@@ -325,7 +350,7 @@
                 </div>
 
                 <template x-if="mode === 'cash'">
-                    <div class="w-full h-full p-5 flex-1 flex flex-col basis-0"
+                    <div class="w-full h-full p-5 pt-0 flex-1 flex flex-col basis-0"
                         x-data="{
                             cash: 0,
                             openingTime: 0,
@@ -340,19 +365,29 @@
                         ">
                         <div class="flex flex-col md:flex-row">
                             <div class="w-full md:w-1/2">
-                                <p>Total do caixa:</p>
-                                <h1 class="font-bold text-4xl" x-text="formatCurrency(cash * 100)"></h1>
+                                <div class="w-fit">
+                                    <label class="
+                                        relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                        text-md text-label z-10
+                                    ">Total do caixa</label>
+                                    <p class="font-bold text-4xl mt-2 w-fit p-4 px-6 rounded-full border-2 border-background-lightest"
+                                    x-text="formatCurrency(cash * 100)"></p>
+                                </div>
                             </div>
                 
                             <div class="w-full md:w-1/2 mt-4 md:mt-0 flex md:justify-end">
                                 <div class="w-fit">
-                                    <p class="w-full">Data de abertura:</p>
-                                    <h1 class="font-bold text-4xl w-full" x-text="unixToDateTime(openingTime)"></h1>
+                                    <label class="
+                                        relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                        text-md text-label z-10
+                                    ">Data de abertura</label>
+                                    <p class="font-bold text-4xl mt-2 w-fit p-4 px-6 rounded-full border-2 border-background-lightest"
+                                    x-text="unixToDateTime(openingTime)"></p>
                                 </div>
                             </div>
                         </div>
                 
-                        <div class="w-full flex">
+                        <div class="w-full flex ml-4">
                             <a class="
                                     flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
                                     hover:bg-background-lightest rounded-full
@@ -381,7 +416,7 @@
                                         title: 'Você tem certeza disso?',
                                         text: payments.length === 0
                                                 ? ' Ainda não foram registrados pagamentos. Deseja fechar o caixa assim mesmo?'
-                                                : 'Você deseja fechar o caixa?',
+                                                : 'Você deseja fechar o caixa e limpar a lista de pagamentos?',
                                         icon: 'warning',
                                         buttons: true,
                                         dangerMode: 'true',
@@ -791,7 +826,52 @@
                             <canvas class="flex-1 basis-0"></canvas>
                         </div>
                     </div>
-                </template>                
+                </template>
+
+                <template x-if="mode === 'manage-users'">
+                    <div class="flex items-center flex-1 basis-0">
+                        <label class="
+                            relative top-4 left-3 bg-background-more-lighter p-1 px-2 rounded-t-xl
+                            text-md transition-[color] duration-300 text-label
+                        ">
+                            Hóspedes
+                        </label>
+
+                        <div class="flex-1"></div>
+
+                        <a class="
+                            flex justify-center items-center w-9 h-9 p-2 ml-4
+                            hover:brightness-110 hover:bg-background-lightest rounded-full
+                            transition-[background, brightness] duration-300
+                        "
+                        href
+                        @click.prevent="
+                            guests.push(
+                                {
+                                    name: '',
+                                    cpf: '',
+                                    phone: ''
+                                }
+                            );
+
+                            if (mode === 'room-reserved')
+                                hasUnsavedData = true;
+                        "
+                        x-show="['room-available', 'room-reserved'].includes(mode)"
+                        title="Adicionar novo hóspede">
+                            <img src="assets/icons/plus.png" alt="+">
+                        </a>
+                    </div>
+
+                    <div class="
+                        flex-1 basis-0 h-full bg-background-more-lighter
+                        rounded-xl mt-2 p-4 overflow-y-auto
+                    ">
+                        <template x-for="(guest, index) in guests">
+
+                        </template>
+                    </div>
+                </template>
 
                 <template x-if="['room-available', 'room-reserved', 'room-occupied'].includes(mode)">
                     <div class="w-full h-full max-h-full p-5 pt-0 flex flex-col flex-1 basis-0"
@@ -824,7 +904,8 @@
                                     {
                                         focused: false,
                                     }
-                                ">
+                                "
+                                x-show="mode !== 'room-occupied'">
                                     <label class="
                                         relative top-4 left-2 bg-background-more-lighter p-1 px-2 rounded-t-xl
                                         text-md transition-[color] duration-300
@@ -855,9 +936,20 @@
                                     }"
 
                                     @focus="focused = true"
-                                    @blur="focused = false"
+                                    @blur="focused = false">
+                                </div>
 
-                                    :disabled="mode === 'room-occupied'">
+                                <div x-show="mode === 'room-occupied'"
+                                    x-init="
+                                        if (mode === 'room-occupied')
+                                            debt = await getRoomDebt(roomData.number) * 100;
+                                    ">
+                                    <label class="
+                                        relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                        text-md text-label z-10
+                                    ">Valor da diária</label>
+                                    <p class="font-bold text-2xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                    x-text="price"></p>
                                 </div>
 
                                 <!-- Entry -->
@@ -1009,115 +1101,139 @@
                                                 </a>
                                             </div>
 
-                                            <div x-data="
-                                                {
-                                                    focused: false,
-                                                }
-                                            ">
-                                                <label class="
-                                                    relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
-                                                    text-md transition-[color] duration-300
-                                                "
-                                                :class="focused ? 'text-reserved' : 'text-label'">
-                                                    Nome
-                                                </label>
-                                                <input class="
-                                                    font-bold text-xl mt-2 w-full p-2 px-4 transition-[border] duration-300
-                                                    outline-none border-2 bg-background-lightest rounded-full
-                                                "
-                                                :class="focused ? 'border-reserved' : 'border-background-lightest'"
-                                                type="text"
-                                                x-model="guest.name"
-                                                x-init="
-                                                    guest.name = mode === 'room-available' ||
-                                                    index >= roomData.guests.length
-                                                        ? ''
-                                                        : roomData.guests[index].name
-                                                "
-                                                @input="
-                                                    if (mode === 'room-reserved')
-                                                        hasUnsavedData = true;
-                                                "
+                                            <div x-show="mode === 'room-occupied'">
+                                                <div>
+                                                    <label class="
+                                                        relative top-5 left-2 bg-background-bit-more-lighter p-1 px-2 rounded-t-xl
+                                                        text-md text-label z-10
+                                                    ">Nome</label>
+                                                    <p class="font-bold text-xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                                    x-text="guest.name"></p>
+                                                </div>
 
-                                                @focus="focused = true"
-                                                @blur="focused = false"
+                                                <div>
+                                                    <label class="
+                                                        relative top-5 left-2 bg-background-bit-more-lighter p-1 px-2 rounded-t-xl
+                                                        text-md text-label z-10
+                                                    ">CPF</label>
+                                                    <p class="font-bold text-xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                                    x-text="guest.cpf"></p>
+                                                </div>
 
-                                                :disabled="mode === 'room-occupied'">
+                                                <div>
+                                                    <label class="
+                                                        relative top-5 left-2 bg-background-bit-more-lighter p-1 px-2 rounded-t-xl
+                                                        text-md text-label z-10
+                                                    ">Telefone</label>
+                                                    <p class="font-bold text-xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                                    x-text="guest.phone"></p>
+                                                </div>
                                             </div>
-                                            
-                                            <div x-data="
-                                                {
-                                                    focused: false,
-                                                }
-                                            ">
-                                                <label class="
-                                                        relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
-                                                        text-md transition-[color] duration-300
-                                                    "
-                                                    :class="focused ? 'text-reserved' : 'text-label'">CPF</label>
-                                                <input class="
-                                                        font-bold text-xl mt-2 w-full p-2 px-4 transition-[border] duration-300
-                                                        outline-none border-2 bg-background-lightest rounded-full
-                                                    "
-                                                    :class="focused ? 'border-reserved' : 'border-background-lightest'"
-                                                    type="text" x-model="guest.cpf"
-                                                    x-init="
-                                                        guest.cpf = mode === 'room-available' ||
-                                                        index >= roomData.guests.length
-                                                            ? ''
-                                                            : formatStrCPF(roomData.guests[index].cpf)
-                                                    "
-                                                    @input="e => {
-                                                        formatCPF(e);
-                                                        guest.cpf = e.target.value;
-                                                        if (mode === 'room-reserved')
-                                                            hasUnsavedData = true;
+
+                                            <div x-show="mode !== 'room-occupied'">
+                                                <div x-data="
+                                                    {
+                                                        focused: false,
                                                     }
-                                                    "
-
-                                                    @focus="focused = true"
-                                                    @blur="focused = false"
-
-                                                    :disabled="mode === 'room-occupied'">
-                                            </div>
-
-                                            <div x-data="
-                                                {
-                                                    focused: false,
-                                                }
-                                            ">
-                                                <label class="
+                                                ">
+                                                    <label class="
                                                         relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
                                                         text-md transition-[color] duration-300
                                                     "
                                                     :class="focused ? 'text-reserved' : 'text-label'">
-                                                    Telefone
-                                                </label>
-                                                <input class="
+                                                        Nome
+                                                    </label>
+                                                    <input class="
                                                         font-bold text-xl mt-2 w-full p-2 px-4 transition-[border] duration-300
                                                         outline-none border-2 bg-background-lightest rounded-full
                                                     "
                                                     :class="focused ? 'border-reserved' : 'border-background-lightest'"
                                                     type="text"
-                                                    x-model="guest.phone"
+                                                    x-model="guest.name"
                                                     x-init="
-                                                        guest.phone = mode === 'room-available' ||
+                                                        guest.name = mode === 'room-available' ||
                                                         index >= roomData.guests.length
                                                             ? ''
-                                                            : formatStrPhone(roomData.guests[index].phone)
+                                                            : roomData.guests[index].name
                                                     "
-                                                    @input="e => {
-                                                        formatPhone(e);
-                                                        guest.phone = e.target.value;
+                                                    @input="
                                                         if (mode === 'room-reserved')
                                                             hasUnsavedData = true;
-                                                    }
                                                     "
-
                                                     @focus="focused = true"
                                                     @blur="focused = false"
-
                                                     :disabled="mode === 'room-occupied'">
+                                                </div>
+                                                
+                                                <div x-data="
+                                                    {
+                                                        focused: false,
+                                                    }
+                                                ">
+                                                    <label class="
+                                                            relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
+                                                            text-md transition-[color] duration-300
+                                                        "
+                                                        :class="focused ? 'text-reserved' : 'text-label'">CPF</label>
+                                                    <input class="
+                                                            font-bold text-xl mt-2 w-full p-2 px-4 transition-[border] duration-300
+                                                            outline-none border-2 bg-background-lightest rounded-full
+                                                        "
+                                                        :class="focused ? 'border-reserved' : 'border-background-lightest'"
+                                                        type="text" x-model="guest.cpf"
+                                                        x-init="
+                                                            guest.cpf = mode === 'room-available' ||
+                                                            index >= roomData.guests.length
+                                                                ? ''
+                                                                : formatStrCPF(roomData.guests[index].cpf)
+                                                        "
+                                                        @input="e => {
+                                                            formatCPF(e);
+                                                            guest.cpf = e.target.value;
+                                                            if (mode === 'room-reserved')
+                                                                hasUnsavedData = true;
+                                                        }
+                                                        "
+                                                        @focus="focused = true"
+                                                        @blur="focused = false"
+                                                        :disabled="mode === 'room-occupied'">
+                                                </div>
+                                                <div x-data="
+                                                    {
+                                                        focused: false,
+                                                    }
+                                                ">
+                                                    <label class="
+                                                            relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
+                                                            text-md transition-[color] duration-300
+                                                        "
+                                                        :class="focused ? 'text-reserved' : 'text-label'">
+                                                        Telefone
+                                                    </label>
+                                                    <input class="
+                                                            font-bold text-xl mt-2 w-full p-2 px-4 transition-[border] duration-300
+                                                            outline-none border-2 bg-background-lightest rounded-full
+                                                        "
+                                                        :class="focused ? 'border-reserved' : 'border-background-lightest'"
+                                                        type="text"
+                                                        x-model="guest.phone"
+                                                        x-init="
+                                                            guest.phone = mode === 'room-available' ||
+                                                            index >= roomData.guests.length
+                                                                ? ''
+                                                                : formatStrPhone(roomData.guests[index].phone)
+                                                        "
+                                                        @input="e => {
+                                                            formatPhone(e);
+                                                            guest.phone = e.target.value;
+                                                            if (mode === 'room-reserved')
+                                                                hasUnsavedData = true;
+                                                        }
+                                                        "
+                                                        @focus="focused = true"
+                                                        @blur="focused = false"
+                                                        :disabled="mode === 'room-occupied'">
+                                                </div>
                                             </div>
                                         </div>
                                     </template>

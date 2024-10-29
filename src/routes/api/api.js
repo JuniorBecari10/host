@@ -25,6 +25,20 @@ function setupApiRoutes(app) {
     });
 
     /*
+        GET /api/users
+        Gets all the users.
+
+        Returns: All the users
+        Return Type: User[]
+        Required Role: Manager
+    */
+        app.get("/api/users", auth.authorize, auth.checkRole(users.ROLE_MANAGER), async (req, res) => {
+            res.json({
+                users: users.users,
+            });
+        });
+
+    /*
         GET /api/name
         Gets the name of the hotel.
 

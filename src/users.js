@@ -11,7 +11,7 @@ let users = [
         name: "Administrador",
         email: "admin@admin.adm",
         password: "$2b$10$VJ6UICGNvXn6QhfaIrWK9OQ0O/32OO/bK0o4KCgcDgCxzFcvEB8Ea",
-        role: ROLE_RECEPTIONIST,
+        role: ROLE_ADMINISTRATOR,
     }
 ];
 

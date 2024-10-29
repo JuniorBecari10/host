@@ -153,6 +153,18 @@ function formatPaymentMethod(method) {
     }
 }
 
+function formatUserRole(role) {
+    switch (role) {
+        case "receptionist": return "Recepcionista";
+        case "manager": return "Gerente";
+        case "administrator": return "Administrador";
+
+        default:
+            console.error(`Cargo desconhecido: ${role}`);
+            break;
+    }
+}
+
 function unixToDateTime(epoch) {
     const date = new Date(epoch);
 
