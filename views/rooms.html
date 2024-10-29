@@ -836,7 +836,8 @@
                 </template>
 
                 <template x-if="mode === 'manage-users'">
-                    <div class="flex-1 basis-0 overflow-auto flex"
+                    <div class="flex-1 basis-0 overflow-auto flex flex-col p-4"
+                        :class="hasUnsavedData ? '' : ' pb-0'"
                         x-data="
                             {
                                 users: [],
@@ -846,7 +847,8 @@
                         x-init="
                             users = await getUsers();
                         ">
-                        <div class="flex-1 basis-0 overflow-auto flex flex-col justify-start items-center p-4">
+                        <div class="flex-1 basis-0 overflow-auto flex flex-col justify-start items-center"
+                            :class="hasUnsavedData ? 'mb-4' : ''">
                             <template x-for="(iuser, index) in users" :key="iuser.id">
                                 <!-- User Card -->
                                 <div class="w-2/3 flex flex-col justify-start items-center bg-background-more-lighter p-4 rounded-2xl mb-4"
@@ -1043,7 +1045,7 @@
 
                         <div x-show="hasUnsavedData" class="
                             w-full h-12 mb-4 p-2 flex justify-center
-                            items-center rounded-lg border-occupied border-2
+                            items-center rounded-full border-occupied border-2
                         "
                         x-transition>
                         <!-- TODO: don't change the flag if the input wasn't accepted -->
@@ -1055,7 +1057,8 @@
                         <div class="
                             w-full h-14 flex items-center justify-evenly
                             rounded-full bg-background-more-lighter
-                        ">
+                        "
+                        x-show="hasUnsavedData" x-transition>
                     
                         </div>
                     </div>
@@ -1431,7 +1434,7 @@
 
                         <div x-show="hasUnsavedData" class="
                             w-full h-12 mb-4 p-2 flex justify-center
-                            items-center rounded-lg border-occupied border-2
+                            items-center rounded-full border-occupied border-2
                         "
                         x-transition>
                         <!-- TODO: don't change the flag if the input wasn't accepted -->
