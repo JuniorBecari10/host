@@ -864,7 +864,7 @@
                                         <span class="flex justify-start items-center">
                                             <span class="flex justify-start items-center" x-show="!canChange">
                                                 <img class="w-5 mx-2 ml-4" src="/assets/icons/lock.png" alt="Lock">
-                                                <span class="text-occupied">Esse usuário possui um cargo igual ou superior ao seu</span>
+                                                <span class="text-occupied">Esse usuário possui um cargo igual ou superior ao seu.</span>
                                             </span>
                                         </span>
                                         <div class="flex-1"></div>
@@ -892,7 +892,7 @@
                                             {
                                                 focused: false,
                                             }
-                                        ">
+                                        " x-show="canChange">
                                             <label class="
                                                 relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
                                                 text-md transition-[color] duration-300
@@ -909,15 +909,23 @@
                                             x-model="iuser.name"
                                             @input="hasUnsavedData = true"
                                             @focus="focused = true"
-                                            @blur="focused = false"
-
-                                            :disabled="!canChange || (fetchedUsers[index] || iuser).email === user.email">
+                                            @blur="focused = false">
                                         </div>
+
+                                        <div x-show="!canChange">
+                                            <label class="
+                                                relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                                text-md text-label z-10
+                                            ">Nome</label>
+                                            <p class="font-bold text-xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                            x-text="iuser.name"></p>
+                                        </div>
+
                                         <div x-data="
                                             {
                                                 focused: false,
                                             }
-                                        ">
+                                        " x-show="canChange">
                                             <label class="
                                                 relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
                                                 text-md transition-[color] duration-300 w-fit flex justify-start items-center
@@ -934,15 +942,23 @@
                             
                                             @input="hasUnsavedData = true"
                                             @focus="focused = true"
-                                            @blur="focused = false"
-
-                                            :disabled="!canChange || (fetchedUsers[index] || iuser).email === user.email">
+                                            @blur="focused = false">
                                         </div>
+
+                                        <div x-show="!canChange">
+                                            <label class="
+                                                relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                                text-md text-label z-10
+                                            ">E-mail</label>
+                                            <p class="font-bold text-xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                            x-text="iuser.email"></p>
+                                        </div>
+
                                         <div x-data="
                                             {
                                                 focused: false,
                                             }
-                                        ">
+                                        " x-show="canChange">
                                             <label class="
                                                 relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
                                                 text-md transition-[color] duration-300
@@ -969,9 +985,7 @@
                             
                                             @input="hasUnsavedData = true"
                                             @focus="focused = true"
-                                            @blur="focused = false"
-
-                                            :disabled="!canChange || (fetchedUsers[index] || iuser).email === user.email">
+                                            @blur="focused = false">
                                         </div>
                                         <div class="w-full">
                                             <label class="
@@ -1007,16 +1021,18 @@
                                                             flex justify-center items-center
                                                         " href
                                                             :class="
-                                                                canChange && iuser.email !== user.email
-                                                                ? getRoleLevel(role.roleId) >= getRoleLevel(user.role)
-                                                                    ? 'brightness-90 cursor-default'
+                                                                canChange
+                                                                    ? getRoleLevel(role.roleId) >= getRoleLevel(user.role)
+                                                                        ? 'brightness-90 cursor-default'
+                                                                        : iuser.role === role.roleId
+                                                                            ? 'brightness-125 hover:brightness-150'
+                                                                            : 'hover:brightness-110'
                                                                     : iuser.role === role.roleId
-                                                                        ? 'brightness-125 hover:brightness-150'
-                                                                        : 'hover:brightness-110'
-                                                                : 'brightness-90 cursor-default'
+                                                                        ? 'brightness-90 cursor-default'
+                                                                        : 'brightness-75 cursor-default'
                                                             "
                                                             @click.prevent="
-                                                                if (canChange && getRoleLevel(role.roleId) < getRoleLevel(user.role) && iuser.email !== user.email) {
+                                                                if (canChange && getRoleLevel(role.roleId) < getRoleLevel(user.role)) {
                                                                     iuser.role = role.roleId;
                                                                     hasUnsavedData = true;
                                                                 }
@@ -1033,7 +1049,7 @@
                             </template>
                             <a
                                 class="
-                                    w-1/2 p-4 bg-background-more-lighter rounded-full
+                                    w-1/2 p-4 bg-background-more-lighter rounded-full mb-4
                                     flex justify-center items-center hover:brightness-110
                                     transition-[background, brightness] duration-300
                                 "
