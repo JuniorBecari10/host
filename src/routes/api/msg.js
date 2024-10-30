@@ -34,6 +34,11 @@ module.exports = {
     TITLE_THERE_MUST_BE_ONE_ADMIN: "Deve ter pelo menos um usuário administrador",
     TITLE_EMAILS_MUST_BE_UNIQUE: "E-mails devem ser únicos",
 
+    TITLE_PASSWORD_REQUIRED: "Senha necessária",
+    TITLE_CANNOT_CHANGE_OWN_ROLE: "Não é possível alterar seu próprio cargo",
+    TITLE_CANNOT_CHANGE_OWN_EMAIL: "Não é possível alterar seu próprio e-mail",
+    TITLE_CANNOT_CHANGE_USER_ROLE_SAME_HIGHER: "Esse usuário possui o mesmo ou cargo maior que o seu",
+
     // Messages
     MSG_INCORRECT_DATA: "Certifique-se de que todos os campos estão preenchidos corretamente.",
     MSG_INCORRECT_DATA_GUESTS: "Certifique-se de que todos os campos dos dados dos hóspedes estão preenchidos corretamente.",
@@ -81,4 +86,8 @@ module.exports = {
 
     MSG_THERE_MUST_BE_ONE_ADMIN: "Adicione pelo menos, um usuário com este cargo.",
     MSG_EMAILS_MUST_BE_UNIQUE: "Existem dois usuários com o mesmo endereço de e-mail. Troque-os.",
+
+    MSG_CANNOT_CHANGE_OWN_ROLE: "É permitido alterar o cargo de um usuário com um cargo menor que o seu apenas.",
+    MSG_CANNOT_CHANGE_OWN_EMAIL: "É permitido alterar o e-mail de um usuário com um cargo menor que o seu apenas.",
+    MSG_CANNOT_CHANGE_USER_ROLE_SAME_HIGHER: "É permitido alterar um usuário com um cargo menor que o seu, ou o seu usuário, apenas.",
 };

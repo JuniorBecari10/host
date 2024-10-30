@@ -1,3 +1,5 @@
+const fs = require("fs");
+
 const ROLE_RECEPTIONIST = "receptionist";
 const ROLE_MANAGER = "manager";
 const ROLE_ADMINISTRATOR = "administrator";
@@ -7,7 +9,6 @@ const USERS_DATABASE_FILE_NAME = "users_database.json";
 // By default, there's a system administrator account.
 let users = [
     {
-        id: 0,
         name: "Administrador",
         email: "admin@admin.adm",
         password: "$2b$10$VJ6UICGNvXn6QhfaIrWK9OQ0O/32OO/bK0o4KCgcDgCxzFcvEB8Ea",
@@ -15,14 +16,24 @@ let users = [
     }
 ];
 
-function loadDataUsers() {
+function saveData() {
+    const json = JSON.stringify(users);
+    fs.writeFile(USERS_DATABASE_FILE_NAME, json, "utf8", error => {
+        if (error) {
+            console.log("Couldn't write database to file.");
+            throw error;
+        }
+    });
+}
+
+function loadData() {
     fs.readFile(USERS_DATABASE_FILE_NAME, "utf8", (error, data) => {
         if (error) {
             console.log("Couldn't read database.");
             throw error;
         }
 
-        users = JSON.parse(data);
+        Object.assign(users, JSON.parse(data));
     });
 }
 
@@ -53,8 +64,10 @@ module.exports = {
 
     USERS_DATABASE_FILE_NAME,
 
+    loadData,
+    saveData,
+
     users,
-    loadDataUsers,
     getRoleLevel,
     formatRole,
 };

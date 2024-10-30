@@ -16,7 +16,6 @@ function setupApiRoutes(app) {
     app.get("/api/user", auth.authorize, auth.checkRole(users.ROLE_RECEPTIONIST), async (req, res) => {
         res.json({
             user: {
-                id: req.user.id,
                 name: req.user.name,
                 email: req.user.email,
                 role: req.user.role,
@@ -36,7 +35,6 @@ function setupApiRoutes(app) {
         res.json({
             users: users.users.map(
                 u => ({
-                    id: u.id,
                     name: u.name,
                     email: u.email,
                     role: u.role,
@@ -63,10 +61,30 @@ function setupApiRoutes(app) {
         Return Type: User[]
         Required Role: Manager
     */
-        app.post("/api/users", auth.authorize, auth.checkRole(users.ROLE_MANAGER), async (req, res) => {
-            const { users: sentUsers } = req.body;
+    app.post("/api/users", auth.authorize, auth.checkRole(users.ROLE_MANAGER), async (req, res) => {
+        const { users: sentUsers } = req.body;
 
-            if (!sentUsers) {
+        if (!sentUsers) {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA,
+                message: msg.MSG_INCORRECT_DATA,
+            });
+            return;
+        }
+
+        if (!(sentUsers instanceof Array)) {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA_TYPES,
+                message: msg.MSG_INCORRECT_DATA_TYPES,
+            });
+            return;
+        }
+
+        // check for one admin user
+        let hasAdmin = false;
+
+        for (const user of sentUsers) {
+            if (!(user.name && user.email && (user.password !== undefined && user.password !== null) && user.role)) {
                 res.status(status.BAD_REQUEST).send({
                     title: msg.TITLE_INCORRECT_DATA,
                     message: msg.MSG_INCORRECT_DATA,
@@ -74,7 +92,12 @@ function setupApiRoutes(app) {
                 return;
             }
 
-            if (!(sentUsers instanceof Array)) {
+            if (!(
+                typeof user.name === "string" &&
+                typeof user.email === "string" &&
+                typeof user.password === "string" &&
+                typeof user.role === "string"
+            )) {
                 res.status(status.BAD_REQUEST).send({
                     title: msg.TITLE_INCORRECT_DATA_TYPES,
                     message: msg.MSG_INCORRECT_DATA_TYPES,
@@ -82,110 +105,92 @@ function setupApiRoutes(app) {
                 return;
             }
 
-            // check for one admin user
-            let hasAdmin = false;
+            if (user.role === users.ROLE_ADMINISTRATOR)
+                hasAdmin = true;
+        }
 
-            for (const user of sentUsers) {
-                if (!(user.id !== undefined && user.id !== null && user.name && user.email && (user.password !== undefined && user.password !== null) && user.role)) {
-                    res.status(status.BAD_REQUEST).send({
-                        title: msg.TITLE_INCORRECT_DATA,
-                        message: msg.MSG_INCORRECT_DATA,
-                    });
-                    return;
-                }
+        if (!hasAdmin) {
+            res.status(status.FORBIDDEN).send({
+                title: msg.TITLE_THERE_MUST_BE_ONE_ADMIN,
+                message: msg.MSG_THERE_MUST_BE_ONE_ADMIN,
+            });
+            return;
+        }
 
-                if (!(
-                    typeof user.id === "number" &&
-                    typeof user.name === "string" &&
-                    typeof user.email === "string" &&
-                    typeof user.password === "string" &&
-                    typeof user.role === "string"
-                )) {
-                    res.status(status.BAD_REQUEST).send({
-                        title: msg.TITLE_INCORRECT_DATA_TYPES,
-                        message: msg.MSG_INCORRECT_DATA_TYPES,
-                    });
-                    return;
-                }
+        // Check for unique e-mails, using a Set
+        const emailSet = new Set();
 
-                if (user.role === users.ROLE_ADMINISTRATOR)
-                    hasAdmin = true;
-            }
-
-            if (!hasAdmin) {
+        for (const user of sentUsers) {
+            if (emailSet.has(user.email)) {
                 res.status(status.FORBIDDEN).send({
-                    title: msg.TITLE_THERE_MUST_BE_ONE_ADMIN,
-                    message: msg.MSG_THERE_MUST_BE_ONE_ADMIN,
+                    title: msg.TITLE_EMAILS_MUST_BE_UNIQUE,
+                    message: msg.MSG_EMAILS_MUST_BE_UNIQUE,
                 });
                 return;
             }
+            emailSet.add(user.email);
+        }
 
-            // check for unique e-mails, using a Set
-            const emailSet = new Set();
-
-            for (const user of sentUsers) {
-                if (emailSet.has(user.email)) {
-                    res.status(status.FORBIDDEN).send({
-                        title: msg.TITLE_EMAILS_MUST_BE_UNIQUE,
-                        message: msg.MSG_EMAILS_MUST_BE_UNIQUE,
+        for (const sentUser of sentUsers) {
+            const dbUser = users.users.find(u => u.email === sentUser.email);
+        
+            if (dbUser === undefined) {
+                // If user doesn't exist in database and password is blank, throw an error
+                if (sentUser.password.trim() === "") {
+                    return res.status(status.BAD_REQUEST).send({
+                        title: msg.TITLE_PASSWORD_REQUIRED,
+                        message: `Novo usuário com o e-mail '${sentUser.email}' precisa de uma senha.`,
                     });
-                    return;
                 }
-                emailSet.add(user.email);
-            }
-
-            // Begin merging sent users with the existing database users
-            for (const sentUser of sentUsers) {
-                // Find the corresponding user in the database
-                const dbUser = users.users.find(u => u.email === sentUser.email);
-
-                if (!dbUser) {
-                    // If user doesn't exist and password is blank, throw an error
-                    if (sentUser.password.trim() === "") {
-                        return res.status(status.BAD_REQUEST).send({
-                            title: msg.TITLE_PASSWORD_REQUIRED,
-                            message: `Password is required for new user with email ${sentUser.email}.`,
-                        });
-                    }
-                    // Create the new user in the database with hashed password
-                    const hashedPassword = await auth.hashPassword(sentUser.password);
-                    users.users.push({
-                        id: sentUser.id,
-                        name: sentUser.name,
-                        email: sentUser.email,
-                        password: hashedPassword,
-                        role: sentUser.role,
-                    });
-                } else {
-                    // Prevent changing role for the requesting user
-                    if (req.user.email === dbUser.email && dbUser.role !== sentUser.role) {
+        
+                // Hash the password and create the new user
+                const hashedPassword = await auth.hashPassword(sentUser.password);
+                users.users.push({
+                    name: sentUser.name,
+                    email: sentUser.email,
+                    password: hashedPassword,
+                    role: sentUser.role,
+                });
+            } else {
+                if (req.user.email === sentUser.email) {
+                    if (dbUser.role !== sentUser.role) {
                         return res.status(status.FORBIDDEN).send({
                             title: msg.TITLE_CANNOT_CHANGE_OWN_ROLE,
-                            message: "You cannot change your own role.",
+                            message: msg.MSG_CANNOT_CHANGE_OWN_ROLE,
                         });
                     }
-
-                    // Prevent changing sibling or higher role
-                    if (users.getRoleLevel(sentUser.role) >= users.getRoleLevel(req.user.role) && req.user.email !== req.user.email) {
-                        return res.status(status.FORBIDDEN).send({
-                            title: msg.TITLE_CANNOT_CHANGE_SIBLING_USER,
-                            message: "You cannot change a sibling user's role.",
-                        });
-                    }
-
-                    // Update existing user details
+        
                     dbUser.name = sentUser.name;
-                    dbUser.role = sentUser.role; // Only if allowed, this should be restricted above
-
-                    // Only hash and update password if a new one is provided
+        
+                    if (sentUser.password.trim() !== "") {
+                        dbUser.password = await auth.hashPassword(sentUser.password);
+                    }
+                } else {
+                    if (users.getRoleLevel(sentUser.role) >= users.getRoleLevel(req.user.role)) {
+                        return res.status(status.FORBIDDEN).send({
+                            title: msg.TITLE_CANNOT_CHANGE_USER_ROLE_SAME_HIGHER,
+                            message: msg.MSG_CANNOT_CHANGE_USER_ROLE_SAME_HIGHER,
+                        });
+                    }
+        
+                    dbUser.name = sentUser.name;
+                    dbUser.role = sentUser.role;
+        
                     if (sentUser.password.trim() !== "") {
                         dbUser.password = await auth.hashPassword(sentUser.password);
                     }
                 }
             }
+        }        
 
-            res.status(200).json({ users: sentUsers });
-        });
+        // Delete users that are in the database but not in sentUsers, that means it got deleted
+        users.users = users.users.filter(dbUser => 
+            sentUsers.some(sentUser => sentUser.email === dbUser.email)
+        );
+
+        users.saveData();
+        res.status(200).json({ users: users.users });
+    });
 
     /*
         GET /api/name

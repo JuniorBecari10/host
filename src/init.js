@@ -25,7 +25,7 @@ function readDatabase() {
     console.log("Reading database...\n");
 
     if (fs.existsSync(rooms.HOTEL_DATABASE_FILE_NAME)) {
-        rooms.loadDataHotel();
+        rooms.loadData();
         console.log("Hotel database loaded successfully.");
     }
     else
@@ -34,7 +34,7 @@ function readDatabase() {
     // ---
 
     if (fs.existsSync(users.USERS_DATABASE_FILE_NAME)) {
-        users.loadDataUsers();
+        users.loadData();
         console.log("Users database loaded successfully.");
     }
     else

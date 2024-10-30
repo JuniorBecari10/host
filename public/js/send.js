@@ -28,8 +28,9 @@ async function sendPost(endpoint, data = {}) {
         try {
             const { title, message } = JSON.parse(e.request.responseText);
             swal(title, message, "error");
-        } catch (parseError) {
+        } catch (e) {
             swal("Erro", "Um erro inesperado ocorreu. O servidor pode estar desligado.", "error");
+            console.error(e);
         }
         return { success: false, error: e.message };
     }

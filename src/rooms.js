@@ -158,7 +158,7 @@ function saveData() {
     });
 }
 
-function loadDataHotel() {
+function loadData() {
     fs.readFile(HOTEL_DATABASE_FILE_NAME, "utf8", (error, data) => {
         if (error) {
             console.log("Couldn't read database.");
@@ -207,5 +207,5 @@ module.exports = {
     setRoom,
 
     defaultRoom,
-    loadDataHotel,
+    loadData,
 };

@@ -837,7 +837,7 @@
                 </template>
 
                 <template x-if="mode === 'manage-users'">
-                    <div class="flex-1 basis-0 overflow-auto flex flex-col p-4"
+                    <div class="flex-1 basis-0 overflow-auto flex flex-col p-4 pr-0"
                         :class="hasUnsavedData ? '' : ' pb-0'"
                         x-data="
                             {
@@ -854,7 +854,7 @@
                                 <div class="w-2/3 flex flex-col justify-start items-center bg-background-more-lighter p-4 rounded-2xl mb-4"
                                     x-data="
                                         {
-                                            canChange: getRoleLevel(iuser.role) < getRoleLevel(user.role) || iuser.email === user.email,
+                                            canChange: getRoleLevel(iuser.role) < getRoleLevel(user.role),
                                         }
                                     ">
                                     <div class="w-full flex justify-start items-center">
@@ -874,7 +874,8 @@
                                         href
                                         x-show="
                                             users.length > 1 &&
-                                            canChange
+                                            canChange &&
+                                            iuser.email !== user.email
                                         "
                                         @click.prevent="
                                             users.splice(index, 1);
@@ -908,7 +909,7 @@
                                             @focus="focused = true"
                                             @blur="focused = false"
 
-                                            :disabled="!canChange">
+                                            :disabled="!canChange || iuser.email === user.email">
                                         </div>
                                         <div x-data="
                                             {
@@ -917,10 +918,9 @@
                                         ">
                                             <label class="
                                                 relative top-4 left-3 bg-background-lightest p-1 px-2 rounded-t-xl
-                                                text-md transition-[color] duration-300
-                                            "
-                                            :class="focused ? 'text-reserved' : 'text-label'">
-                                                E-mail
+                                                text-md transition-[color] duration-300 w-fit flex justify-start items-center
+                                            " >
+                                                <span :class="focused ? 'text-reserved' : 'text-label'">E-mail</span>
                                             </label>
                                             <input class="
                                                 font-bold text-xl mt-2 w-full p-2 px-4 transition-[border] duration-300
@@ -934,7 +934,7 @@
                                             @focus="focused = true"
                                             @blur="focused = false"
 
-                                            :disabled="!canChange">
+                                            :disabled="!canChange || iuser.email === user.email">
                                         </div>
                                         <div x-data="
                                             {
@@ -950,9 +950,9 @@
                                             </label>
                                             <label class="
                                                 relative top-11 -left-[8.4rem] bg-background-lightest p-1 px-2 rounded-t-xl
-                                                text-md transition-[opacity] duration-300 text-placeholder
+                                                text-md transition-[opacity] duration-300 text-placeholder pointer-events-none
                                             "
-                                            :class="(focused || $refs.password.value !== '' ? 'opacity-0' : 'opacity-100') + (canChange ? ' cursor-text' : '')"
+                                            :class="(focused || iuser.password !== '' ? 'opacity-0' : 'opacity-100') + (canChange ? ' cursor-text' : '')"
                                             @click="$refs.password.focus()">
                                                 Deixe em branco para manter a senha atual
                                             </label>
@@ -969,7 +969,7 @@
                                             @focus="focused = true"
                                             @blur="focused = false"
 
-                                            :disabled="!canChange">
+                                            :disabled="!canChange || iuser.email === user.email">
                                         </div>
                                         <div class="w-full">
                                             <label class="
@@ -977,11 +977,6 @@
                                                 text-md text-label z-10 w-fit flex justify-start items-center
                                             ">
                                                 <span class="text-md text-label">Cargo</span>
-
-                                                <span class="flex justify-start items-center w-fit" x-show="iuser.email === user.email">
-                                                    <img class="w-5 mx-2 ml-4 relative bottom-0.5" src="/assets/icons/lock.png" alt="Lock">
-                                                    <span class="text-occupied text-md">Não é possível alterar o seu próprio cargo</span>
-                                                </span>
                                             </label>
                                             <div>
                                                 <div class="mt-2 w-full p-4 rounded-full border-2 border-background-lightest flex justify-center">
@@ -1081,9 +1076,10 @@
                             @click.prevent="
                                 const res = await editUsers(users);
                                     
-                                if (res.success) {
+                                if (res.success)
                                     hasUnsavedData = false;
-                                }
+
+                                users.forEach(u => u.password = '');
                             "
                             x-transition>
                                 Salvar Alterações
