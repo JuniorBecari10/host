@@ -837,15 +837,17 @@
                 </template>
 
                 <template x-if="mode === 'manage-users'">
-                    <div class="flex-1 basis-0 overflow-auto flex flex-col p-4 pr-0"
+                    <div class="flex-1 basis-0 overflow-auto flex flex-col p-4"
                         :class="hasUnsavedData ? '' : ' pb-0'"
                         x-data="
                             {
                                 users: [],
+                                fetchedUsers: [],
                             }
                         "
                         x-init="
                             users = await getUsers();
+                            fetchedUsers = await getUsers();
                         ">
                         <div class="flex-1 basis-0 overflow-auto flex flex-col justify-start items-center"
                             :class="hasUnsavedData ? 'mb-4' : ''">
@@ -875,7 +877,7 @@
                                         x-show="
                                             users.length > 1 &&
                                             canChange &&
-                                            iuser.email !== user.email
+                                            (fetchedUsers[index] || iuser).email !== user.email
                                         "
                                         @click.prevent="
                                             users.splice(index, 1);
@@ -909,7 +911,7 @@
                                             @focus="focused = true"
                                             @blur="focused = false"
 
-                                            :disabled="!canChange || iuser.email === user.email">
+                                            :disabled="!canChange || (fetchedUsers[index] || iuser).email === user.email">
                                         </div>
                                         <div x-data="
                                             {
@@ -934,7 +936,7 @@
                                             @focus="focused = true"
                                             @blur="focused = false"
 
-                                            :disabled="!canChange || iuser.email === user.email">
+                                            :disabled="!canChange || (fetchedUsers[index] || iuser).email === user.email">
                                         </div>
                                         <div x-data="
                                             {
@@ -969,7 +971,7 @@
                                             @focus="focused = true"
                                             @blur="focused = false"
 
-                                            :disabled="!canChange || iuser.email === user.email">
+                                            :disabled="!canChange || (fetchedUsers[index] || iuser).email === user.email">
                                         </div>
                                         <div class="w-full">
                                             <label class="
@@ -1053,7 +1055,7 @@
                         </div>
 
                         <div x-show="hasUnsavedData" class="
-                            w-full h-12 mb-4 p-2 flex justify-center
+                            w-full h-12 mb-4 p-2 mr-4 flex justify-center
                             items-center rounded-full border-occupied border-2
                         "
                         x-transition>

@@ -16,6 +16,7 @@ function setupApiRoutes(app) {
     app.get("/api/user", auth.authorize, auth.checkRole(users.ROLE_RECEPTIONIST), async (req, res) => {
         res.json({
             user: {
+                id: req.user.id,
                 name: req.user.name,
                 email: req.user.email,
                 role: req.user.role,
@@ -35,6 +36,7 @@ function setupApiRoutes(app) {
         res.json({
             users: users.users.map(
                 u => ({
+                    id: u.id,
                     name: u.name,
                     email: u.email,
                     role: u.role,
@@ -117,7 +119,7 @@ function setupApiRoutes(app) {
             return;
         }
 
-        // Check for unique e-mails, using a Set
+        // check for unique e-mails, using a Set
         const emailSet = new Set();
 
         for (const user of sentUsers) {
@@ -133,62 +135,59 @@ function setupApiRoutes(app) {
 
         for (const sentUser of sentUsers) {
             const dbUser = users.users.find(u => u.email === sentUser.email);
-        
+
             if (dbUser === undefined) {
-                // If user doesn't exist in database and password is blank, throw an error
                 if (sentUser.password.trim() === "") {
                     return res.status(status.BAD_REQUEST).send({
                         title: msg.TITLE_PASSWORD_REQUIRED,
                         message: `Novo usuário com o e-mail '${sentUser.email}' precisa de uma senha.`,
                     });
                 }
-        
-                // Hash the password and create the new user
+
                 const hashedPassword = await auth.hashPassword(sentUser.password);
+
                 users.users.push({
+                    id: sentUser.id,
                     name: sentUser.name,
                     email: sentUser.email,
                     password: hashedPassword,
                     role: sentUser.role,
                 });
-            } else {
-                if (req.user.email === sentUser.email) {
+            }
+            
+            else {
+                if (req.user.email === dbUser.email) {
                     if (dbUser.role !== sentUser.role) {
                         return res.status(status.FORBIDDEN).send({
                             title: msg.TITLE_CANNOT_CHANGE_OWN_ROLE,
                             message: msg.MSG_CANNOT_CHANGE_OWN_ROLE,
                         });
                     }
-        
-                    dbUser.name = sentUser.name;
-        
+                }
+
+                // Update existing user details
+                dbUser.name = sentUser.name;
+
+                // Check if the logged-in user is the one being updated
+                if (req.user.email === dbUser.email) {
+                    // Check if the password is changed
                     if (sentUser.password.trim() !== "") {
                         dbUser.password = await auth.hashPassword(sentUser.password);
                     }
                 } else {
-                    if (users.getRoleLevel(sentUser.role) >= users.getRoleLevel(req.user.role)) {
-                        return res.status(status.FORBIDDEN).send({
-                            title: msg.TITLE_CANNOT_CHANGE_USER_ROLE_SAME_HIGHER,
-                            message: msg.MSG_CANNOT_CHANGE_USER_ROLE_SAME_HIGHER,
-                        });
-                    }
-        
-                    dbUser.name = sentUser.name;
-                    dbUser.role = sentUser.role;
-        
+                    // Only hash and update password if a new one is provided
                     if (sentUser.password.trim() !== "") {
                         dbUser.password = await auth.hashPassword(sentUser.password);
                     }
                 }
             }
-        }        
+        }
 
         // Delete users that are in the database but not in sentUsers, that means it got deleted
         users.users = users.users.filter(dbUser => 
             sentUsers.some(sentUser => sentUser.email === dbUser.email)
         );
 
-        users.saveData();
         res.status(200).json({ users: users.users });
     });
 
