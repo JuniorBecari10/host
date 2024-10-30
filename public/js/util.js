@@ -273,6 +273,10 @@ async function changeCheckOut(number, check_out) {
     return sendPost('change-check-out', { number, check_out });
 }
 
+async function editUsers(users) {
+    return sendPost('users', { users });
+}
+
 async function cancel(number) {
     return sendPost('cancel', { number });
 }

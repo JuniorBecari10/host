@@ -32,6 +32,7 @@ module.exports = {
     TITLE_INVALID_PAYMENT_METHOD: "Método de pagamento inválido",
 
     TITLE_THERE_MUST_BE_ONE_ADMIN: "Deve ter pelo menos um usuário administrador",
+    TITLE_EMAILS_MUST_BE_UNIQUE: "E-mails devem ser únicos",
 
     // Messages
     MSG_INCORRECT_DATA: "Certifique-se de que todos os campos estão preenchidos corretamente.",
@@ -79,4 +80,5 @@ module.exports = {
     MSG_INVALID_PAYMENT_METHOD: "O método de pagamento seleciondo é inválido.",
 
     MSG_THERE_MUST_BE_ONE_ADMIN: "Adicione pelo menos, um usuário com este cargo.",
+    MSG_EMAILS_MUST_BE_UNIQUE: "Existem dois usuários com o mesmo endereço de e-mail. Troque-os.",
 };

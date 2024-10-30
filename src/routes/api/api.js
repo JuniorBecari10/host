@@ -64,9 +64,9 @@ function setupApiRoutes(app) {
         Required Role: Manager
     */
         app.post("/api/users", auth.authorize, auth.checkRole(users.ROLE_MANAGER), async (req, res) => {
-            const { users } = req.body;
+            const { users: sentUsers } = req.body;
 
-            if (!users) {
+            if (!sentUsers) {
                 res.status(status.BAD_REQUEST).send({
                     title: msg.TITLE_INCORRECT_DATA,
                     message: msg.MSG_INCORRECT_DATA,
@@ -74,7 +74,7 @@ function setupApiRoutes(app) {
                 return;
             }
 
-            if (!(users instanceof Array)) {
+            if (!(sentUsers instanceof Array)) {
                 res.status(status.BAD_REQUEST).send({
                     title: msg.TITLE_INCORRECT_DATA_TYPES,
                     message: msg.MSG_INCORRECT_DATA_TYPES,
@@ -85,11 +85,25 @@ function setupApiRoutes(app) {
             // check for one admin user
             let hasAdmin = false;
 
-            for (let user of users) {
-                if (!(user.id && user.name && user.email && (user.password || user.password !== "") && user.role)) {
+            for (const user of sentUsers) {
+                if (!(user.id !== undefined && user.id !== null && user.name && user.email && (user.password !== undefined && user.password !== null) && user.role)) {
                     res.status(status.BAD_REQUEST).send({
                         title: msg.TITLE_INCORRECT_DATA,
                         message: msg.MSG_INCORRECT_DATA,
+                    });
+                    return;
+                }
+
+                if (!(
+                    typeof user.id === "number" &&
+                    typeof user.name === "string" &&
+                    typeof user.email === "string" &&
+                    typeof user.password === "string" &&
+                    typeof user.role === "string"
+                )) {
+                    res.status(status.BAD_REQUEST).send({
+                        title: msg.TITLE_INCORRECT_DATA_TYPES,
+                        message: msg.MSG_INCORRECT_DATA_TYPES,
                     });
                     return;
                 }
@@ -106,7 +120,71 @@ function setupApiRoutes(app) {
                 return;
             }
 
-            res.status(200).json({ ok: "ok" });
+            // check for unique e-mails, using a Set
+            const emailSet = new Set();
+
+            for (const user of sentUsers) {
+                if (emailSet.has(user.email)) {
+                    res.status(status.FORBIDDEN).send({
+                        title: msg.TITLE_EMAILS_MUST_BE_UNIQUE,
+                        message: msg.MSG_EMAILS_MUST_BE_UNIQUE,
+                    });
+                    return;
+                }
+                emailSet.add(user.email);
+            }
+
+            // Begin merging sent users with the existing database users
+            for (const sentUser of sentUsers) {
+                // Find the corresponding user in the database
+                const dbUser = users.users.find(u => u.email === sentUser.email);
+
+                if (!dbUser) {
+                    // If user doesn't exist and password is blank, throw an error
+                    if (sentUser.password.trim() === "") {
+                        return res.status(status.BAD_REQUEST).send({
+                            title: msg.TITLE_PASSWORD_REQUIRED,
+                            message: `Password is required for new user with email ${sentUser.email}.`,
+                        });
+                    }
+                    // Create the new user in the database with hashed password
+                    const hashedPassword = await auth.hashPassword(sentUser.password);
+                    users.users.push({
+                        id: sentUser.id,
+                        name: sentUser.name,
+                        email: sentUser.email,
+                        password: hashedPassword,
+                        role: sentUser.role,
+                    });
+                } else {
+                    // Prevent changing role for the requesting user
+                    if (req.user.email === dbUser.email && dbUser.role !== sentUser.role) {
+                        return res.status(status.FORBIDDEN).send({
+                            title: msg.TITLE_CANNOT_CHANGE_OWN_ROLE,
+                            message: "You cannot change your own role.",
+                        });
+                    }
+
+                    // Prevent changing sibling or higher role
+                    if (users.getRoleLevel(sentUser.role) >= users.getRoleLevel(req.user.role) && req.user.email !== req.user.email) {
+                        return res.status(status.FORBIDDEN).send({
+                            title: msg.TITLE_CANNOT_CHANGE_SIBLING_USER,
+                            message: "You cannot change a sibling user's role.",
+                        });
+                    }
+
+                    // Update existing user details
+                    dbUser.name = sentUser.name;
+                    dbUser.role = sentUser.role; // Only if allowed, this should be restricted above
+
+                    // Only hash and update password if a new one is provided
+                    if (sentUser.password.trim() !== "") {
+                        dbUser.password = await auth.hashPassword(sentUser.password);
+                    }
+                }
+            }
+
+            res.status(200).json({ users: sentUsers });
         });
 
     /*
@@ -402,8 +480,7 @@ function setupApiRoutes(app) {
         It must be in the reserved state.
 
         Body:
-
-        number: string
+        - number: string
 
         Returns: the modified room.
         Return Type: Room (object)
@@ -466,8 +543,7 @@ function setupApiRoutes(app) {
         It must be in the reserved state.
 
         Body:
-
-        number: string
+        - number: string
 
         Returns: the modified room.
         Return Type: Room (object)
@@ -557,10 +633,9 @@ function setupApiRoutes(app) {
         It must be in the occupied state.
 
         Body:
-
-        number: string
-        amount: number
-        method: string - must be one of the allowed methods
+        - number: string
+        - amount: number
+        - method: string - must be one of the allowed methods
 
         Returns: the modified room.
         Return Type: Room (object)
@@ -651,9 +726,8 @@ function setupApiRoutes(app) {
         It must be in the occupied state.
 
         Body:
-
-        number: string
-        check_out?: number - set it to -1 to increase one day
+        - number: string
+        - check_out?: number - set it to -1 to increase one day
 
         Returns: the modified room.
         Return Type: Room (object)
@@ -741,8 +815,8 @@ function setupApiRoutes(app) {
 
         Body:
 
-        number: string
-        chargeback_mode?: string - only used when the debt is less than zero.
+        - number: string
+        - chargeback_mode?: string - only used when the debt is less than zero.
                                 If the room's debt is zero and this mode is not set, the operation will be cancelled.
                                 Accepted modes: 'keep' and 'reverse'.
                                 

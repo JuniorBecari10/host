@@ -189,6 +189,7 @@
                     font-semibold text-sm
                     hover:brightness-110 rounded-full transition-[background, brightness] duration-300
                 "
+                x-show="getRoleLevel(user.role) >= getRoleLevel('manager')"
                 @click.prevent="
                     mode = 'manage-users';
                     visible = true;
@@ -326,7 +327,7 @@
                         "
                         href
                         @click.prevent="
-                            if (['room-available', 'room-reserved', 'room-occupied'].includes(mode) && hasUnsavedData) {
+                            if (['room-available', 'room-reserved', 'room-occupied', 'manage-users'].includes(mode) && hasUnsavedData) {
                                 swal({
                                     title: 'Você tem certeza disso?',
                                     text: 'Você deseja fechar a tela e perder as alterações?',
@@ -841,7 +842,6 @@
                         x-data="
                             {
                                 users: [],
-                                hasUnsavedData: false,
                             }
                         "
                         x-init="
@@ -849,16 +849,22 @@
                         ">
                         <div class="flex-1 basis-0 overflow-auto flex flex-col justify-start items-center"
                             :class="hasUnsavedData ? 'mb-4' : ''">
-                            <template x-for="(iuser, index) in users" :key="iuser.id">
+                            <template x-for="(iuser, index) in users">
                                 <!-- User Card -->
                                 <div class="w-2/3 flex flex-col justify-start items-center bg-background-more-lighter p-4 rounded-2xl mb-4"
                                     x-data="
                                         {
-                                            canChange: getRoleLevel(iuser.role) < getRoleLevel(user.role),
+                                            canChange: getRoleLevel(iuser.role) < getRoleLevel(user.role) || iuser.email === user.email,
                                         }
                                     ">
-                                    <div class="w-full flex">
-                                        <span class="font-bold uppercase tracking-widest text-sm ml-2 w-fit" x-text="'Id: ' + index"></span>
+                                    <div class="w-full flex justify-start items-center">
+                                        <span class="font-bold uppercase tracking-widest text-sm ml-2 w-fit" x-text="'Usuário #' + (index + 1)"></span>
+                                        <span class="flex justify-start items-center">
+                                            <span class="flex justify-start items-center" x-show="!canChange">
+                                                <img class="w-5 mx-2 ml-4" src="/assets/icons/lock.png" alt="Lock">
+                                                <span class="text-occupied">Esse usuário possui um cargo igual ou superior ao seu</span>
+                                            </span>
+                                        </span>
                                         <div class="flex-1"></div>
                                         <a class="
                                             flex justify-center items-center w-8 h-8 p-2 ml-4
@@ -901,7 +907,8 @@
                                             @input="hasUnsavedData = true"
                                             @focus="focused = true"
                                             @blur="focused = false"
-                                            :disabled="mode === 'room-occupied'">
+
+                                            :disabled="!canChange">
                                         </div>
                                         <div x-data="
                                             {
@@ -926,7 +933,8 @@
                                             @input="hasUnsavedData = true"
                                             @focus="focused = true"
                                             @blur="focused = false"
-                                            :disabled="mode === 'room-occupied'">
+
+                                            :disabled="!canChange">
                                         </div>
                                         <div x-data="
                                             {
@@ -942,9 +950,9 @@
                                             </label>
                                             <label class="
                                                 relative top-11 -left-[8.4rem] bg-background-lightest p-1 px-2 rounded-t-xl
-                                                text-md transition-[opacity] duration-300 cursor-text text-placeholder
+                                                text-md transition-[opacity] duration-300 text-placeholder
                                             "
-                                            :class="focused || $refs.password.value !== '' ? 'opacity-0' : 'opacity-100'"
+                                            :class="(focused || $refs.password.value !== '' ? 'opacity-0' : 'opacity-100') + (canChange ? ' cursor-text' : '')"
                                             @click="$refs.password.focus()">
                                                 Deixe em branco para manter a senha atual
                                             </label>
@@ -960,16 +968,19 @@
                                             @input="hasUnsavedData = true"
                                             @focus="focused = true"
                                             @blur="focused = false"
-                                            :disabled="mode === 'room-occupied'">
+
+                                            :disabled="!canChange">
                                         </div>
                                         <div class="w-full">
                                             <label class="
-                                                relative top-5 left-2 bg-background-more-lighter p-1 px-2 rounded-t-xl
-                                                text-md text-label z-10 w-full
+                                                relative top-6 left-3 bg-background-more-lighter p-1 px-2 rounded-t-xl
+                                                text-md text-label z-10 w-fit flex justify-start items-center
                                             ">
-                                                <span>Cargo</span>
-                                                <span class="text-occupied ml-0.5" x-show="!canChange">
-                                                    • Bloqueado - Esse usuário possui um cargo igual ou superior ao seu
+                                                <span class="text-md text-label">Cargo</span>
+
+                                                <span class="flex justify-start items-center w-fit" x-show="iuser.email === user.email">
+                                                    <img class="w-5 mx-2 ml-4 relative bottom-0.5" src="/assets/icons/lock.png" alt="Lock">
+                                                    <span class="text-occupied text-md">Não é possível alterar o seu próprio cargo</span>
                                                 </span>
                                             </label>
                                             <div>
@@ -999,7 +1010,7 @@
                                                             flex justify-center items-center
                                                         " href
                                                             :class="
-                                                                canChange
+                                                                canChange && iuser.email !== user.email
                                                                 ? getRoleLevel(role.roleId) >= getRoleLevel(user.role)
                                                                     ? 'brightness-90 cursor-default'
                                                                     : iuser.role === role.roleId
@@ -1008,7 +1019,7 @@
                                                                 : 'brightness-90 cursor-default'
                                                             "
                                                             @click.prevent="
-                                                                if (canChange && getRoleLevel(role.roleId) < getRoleLevel(user.role)) {
+                                                                if (canChange && getRoleLevel(role.roleId) < getRoleLevel(user.role) && iuser.email !== user.email) {
                                                                     iuser.role = role.roleId;
                                                                     hasUnsavedData = true;
                                                                 }
@@ -1066,6 +1077,13 @@
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
+                            "
+                            @click.prevent="
+                                const res = await editUsers(users);
+                                    
+                                if (res.success) {
+                                    hasUnsavedData = false;
+                                }
                             "
                             x-transition>
                                 Salvar Alterações
@@ -1436,7 +1454,7 @@
                             </div>
                         </div>
 
-                        <div x-show="hasUnsavedData && mode === 'room-reserved'" class="
+                        <div x-show="hasUnsavedData && ['room-reserved', 'room-occupied'].includes(mode)" class="
                             w-full h-12 mb-4 p-2 flex justify-center
                             items-center rounded-full border-occupied border-2
                         "
