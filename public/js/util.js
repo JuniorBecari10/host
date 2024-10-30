@@ -235,20 +235,9 @@ async function getRoomDebt(number) {
 async function getCheckOutHour() {
     return await sendGet('check-out-hour');
 }
+
 async function getRoom(number) {
-    const token = localStorage.getItem("token") || "";
-    try {
-        const response = await axios.get(`http://${API_URL}/api/name`, {
-            params: { number },
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            }
-        });
-        return response.data.name;
-    } catch (e) {
-        console.error(JSON.parse(e.request.responseText).message);
-    }
+    return (await sendGet(`room/${number}`));
 }
 
 // ---

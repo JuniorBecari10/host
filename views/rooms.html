@@ -729,7 +729,7 @@
                                 <img class="mb-4" src="assets/icons/no-money.png" alt="Sem pagamentos">
 
                                 <h1 class="font-bold text-2xl">Sem pagamentos</h1>
-                                <p>Não foram encontrados pagamentos para este quarto.</p>
+                                <p>Não foram encontrados pagamentos para este quarto, durante esta estadia.</p>
                             </div>
                         </div>
                     </div>
@@ -1274,7 +1274,10 @@
                                                 </a>
                                             </div>
 
-                                            <div x-show="mode === 'room-occupied'">
+                                            <div x-show="mode === 'room-occupied'"
+                                                x-init="
+                                                    $refs.cpfDisplay.innerText = formatStrCPF((await getRoom(roomData.number)).guests[index].cpf);
+                                                ">
                                                 <div>
                                                     <label class="
                                                         relative top-5 left-2 bg-background-bit-more-lighter p-1 px-2 rounded-t-xl
@@ -1290,7 +1293,7 @@
                                                         text-md text-label z-10
                                                     ">CPF</label>
                                                     <p class="font-bold text-xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
-                                                    x-text="guest.cpf"></p>
+                                                    x-ref="cpfDisplay"></p>
                                                 </div>
 
                                                 <div>
