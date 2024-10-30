@@ -668,7 +668,7 @@
                     <div class="w-full h-full max-h-full p-5 pt-0 flex flex-col flex-1 basis-0"
                         x-data="{ payments: [], ascending: false }"
                         x-init="
-                            payments = (await getPayments()).filter(p => p.room === roomData.number);
+                            payments = roomData.payments;
                             payments.reverse();
                         ">
                         <div class="w-full h-14 flex items-center">
@@ -872,6 +872,7 @@
                                         "
                                         @click.prevent="
                                             users.splice(index, 1);
+                                            hasUnsavedData = true;
                                         "
                                         title="Remover usuário">
                                             <img src="assets/icons/close.png" alt="X" >
@@ -967,7 +968,7 @@
                                                 text-md text-label z-10 w-full
                                             ">
                                                 <span>Cargo</span>
-                                                <span class="text-occupied" x-show="!canChange">
+                                                <span class="text-occupied ml-0.5" x-show="!canChange">
                                                     • Bloqueado - Esse usuário possui um cargo igual ou superior ao seu
                                                 </span>
                                             </label>
@@ -1037,6 +1038,8 @@
                                         role: 'receptionist',
                                         password: '',
                                     });
+
+                                    hasUnsavedData = true;
                                 ">
                                 <img class="w-5 mr-4" src="/assets/icons/plus.png" alt="">
                                 Adicionar usuário
@@ -1049,7 +1052,7 @@
                         "
                         x-transition>
                         <!-- TODO: don't change the flag if the input wasn't accepted -->
-                            <img class="mr-3" src="assets/icons/warning.png" alt="Warning">
+                            <img class="mr-3 w-7" src="assets/icons/warning.png" alt="Warning">
                             Você possui alterações não salvas.
                         </div>
 
@@ -1059,7 +1062,14 @@
                             rounded-full bg-background-more-lighter
                         "
                         x-show="hasUnsavedData" x-transition>
-                    
+                            <a x-show="hasUnsavedData" href class="
+                                w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
+                                rounded-full bg-background-lightest
+                                hover:brightness-110 transition-[background, brightness] duration-300
+                            "
+                            x-transition>
+                                Salvar Alterações
+                            </a>
                         </div>
                     </div>
                 </template>
@@ -1122,8 +1132,7 @@
                                         formatMoney(e);
                                         price = e.target.value;
                                     
-                                        if (mode === 'room-reserved')
-                                            hasUnsavedData = true;
+                                        hasUnsavedData = true;
                                     }"
 
                                     @focus="focused = true"
@@ -1227,36 +1236,11 @@
                                     ">
                                         Hóspedes
                                     </label>
-
-                                    <div class="flex-1"></div>
-
-                                    <a class="
-                                        flex justify-center items-center w-9 h-9 p-2 ml-4
-                                        hover:brightness-110 hover:bg-background-lightest rounded-full
-                                        transition-[background, brightness] duration-300
-                                    "
-                                    href
-                                    @click.prevent="
-                                        guests.push(
-                                            {
-                                                name: '',
-                                                cpf: '',
-                                                phone: ''
-                                            }
-                                        );
-
-                                        if (mode === 'room-reserved')
-                                            hasUnsavedData = true;
-                                    "
-                                    x-show="['room-available', 'room-reserved'].includes(mode)"
-                                    title="Adicionar novo hóspede">
-                                        <img src="assets/icons/plus.png" alt="+">
-                                    </a>
                                 </div>
 
                                 <div class="
                                     flex-1 basis-0 h-full bg-background-more-lighter
-                                    rounded-xl mt-2 p-4 overflow-y-auto
+                                    rounded-xl mt-2 p-4 overflow-y-auto flex flex-col justify-start items-center
                                 ">
                                     <template x-for="(guest, index) in guests">
                                         <div class="w-full h-fit bg-background-bit-more-lighter rounded-xl p-4 mb-4"
@@ -1283,9 +1267,7 @@
                                                 "
                                                 @click.prevent="
                                                     guests.splice(element_index, 1);
-
-                                                    if (mode === 'room-reserved')
-                                                        hasUnsavedData = true;
+                                                    hasUnsavedData = true;
                                                 "
                                                 title="Remover hóspede">
                                                     <img src="assets/icons/close.png" alt="X" >
@@ -1348,8 +1330,7 @@
                                                             : roomData.guests[index].name
                                                     "
                                                     @input="
-                                                        if (mode === 'room-reserved')
-                                                            hasUnsavedData = true;
+                                                        hasUnsavedData = true;
                                                     "
                                                     @focus="focused = true"
                                                     @blur="focused = false"
@@ -1381,8 +1362,7 @@
                                                         @input="e => {
                                                             formatCPF(e);
                                                             guest.cpf = e.target.value;
-                                                            if (mode === 'room-reserved')
-                                                                hasUnsavedData = true;
+                                                            hasUnsavedData = true;
                                                         }
                                                         "
                                                         @focus="focused = true"
@@ -1417,8 +1397,7 @@
                                                         @input="e => {
                                                             formatPhone(e);
                                                             guest.phone = e.target.value;
-                                                            if (mode === 'room-reserved')
-                                                                hasUnsavedData = true;
+                                                            hasUnsavedData = true;
                                                         }
                                                         "
                                                         @focus="focused = true"
@@ -1428,17 +1407,39 @@
                                             </div>
                                         </div>
                                     </template>
+
+                                    <a class="
+                                            w-2/3 p-4 bg-background-bit-more-lighter rounded-full
+                                            flex justify-center items-center hover:brightness-110
+                                            transition-[background, brightness] duration-300
+                                        "
+                                        x-show="['room-available', 'room-reserved'].includes(mode)"
+                                        href
+                                        @click.prevent="
+                                            guests.push(
+                                                {
+                                                    name: '',
+                                                    cpf: '',
+                                                    phone: ''
+                                                }
+                                            );
+
+                                            hasUnsavedData = true;
+                                        ">
+                                        <img class="w-5 mr-4" src="/assets/icons/plus.png" alt="">
+                                        Adicionar hóspede
+                                    </a>
                                 </div>
                             </div>
                         </div>
 
-                        <div x-show="hasUnsavedData" class="
+                        <div x-show="hasUnsavedData && mode === 'room-reserved'" class="
                             w-full h-12 mb-4 p-2 flex justify-center
                             items-center rounded-full border-occupied border-2
                         "
                         x-transition>
                         <!-- TODO: don't change the flag if the input wasn't accepted -->
-                            <img class="mr-3" src="assets/icons/warning.png" alt="Warning">
+                            <img class="mr-3 w-7" src="assets/icons/warning.png" alt="Warning">
                             Você possui alterações não salvas.
                         </div>
 
@@ -1455,8 +1456,10 @@
                             "
                             @click.prevent="
                                 const res = await reserve(roomData.number, guests, price, check_out);
-                                if (res.success)
+                                if (res.success) {
                                     reset();
+                                    hasUnsavedData = false;
+                                }
                             ">
                                 Reservar
                             </a>

@@ -63,7 +63,7 @@ function setupApiRoutes(app) {
         Return Type: User[]
         Required Role: Manager
     */
-        app.get("/api/users", auth.authorize, auth.checkRole(users.ROLE_MANAGER), async (_, res) => {
+        app.post("/api/users", auth.authorize, auth.checkRole(users.ROLE_MANAGER), async (req, res) => {
             const { users } = req.body;
 
             if (!users) {
@@ -82,6 +82,9 @@ function setupApiRoutes(app) {
                 return;
             }
 
+            // check for one admin user
+            let hasAdmin = false;
+
             for (let user of users) {
                 if (!(user.id && user.name && user.email && (user.password || user.password !== "") && user.role)) {
                     res.status(status.BAD_REQUEST).send({
@@ -90,9 +93,20 @@ function setupApiRoutes(app) {
                     });
                     return;
                 }
+
+                if (user.role === users.ROLE_ADMINISTRATOR)
+                    hasAdmin = true;
             }
 
-            
+            if (!hasAdmin) {
+                res.status(status.FORBIDDEN).send({
+                    title: msg.TITLE_THERE_MUST_BE_ONE_ADMIN,
+                    message: msg.MSG_THERE_MUST_BE_ONE_ADMIN,
+                });
+                return;
+            }
+
+            res.status(200).json({ ok: "ok" });
         });
 
     /*
@@ -182,6 +196,36 @@ function setupApiRoutes(app) {
     app.get("/api/payments", auth.authorize, auth.checkRole(users.ROLE_RECEPTIONIST), async (_, res) => {
         res.json({ payments: rooms.getHotelPayments() });
     });
+
+    /*
+        GET /api/payments/:room
+        Gets the currently listed payments for the specified room
+
+        Returns: The currently listed payments for the specified room.
+        Return Type: Array
+    */
+        app.get("/api/payments/:number", auth.authorize, auth.checkRole(users.ROLE_RECEPTIONIST), async (_, res) => {
+            const number = req.params.number;
+            const room = rooms.getRoom(number);
+
+            if (typeof number !== "string") {
+                res.status(status.BAD_REQUEST).send({
+                    title: msg.TITLE_INCORRECT_DATA_TYPES,
+                    message: msg.MSG_INCORRECT_DATA_TYPES,
+                });
+                return;
+            }
+
+            if (room === undefined) {
+                res.status(status.NOT_FOUND).send({
+                    title: msg.TITLE_ROOM_NOT_FOUND,
+                    message: msg.MSG_ROOM_NOT_FOUND,
+                });
+                return;
+            }
+        
+            res.json({ payments: room.payments });
+        });
 
     /*
         GET /api/check-out-hour
@@ -497,6 +541,7 @@ function setupApiRoutes(app) {
         
             guests: room.guests,
             price: room.price,
+            payments: [],
         
             check_in: now,
             check_out: room.check_out,
@@ -594,6 +639,9 @@ function setupApiRoutes(app) {
         };
 
         rooms.addHotelPayment(payment);
+        rooms.setRoomField(roomIndex, "payments", room.payments.concat(payment));
+        rooms.saveData();
+
         return res.json(rooms.getRoomByIndex(roomIndex));
     });
 

@@ -138,6 +138,7 @@ function defaultRoom(number) {
         // Optional - only when it's occupied
         guests: [],
         price: 0,
+        payments: [],
     
         check_in: 0,
         check_out: 0,
@@ -188,6 +189,7 @@ module.exports = {
     isOccupied,
 
     setRoomField,
+    saveData,
 
     getHotelName,
     getHotelRooms,

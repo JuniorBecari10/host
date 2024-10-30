@@ -31,6 +31,8 @@ module.exports = {
     TITLE_AMOUNT_MUST_BE_GREATER_THAN_ZERO: "O valor a ser pago precisa ser superior a zero",
     TITLE_INVALID_PAYMENT_METHOD: "Método de pagamento inválido",
 
+    TITLE_THERE_MUST_BE_ONE_ADMIN: "Deve ter pelo menos um usuário administrador",
+
     // Messages
     MSG_INCORRECT_DATA: "Certifique-se de que todos os campos estão preenchidos corretamente.",
     MSG_INCORRECT_DATA_GUESTS: "Certifique-se de que todos os campos dos dados dos hóspedes estão preenchidos corretamente.",
@@ -75,4 +77,6 @@ module.exports = {
 
     MSG_AMOUNT_MUST_BE_GREATER_THAN_ZERO: "Altere para um valor que seja superior a zero.",
     MSG_INVALID_PAYMENT_METHOD: "O método de pagamento seleciondo é inválido.",
+
+    MSG_THERE_MUST_BE_ONE_ADMIN: "Adicione pelo menos, um usuário com este cargo.",
 };
