@@ -2,7 +2,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 
 const status = require("../status");
-const rooms = require("../rooms");
 const msg = require("./api/msg");
 const users = require("../users");
 

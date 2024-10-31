@@ -1,5 +1,9 @@
-if (process.env.NODE_ENV !== "production")
+const env = require("./env");
+
+if (process.env.NODE_ENV !== "production") {
+    env.setupEnv();
     require("dotenv").config();
+}
 
 const express = require("express");
 const init = require("./init");
