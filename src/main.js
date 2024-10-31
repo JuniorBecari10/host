@@ -5,7 +5,7 @@ const express = require("express");
 const init = require("./init");
 const setupRoutes = require("./routes/routes");
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 const app = express();
 
 init(app);

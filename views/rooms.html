@@ -837,7 +837,7 @@
                 </template>
 
                 <template x-if="mode === 'manage-users'">
-                    <div class="flex-1 basis-0 overflow-auto flex flex-col p-4"
+                    <div class="flex-1 basis-0 overflow-x-hidden overflow-y-auto flex flex-col p-4"
                         :class="hasUnsavedData ? '' : ' pb-0'"
                         x-data="
                             {
@@ -848,6 +848,7 @@
                         x-init="
                             users = await getUsers();
                             fetchedUsers = await getUsers();
+                            hasUnsavedData = false;
                         ">
                         <div class="flex-1 basis-0 overflow-auto flex flex-col justify-start items-center"
                             :class="hasUnsavedData ? 'mb-4' : ''">
