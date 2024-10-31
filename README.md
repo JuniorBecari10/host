@@ -29,6 +29,6 @@ Remind that on non-production environments this file is created automatically wi
 
 Contributions are welcome! Please open an issue to discuss potential improvements or submit a pull request.
 
-# License
+## License
 
 See `LICENSE` file.
