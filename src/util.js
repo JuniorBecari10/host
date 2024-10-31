@@ -25,6 +25,11 @@ function formatCheckOutHour(checkOut) {
     return `${hours}:${minutes}`
 }
 
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
 function logMessage(req) {
     // Message structure:
     // [00/00/00 - 00:00:00] METHOD /path
@@ -240,6 +245,7 @@ module.exports = {
     logMiddleware,
     formatCheckOutHour,
     getDebt,
+    isValidEmail,
 
     reserve,
     editReservation,

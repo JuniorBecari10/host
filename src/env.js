@@ -5,6 +5,8 @@ const crypto = require("crypto");
 const ENV_PATH = path.join(__dirname, "..", ".env");
 
 function setupEnv() {
+    console.log("Checking for .env file...");
+
     if (!fs.existsSync(ENV_PATH)) {
         const envContent = `SECRET_KEY=${generateSecretKey()}\nPORT=8080\n`;
       

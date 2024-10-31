@@ -371,7 +371,7 @@
                                         relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
                                         text-md text-label z-10
                                     ">Total do caixa</label>
-                                    <p class="font-bold text-4xl mt-2 w-fit p-4 px-6 rounded-full border-2 border-background-lightest"
+                                    <p class="font-bold text-3xl mt-2 w-fit p-4 px-6 rounded-full border-2 border-background-lightest"
                                     x-text="formatCurrency(cash * 100)"></p>
                                 </div>
                             </div>
@@ -382,7 +382,7 @@
                                         relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
                                         text-md text-label z-10
                                     ">Data de abertura</label>
-                                    <p class="font-bold text-4xl mt-2 w-fit p-4 px-6 rounded-full border-2 border-background-lightest"
+                                    <p class="font-bold text-3xl mt-2 w-fit p-4 px-6 rounded-full border-2 border-background-lightest"
                                     x-text="unixToDateTime(openingTime)"></p>
                                 </div>
                             </div>
@@ -768,10 +768,10 @@
                                 });
                             })()
                         ">
-                        <div class="w-full h-26 flex">
+                        <div class="w-full h-fit flex lg:flex-row flex-col">
                             <!-- Left -->
-                            <div class="w-1/2 h-full">
-                                <div class="w-72">
+                            <div class="w-1/2 h-full flex justify-start items-center">
+                                <div class="w-72 relative bottom-5">
                                     <label class="
                                         relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
                                         text-md text-label z-10
@@ -783,49 +783,50 @@
                             </div>
 
                             <!-- Right -->
-                            <div class="flex-1 basis-0 flex flex-col items-end">
-                                <div>
-                                    <span>Vagos:</span>
-                                    <span class="font-bold ml-0.5"
-                                        x-text="rooms.filter(r => r.state === 'available').length">
-                                    </span>
-                                    <span class="font-bold ml-0.5"
-                                        x-text="`(${
-                                            Math.round(
-                                                (rooms.filter(r => r.state === 'available').length / rooms.length)
-                                                * 100
-                                            )
-                                        }%)`">
-                                    </span>
+                            <div class="flex-1 basis-0 flex justify-start lg:justify-end items-center">
+                                <div class="w-40 mr-4 relative bottom-5">
+                                    <label class="
+                                        relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                        text-md text-label z-10
+                                    ">Vagos</label>
+
+                                    <p class="font-bold text-lg mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                    x-text="rooms.filter(r => r.state === 'available').length + ` (${
+                                        Math.round(
+                                            (rooms.filter(r => r.state === 'available').length / rooms.length)
+                                            * 100
+                                        )
+                                    }%)`"></p>
                                 </div>
-    
-                                <div>
-                                    <span>Reservados:</span>
-                                    <span class="font-bold ml-0.5"
-                                        x-text="rooms.filter(r => r.state === 'reserved').length">
-                                    </span>
-                                    <span class="font-bold ml-0.5"
-                                        x-text="`(${
-                                            Math.round(
-                                                (rooms.filter(r => r.state === 'reserved').length / rooms.length)
-                                                * 100
-                                            )
-                                        }%)`"></span>
+
+                                <div class="w-40 mr-4 relative bottom-5">
+                                    <label class="
+                                        relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                        text-md text-label z-10
+                                    ">Reservados</label>
+
+                                    <p class="font-bold text-lg mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                    x-text="rooms.filter(r => r.state === 'reserved').length + ` (${
+                                        Math.round(
+                                            (rooms.filter(r => r.state === 'reserved').length / rooms.length)
+                                            * 100
+                                        )
+                                    }%)`"></p>
                                 </div>
-    
-                                <div>
-                                    <span>Ocupados:</span>
-                                    <span class="font-bold ml-0.5"
-                                        x-text="rooms.filter(r => r.state === 'occupied').length">
-                                    </span>
-                                    <span class="font-bold ml-0.5"
-                                        x-text="`(${
-                                            Math.round(
-                                                (rooms.filter(r => r.state === 'occupied').length / rooms.length)
-                                                * 100
-                                            )
-                                        }%)`">
-                                    </span>
+
+                                <div class="w-40 mr-4 relative bottom-5">
+                                    <label class="
+                                        relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                        text-md text-label z-10
+                                    ">Ocupados</label>
+
+                                    <p class="font-bold text-lg mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
+                                    x-text="rooms.filter(r => r.state === 'occupied').length + ` (${
+                                        Math.round(
+                                            (rooms.filter(r => r.state === 'occupied').length / rooms.length)
+                                            * 100
+                                        )
+                                    }%)`"></p>
                                 </div>
                             </div>
                         </div>
@@ -1033,7 +1034,7 @@
                                                                         : 'brightness-75 cursor-default'
                                                             "
                                                             @click.prevent="
-                                                                if (canChange && getRoleLevel(role.roleId) < getRoleLevel(user.role)) {
+                                                                if (canChange && getRoleLevel(role.roleId) < getRoleLevel(user.role) && iuser.role !== role.roleId) {
                                                                     iuser.role = role.roleId;
                                                                     hasUnsavedData = true;
                                                                 }
@@ -1099,6 +1100,7 @@
                                     hasUnsavedData = false;
 
                                 users.forEach(u => u.password = '');
+                                users.forEach(u => u.email = u.email.toLowerCase());
                             "
                             x-transition>
                                 Salvar Alterações

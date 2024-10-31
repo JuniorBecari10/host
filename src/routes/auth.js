@@ -18,7 +18,7 @@ function setupAuthRoutes(app) {
         Return Type: string
     */
     app.post("/api/login", (req, res) => {
-        const { email, password } = req.body;
+        let { email, password } = req.body;
 
         if (!email || !password) {
             res.status(status.BAD_REQUEST).send({
@@ -36,6 +36,7 @@ function setupAuthRoutes(app) {
             return;
         }
 
+        email = email.toLowerCase();
         const user = users.users.find(u => u.email === email);
 
         if (user === undefined) {

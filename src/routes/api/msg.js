@@ -39,6 +39,8 @@ module.exports = {
     TITLE_CANNOT_CHANGE_OWN_EMAIL: "Não é possível alterar seu próprio e-mail",
     TITLE_CANNOT_CHANGE_USER_ROLE_SAME_HIGHER: "Esse usuário possui o mesmo ou cargo maior que o seu",
 
+    TITLE_INVALID_EMAIL: "E-mail inválido",
+
     // Messages
     MSG_INCORRECT_DATA: "Certifique-se de que todos os campos estão preenchidos corretamente.",
     MSG_INCORRECT_DATA_GUESTS: "Certifique-se de que todos os campos dos dados dos hóspedes estão preenchidos corretamente.",
@@ -90,4 +92,6 @@ module.exports = {
     MSG_CANNOT_CHANGE_OWN_ROLE: "É permitido alterar o cargo de um usuário com um cargo menor que o seu apenas.",
     MSG_CANNOT_CHANGE_OWN_EMAIL: "É permitido alterar o e-mail de um usuário com um cargo menor que o seu apenas.",
     MSG_CANNOT_CHANGE_USER_ROLE_SAME_HIGHER: "É permitido alterar um usuário com um cargo menor que o seu, ou o seu usuário, apenas.",
+
+    MSG_INVALID_EMAIL: "Um e-mail deve ter um '@' e um domínio após ele.",
 };

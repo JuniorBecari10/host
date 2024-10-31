@@ -109,6 +109,16 @@ function setupApiRoutes(app) {
 
             if (user.role === users.ROLE_ADMINISTRATOR)
                 hasAdmin = true;
+        
+            user.email = user.email.toLowerCase();
+
+            if (!util.isValidEmail(user.email)) {
+                res.status(status.BAD_REQUEST).send({
+                    title: msg.TITLE_INVALID_EMAIL,
+                    message: msg.MSG_INVALID_EMAIL,
+                });
+                return;
+            }
         }
 
         if (!hasAdmin) {
@@ -188,6 +198,7 @@ function setupApiRoutes(app) {
             sentUsers.some(sentUser => sentUser.email === dbUser.email)
         );
 
+        users.saveData();
         res.status(200).json({ users: users.users });
     });
 
