@@ -273,6 +273,11 @@ async function changeCheckOut(number, check_out) {
     return sendPost('change-check-out', { number, check_out });
 }
 
+async function changePrice(number, price) {
+    price = currencyToFloat(price);
+    return sendPost('change-price', { number, price });
+}
+
 async function editUsers(users) {
     return sendPost('users', { users });
 }

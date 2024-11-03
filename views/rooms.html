@@ -546,7 +546,10 @@
                                     @focus="focused = true"
                                     @blur="focused = false"
 
-                                    x-init="amount = formatCurrency(await getRoomDebt(roomData.number) * 100)"
+                                    x-init="
+                                        const roomDebt = await getRoomDebt(roomData.number) * 100;
+                                        amount = formatCurrency(roomDebt > 0 ? roomDebt : 0);
+                                    "
                                     :disabled="mode === 'room-occupied'">
                                 </div>
 
@@ -669,8 +672,10 @@
                     <div class="w-full h-full max-h-full p-5 pt-0 flex flex-col flex-1 basis-0"
                         x-data="{ payments: [], ascending: false }"
                         x-init="
-                            payments = roomData.payments;
+                            payments = (await getRoom(roomData.number)).payments;
                             payments.reverse();
+
+                            roomData.payments = payments;
                         ">
                         <div class="w-full h-14 flex items-center">
                             <label class="relative top-4 left-4 bg-background-more-lighter p-1 px-2 rounded-t-xl text-md text-label">Pagamentos</label>
@@ -697,8 +702,10 @@
                                 "
                                 href
                                 @click.prevent="
-                                    payments = (await getPayments()).filter(p => p.room === roomData.number);
+                                    payments = (await getRoom(roomData.number)).payments;
                                     payments.reverse();
+
+                                    roomData.payments = payments;
                                 "
                                 title="Recarregar Pagamentos">
                                 <img src="assets/icons/reload.png" alt="Recarregar">
@@ -1122,6 +1129,8 @@
                             guests: mode === 'room-available'
                                 ? [ { name: '', cpf: '0', phone: '0' } ]
                                 : roomData.guests,
+                            
+                            changedCheckOut: false,
                         }"
                     x-init="
                         if (mode === 'room-available') {
@@ -1141,7 +1150,7 @@
                                         focused: false,
                                     }
                                 "
-                                x-show="mode !== 'room-occupied'">
+                                x-show="mode !== 'room-occupied' || getRoleLevel(user.role) >= getRoleLevel('manager')">
                                     <label class="
                                         relative top-4 left-2 bg-background-more-lighter p-1 px-2 rounded-t-xl
                                         text-md transition-[color] duration-300
@@ -1174,7 +1183,7 @@
                                     @blur="focused = false">
                                 </div>
 
-                                <div x-show="mode === 'room-occupied'"
+                                <div x-show="mode === 'room-occupied' && getRoleLevel(user.role) === getRoleLevel('receptionist')"
                                     x-init="
                                         if (mode === 'room-occupied')
                                             debt = await getRoomDebt(roomData.number) * 100;
@@ -1214,8 +1223,10 @@
                                         element.setAttribute('min', parsed);
                                     "
                                     @input="
-                                        if (['room-reserved', 'room-occupied'].includes(mode))
+                                        if (['room-reserved', 'room-occupied'].includes(mode)) {
                                             hasUnsavedData = true;
+                                            changedCheckOut = true;
+                                        }
                                     "
                                     @focus="focused = true"
                                     @blur="focused = false">
@@ -1605,12 +1616,19 @@
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
-                                const res = await changeCheckOut(roomData.number, check_out);
+                                let checkOutRes = { success: true };
+                                if (changedCheckOut)
+                                    checkOutRes = await changeCheckOut(roomData.number, check_out);
                                 
-                                if (res.success) {
-                                    hasUnsavedData = false;
+                                const priceRes = await changePrice(roomData.number, price);
+                                
+                                if ((changedCheckOut && checkOutRes.success) || priceRes.success) {
                                     debt = await getRoomDebt(roomData.number) * 100;
+                                    roomData = await getRoom(roomData.number);
                                 }
+                                
+                                if (checkOutRes.success && priceRes.success)
+                                    hasUnsavedData = false;
                             "
                             x-transition>
                                 Salvar Alterações

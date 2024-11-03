@@ -57,6 +57,7 @@ module.exports = {
     MSG_ROOM_NOT_FOUND: "Certifique-se de que o número do quarto foi digitado corretamente.",
 
     MSG_ROOM_IS_AVAILABLE_DEF_CHECK_OUT: "Não é possível editar a data do check-out, pois o quarto está vago. Ele precisa estar ocupado.",
+    MSG_ROOM_IS_AVAILABLE_DEF_PRICE: "Não é possível editar o preço, pois o quarto está vago. Ele precisa estar ocupado.",
     MSG_ROOM_IS_AVAILABLE_DEBT: "Não é possível visualizar a conta de um quarto vago. Ele precisa estar ocupado.",
     MSG_ROOM_IS_AVAILABLE_EDIT: "Não é possível editar a reserva, pois o quarto está vago. Tente fazer a reserva.",
     MSG_ROOM_IS_AVAILABLE_PAY: "Não é possível efetuar pagamentos, pois o quarto está vago. Ele precisa estar ocupado.",
@@ -66,6 +67,7 @@ module.exports = {
 
     MSG_ROOM_IS_RESERVED_CHECK_OUT: "Não é possível efetuar check-out neste quarto, pois ele está reservado. Tente cancelar a reserva.",
     MSG_ROOM_IS_RESERVED_DEF_CHECK_OUT: "Não é possível editar a data do check-out, pois o quarto está reservado. Ele precisa estar ocupado.",
+    MSG_ROOM_IS_RESERVED_DEF_PRICE: "Não é possível editar o preço, pois o quarto está reservado. Ele precisa estar ocupado.",
     MSG_ROOM_IS_RESERVED_DEBT: "Não é possível visualizar a conta de um quarto reservado. Ele precisa estar ocupado",
     MSG_ROOM_IS_RESERVED_PAY: "Não é possível efetuar pagamentos, pois o quarto está reservado. Ele precisa estar ocupado.",
     MSG_ROOM_IS_ALREADY_RESERVED: "Não é possível reservar este quarto, pois ele já está reservado. Tente editar a reserva.",

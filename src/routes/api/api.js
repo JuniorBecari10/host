@@ -824,6 +824,72 @@ function setupApiRoutes(app) {
     });
 
     /*
+        POST /api/change-price
+        Changes the price of the specified room.
+        It must be in the occupied state.
+
+        Body:
+        - number: string
+        - price: number
+
+        Returns: the modified room.
+        Return Type: Room (object)
+        Required Role: Manager
+    */
+        app.post("/api/change-price", auth.authorize, auth.checkRole(users.ROLE_MANAGER), async (req, res) => {
+            const { number, price } = req.body;
+    
+            if (!(number && (price || price !== "0"))) {
+                res.status(status.BAD_REQUEST).send({
+                    title: msg.TITLE_INCORRECT_DATA,
+                    message: msg.MSG_INCORRECT_DATA,
+                });
+                return;
+            }
+    
+            if (
+                typeof number !== "string" ||
+                typeof price !== "number"
+            ) {
+                res.status(status.BAD_REQUEST).send({
+                    title: msg.TITLE_INCORRECT_DATA_TYPES,
+                    message: msg.MSG_INCORRECT_DATA_TYPES,
+                });
+                return;
+            }
+    
+            const roomIndex = rooms.getRoomIndex(number);
+            const room = rooms.getRoomByIndex(roomIndex);
+    
+            if (roomIndex === -1) {
+                res.status(status.NOT_FOUND).send({
+                    title: msg.TITLE_ROOM_NOT_FOUND,
+                    message: msg.MSG_ROOM_NOT_FOUND,
+                });
+                return;
+            }
+    
+            if (rooms.isAvailable(room)) {
+                res.status(status.FORBIDDEN).send({
+                    title: msg.TITLE_ROOM_IS_AVAILABLE,
+                    message: msg.MSG_ROOM_IS_AVAILABLE_DEF_PRICE,
+                });
+                return;
+            }
+    
+            if (rooms.isReserved(room)) {
+                res.status(status.FORBIDDEN).send({
+                    title: msg.TITLE_ROOM_IS_RESERVED,
+                    message: msg.MSG_ROOM_IS_RESERVED_DEF_PRICE,
+                });
+                return;
+            }
+    
+            rooms.setRoomField(roomIndex, "price", price);
+            return res.json(rooms.getRoomByIndex(roomIndex));
+        });
+
+    /*
         POST /api/checkout
         Performs the check-out of the specified room.
         It must be in the occupied state.
@@ -908,6 +974,16 @@ function setupApiRoutes(app) {
                     break;
                 
                 case "reverse":
+                    // The user must have a role that is equal or above Manager to perform a chargeback.
+                    if (users.getRoleLevel(req.user.role) < users.getRoleLevel(users.ROLE_MANAGER)) {
+                        res.status(status.UNAUTHORIZED).send({
+                            title: "Permissões insuficientes",
+                            message: `Esse usuário não possui permissão suficiente para realizar essa ação. É necessário um cargo de, pelo menos, ${users.formatRole(users.ROLE_MANAGER)}. Esse usuário possui o cargo ${users.formatRole(req.user.role)}.`,
+                        });
+
+                        return;
+                    }
+
                     performReverse = true;
                     break;
                 
