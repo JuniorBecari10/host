@@ -1642,30 +1642,48 @@
                             "
                             @click.prevent="
                                 if (debt < 0) {
-                                    swal({
-                                        title: 'O quarto possui sobras na conta',
-                                        text: 'Selecione um modo para que o check-out possa ser efetuado.',
-                                        icon: 'warning',
-                                        buttons: {
-                                            reverse: {
-                                                text: 'Estornar sobras',
-                                                value: 'reverse',
+                                    if (getRoleLevel(user.role) >= getRoleLevel('manager')) {
+                                        swal({
+                                            title: 'O quarto possui sobras na conta',
+                                            text: 'Selecione um modo para que o check-out possa ser efetuado.',
+                                            icon: 'warning',
+                                            buttons: {
+                                                reverse: {
+                                                    text: 'Estornar sobras',
+                                                    value: 'reverse',
+                                                },
+    
+                                                keep: {
+                                                    text: 'Deixar no caixa',
+                                                    value: 'keep',
+                                                }
                                             },
-
-                                            keep: {
-                                                text: 'Deixar no caixa',
-                                                value: 'keep',
+                                        })
+                                        .then(async (value) => {
+                                            if (!['reverse', 'keep'].includes(value)) return;
+    
+                                            const res = await checkOut(roomData.number, value);
+    
+                                            if (res.success)
+                                                reset();
+                                        });
+                                    }
+                                    else {
+                                        swal({
+                                            title: 'O quarto possui sobras na conta',
+                                            text: 'As sobras serão deixadas no caixa.',
+                                            buttons: true,
+                                            icon: 'warning'
+                                        })
+                                        .then(async (accepted) => {
+                                            if (accepted) {
+                                                const res = await checkOut(roomData.number, 'keep');
+    
+                                                if (res.success)
+                                                    reset();
                                             }
-                                        },
-                                    })
-                                    .then(async (value) => {
-                                        if (!['reverse', 'keep'].includes(value)) return;
-
-                                        const res = await checkOut(roomData.number, value);
-
-                                        if (res.success)
-                                            reset();
-                                    });
+                                        });
+                                    }
                                 }
                                 else {
                                     const res = await checkOut(roomData.number, 'none');
