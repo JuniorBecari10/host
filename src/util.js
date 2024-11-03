@@ -34,12 +34,12 @@ function logMessage(req) {
     // Message structure:
     // [00/00/00 - 00:00:00] METHOD /path
     
-    const now = new Date(Date.now());
+    const now = new Date();
         
     const day = [
-        now.getDay() < 10 ? "0" + now.getDay() : now.getDay(),
+        now.getDate() < 10 ? "0" + now.getDate() : now.getDate(),  // Use getDate() here
         now.getMonth() + 1 < 10 ? "0" + (now.getMonth() + 1) : now.getMonth() + 1,
-        now.getFullYear(),
+        now.getFullYear().toString(),
     ];
 
     const time = [
