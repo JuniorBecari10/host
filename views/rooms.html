@@ -44,6 +44,8 @@
                 userBg: '',
                 contrasting: '',
 
+                showManagerButtons: false,
+
                 async getUser() {
                     this.user = await getUser();
 
@@ -58,6 +60,8 @@
                     $refs.userIconCardLabel.style.color = this.contrasting;
 
                     $refs.userRole.innerText = formatUserRole(this.user.role);
+
+                    this.showManagerButtons = getRoleLevel(this.user.role) >= getRoleLevel('manager');
                 }
             }
         "
@@ -179,7 +183,7 @@
                     font-semibold text-sm
                     hover:brightness-110 rounded-full transition-[background, brightness] duration-300
                 "
-                x-show="getRoleLevel(user.role) >= getRoleLevel('manager')"
+                x-show="showManagerButtons"
                 @click.prevent="
                     mode = 'manage-users';
                     visible = true;
@@ -1301,7 +1305,9 @@
 
                                             <div x-show="mode === 'room-occupied'"
                                                 x-init="
-                                                    $refs.cpfDisplay.innerText = formatStrCPF((await getRoom(roomData.number)).guests[index].cpf);
+                                                    const room = (await getRoom(roomData.number));
+                                                    if (room.guests[index])
+                                                        $refs.cpfDisplay.innerText = formatStrCPF(room.guests[index].cpf);
                                                 ">
                                                 <div>
                                                     <label class="
