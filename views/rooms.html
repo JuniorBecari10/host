@@ -19,15 +19,47 @@
 
         <!-- Redirect Script to login if the user isn't authenticated -->
         <script>
-            // if the token is missing or is invalid, redirect to login, since this request will fail if that happens
-            getUser()
-                .catch((e) => {
-                    window.location.href = `http://${API_URL}/login`;
-                });
+            function check(alert) {
+                if (alert) {
+                    // if the token is missing or is invalid, redirect to login, since this request will fail if that happens
+                    getUser()
+                        .catch((e) => {
+                            if (alert) {
+                                swal({
+                                    title: 'Token de acesso expirado ou excluído',
+                                    text: 'Você será redirecionado para a tela de login.',
+                                    icon: 'warning',
+                                    dangerMode: 'true',
+                                })
+                                    .then(async (_) => {
+                                        window.location.href = `http://${API_URL}/login`;
+                                    });
+                            }
+                            else
+                                window.location.href = `http://${API_URL}/login`;
+                        });
+                }
 
-            // fallback to redirect to login if the token is missing
-            if (!localStorage.getItem("token"))
-                window.location.href = `http://${API_URL}/login`;
+                // fallback to redirect to login if the token is missing
+                if (!localStorage.getItem("token")) {
+                    if (alert) {
+                        swal({
+                            title: 'Token de acesso expirado ou excluído',
+                            text: 'Você será redirecionado para a tela de login.',
+                            icon: 'information',
+                            dangerMode: 'true',
+                        })
+                            .then(async (_) => {
+                                window.location.href = `http://${API_URL}/login`;
+                        });
+                    }
+                    else
+                        window.location.href = `http://${API_URL}/login`;
+                }
+            }
+
+            setInterval(() => check(true), 10000); // run every 10 seconds
+            check(false); // run once now
         </script>
     </head>
 
@@ -97,21 +129,21 @@
             <!-- Account info -->
             <div
                 class="w-12 h-12 p-2 mr-4">
-                <a href="#" title="Usuário" class="
+                <button title="Usuário" class="
                     w-full h-full rounded-full flex justify-center items-center
                     hover:brightness-110 transition-[background, brightness] duration-300
                 "
                     @click.prevent="showUserCard = !showUserCard;"
                     x-ref="userIconBg">
                     <span x-ref="userIconLabel" x-text="user.name ? user.name[0] : ''"></span>
-                </a>
+                </button>
             </div>
         </header>
 
         <!-- User Card -->
         <div class="
             absolute right-0 top-16 mr-2 p-4
-            bg-background-more-lighter w-80 flex flex-col items-center rounded-xl
+            bg-background-more-lighter w-80 flex flex-col items-center rounded-2xl
         "
         x-show="showUserCard"
         x-transition.scale.origin.top
@@ -133,27 +165,27 @@
 
             <div class="flex-1"></div>
 
-            <a class="
+            <button class="
                 w-full h-10 rounded-full flex justify-center items-center bg-background-lightest mt-2
-                hover:brightness-110 transition-[background, brightness] duration-300" href
+                hover:brightness-110 transition-[background, brightness] duration-300"
                 @click.prevent="
                     localStorage.removeItem('token');
                     window.location.href = `http://${API_URL}/login`;
                 ">
                 <img class="w-5 mr-2" src="assets/icons/logout.png" alt="">
                 <span>Sair</span>
-            </a>
+            </button>
          </div>
 
         <main class="flex flex-col h-full-4 overflow-y-auto" x-data="{ rooms: [] }">
             <!-- Options Bar -->
-            <div class="flex justify-center items-center width-full h-14 bg-background-lighter m-4 rounded-full">
+            <div class="flex justify-center items-center h-16 sm:h-14 overflow-x-auto overflow-y-hidden bg-background-lighter m-4 rounded-full">
                 <!-- Option Card - Guests -->
-                <a href class="
+                <button class="
                     flex justify-center items-center
                     w-fit bg-background-lightest
                     m-2 my-4 p-4 py-2
-                    font-semibold text-sm
+                    font-semibold text-sm flex-nowrap text-nowrap
                     hover:brightness-110 rounded-full transition-[background, brightness] duration-300
                 "
                 @click.prevent="
@@ -163,14 +195,14 @@
                 >
                     <img class="mr-2 w-6 h-6" src="assets/icons/chart-pie.png" alt="Ocupação">
                     Ocupação
-                </a>
+                </button>
 
                 <!-- Option Card - Cash -->
-                <a href class="
+                <button class="
                     flex justify-center items-center
                     w-fit bg-background-lightest
                     m-2 my-4 p-4 py-2
-                    font-semibold text-sm
+                    font-semibold text-sm flex-nowrap text-nowrap
                     hover:brightness-110 rounded-full transition-[background, brightness] duration-300
                 "
                 @click.prevent="
@@ -180,12 +212,12 @@
                 ">
                     <img class="mr-2 w-5 h-5" src="assets/icons/dollar.png" alt="Caixa">
                     Caixa
-                </a>
+                </button>
 
-                <a href class="
+                <button class="
                     flex justify-center items-center
                     w-fit bg-background-lightest
-                    m-2 my-4 p-4 py-2
+                    m-2 my-4 p-4 py-2 pr-2 flex-nowrap
                     font-semibold text-sm
                     hover:brightness-110 rounded-full transition-[background, brightness] duration-300
                 "
@@ -197,9 +229,9 @@
                 >
                     <img class="mr-2 w-6 h-6" src="assets/icons/user.png" alt="Ocupação">
                     
-                    <span>Gerenciar Usuários</span>
-                    <span class="ml-2 uppercase tracking-widest font-semibold text-xs bg-background-lightest brightness-125 p-1 px-2 rounded-full">Gerente +</span>
-                </a>
+                    <span class="text-nowrap">Gerenciar Usuários</span>
+                    <span class="ml-2 flex-nowrap text-nowrap uppercase tracking-widest font-semibold text-xs bg-background-lightest brightness-125 p-1 px-2 rounded-full">Gerente +</span>
+                </button>
             </div>
 
             <!-- Hints -->
@@ -213,16 +245,15 @@
                 <div class="rounded-full bg-occupied w-1.5 h-1.5 mr-2.5"></div>
                 <span class="mr-6">Ocupado</span>
 
-                <a class="
+                <button class="
                         flex justify-center items-center w-8 h-8 p-2 hover:brightness-110
                         hover:bg-background-lighter rounded-full transition-[background, brightness] duration-300
                     "
-                    href
                     id="reload-btn"
                     @click.prevent="rooms = await getRooms()"
                     title="Recarregar">
                     <img src="assets/icons/reload.png" alt="Recarregar">
-                </a>
+                </button>
             </div>
 
             <!-- Room Area -->
@@ -231,7 +262,7 @@
                 <template x-for="room in rooms">
                     <div class="w-full h-full flex justify-center items-center">
                         <!-- Apartment Card -->
-                        <a href class="
+                        <button class="
                                 flex justify-center items-center
                                 w-20 h-20 hover:brightness-110
                                 font-bold text-xl rounded-2xl
@@ -263,7 +294,7 @@
                                 }
                             "
                             x-text="room.number">
-                        </a>
+                        </button>
                     </div>
                 </template>
             </div>
@@ -289,11 +320,10 @@
             x-transition x-transition.duration.300ms>
                 <!-- Header -->
                 <div class="flex justify-center items-center w-full h-16 p-4">
-                    <a x-show="['payment', 'visualize-payments'].includes(mode)" class="
+                    <button x-show="['payment', 'visualize-payments'].includes(mode)" class="
                             flex justify-center items-center w-10 h-10 p-2 hover:brightness-110
                             hover:bg-background-lightest rounded-full transition-[background, brightness] duration-300
                         "
-                        href
                         @click.prevent="
                             visible = false;
                             setTimeout(() => {
@@ -302,7 +332,7 @@
                             }, 350);
                         ">
                         <img class="w-5 h-5" src="assets/icons/back.png" alt="Back">
-                    </a>
+                    </button>
 
                     <div class="w-10" x-show="!['payment', 'visualize-payments'].includes(mode)"></div>
 
@@ -311,6 +341,7 @@
                         <p x-show="mode === 'payment'" x-text="'Efetuar Pagamento: ' + roomData.number"></p>
                         <p x-show="mode === 'visualize-payments'" x-text="'Visualizar Pagamentos: ' + roomData.number"></p>
                         <p x-show="mode === 'occupation'">Ocupação</p>
+                        
                         <p x-show="mode === 'manage-users'">
                             <span>Gerenciar Usuários</span>
                             <span class="ml-2 uppercase tracking-widest font-semibold text-xs bg-background-lightest brightness-125 p-1 px-2 rounded-full">Gerente +</span>
@@ -321,11 +352,10 @@
                         <p x-show="mode === 'room-occupied'" x-text="'Visualizar Apartamento: ' + roomData.number"></p>
                     </span>
 
-                    <a class="
+                    <button class="
                             flex justify-center items-center w-10 h-10 p-2 ml-4 hover:brightness-110
                             hover:bg-background-lightest rounded-full transition-[background, brightness] duration-300
                         "
-                        href
                         @click.prevent="
                             if (['room-available', 'room-reserved', 'room-occupied', 'manage-users'].includes(mode) && hasUnsavedData) {
                                 swal({
@@ -347,7 +377,7 @@
                                 reset();
                         ">
                         <img class="w-6 h-6" src="assets/icons/close.png" alt="X">
-                    </a>
+                    </button>
                 </div>
 
                 <template x-if="mode === 'cash'">
@@ -389,13 +419,12 @@
                         </div>
                 
                         <div class="w-full flex ml-4">
-                            <a class="
+                            <button class="
                                     flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
                                     hover:bg-background-lightest rounded-full
                                     transition-[background, brightness] duration-300
                                     "
                                 id="reload-cash"
-                                href
                                 @click.prevent="
                                     cash = await getCash();
                                     openingTime = await getCashOpeningTime();
@@ -404,14 +433,13 @@
                                 "
                                 title="Recarregar Caixa">
                                 <img src="assets/icons/reload.png" alt="Recarregar">
-                            </a>
+                            </button>
                 
                             <!-- Close Cash confirmation -->
-                            <a class="
+                            <button class="
                                     flex justify-center items-center w-8 h-8 p-2 mt-2 ml-2
                                     hover:brightness-110 hover:bg-background-lightest rounded-full
                                     transition-[background, brightness] duration-300"
-                                href
                                 @click.prevent="
                                     swal({
                                         title: 'Você tem certeza disso?',
@@ -436,7 +464,7 @@
                                 "
                                 title="Fechar Caixa">
                                 <img src="assets/icons/dollar.png" alt="Recarregar">
-                            </a>
+                            </button>
                         </div>
                 
                         <div class="flex-1 flex flex-col mt-4">
@@ -444,26 +472,24 @@
                                 <label class="relative top-4 left-4 bg-background-more-lighter p-1 px-2 rounded-t-xl text-md text-label">Pagamentos</label>
                                 <div class="flex-1"></div>
 
-                                <a x-show="payments.length > 1" class="
+                                <button x-show="payments.length > 1" class="
                                         flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
                                         hover:bg-background-lightest rounded-full
                                         transition-[background, brightness] duration-300
                                     "
-                                    href
                                     @click.prevent="
                                         payments.reverse();
                                         ascending = !ascending;
                                     "
                                     :title="ascending ? 'Ordenar por: mais recentes primeiro' : 'Ordenar por: mais antigas primeiro'">
                                     <img :src="ascending ? 'assets/icons/order-up.png' : 'assets/icons/order-down.png'" alt="Ordenar">
-                                </a>
+                                </button>
                 
-                                <a class="
+                                <button class="
                                         flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
                                         hover:bg-background-lightest rounded-full
                                         transition-[background, brightness] duration-300
                                     "
-                                    href
                                     @click.prevent="
                                         cash = await getCash();
                                         openingTime = await getCashOpeningTime();
@@ -472,7 +498,7 @@
                                     "
                                     title="Recarregar Pagamentos">
                                     <img src="assets/icons/reload.png" alt="Recarregar">
-                                </a>
+                                </button>
                             </div>
                             <div class="
                                 flex-1 basis-0 h-full max-h-full overflow-y-auto
@@ -615,9 +641,9 @@
                                         }
                                     ]
                                     ">
-                                        <a href class="
+                                        <div class="
                                             w-11/12 h-11/12 bg-background-bit-more-lighter
-                                            m-2 rounded-2xl flex flex-col 
+                                            m-2 rounded-2xl flex flex-col cursor-pointer
                                             transition-[background, brightness] duration-300
                                         "
                                         :class="
@@ -632,7 +658,7 @@
                                             <p class="w-full h-12 text-center"
                                                 x-text="method.name">
                                             </p>
-                                        </a>
+                                        </div>
                                     </template>
                                 </div>
                             </div>
@@ -643,7 +669,7 @@
                             rounded-full bg-background-more-lighter
                         ">
                             <!-- Botão Pagar -->
-                            <a href class="
+                            <button class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -663,60 +689,54 @@
                                 }
                             ">
                                 Efetuar Pagamento
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </template>
 
                 <template x-if="mode === 'visualize-payments'">
                     <div class="w-full h-full max-h-full p-5 pt-0 flex flex-col flex-1 basis-0"
-                        x-data="{ payments: [], ascending: false }"
+                        x-data="{ ascending: false }"
                         x-init="
-                            payments = (await getRoom(roomData.number)).payments;
-                            payments.reverse();
-
-                            roomData.payments = payments;
+                            roomData.payments = (await getRoom(roomData.number)).payments;
+                            roomData.payments.reverse();
                         ">
                         <div class="w-full h-14 flex items-center">
                             <label class="relative top-4 left-4 bg-background-more-lighter p-1 px-2 rounded-t-xl text-md text-label">Pagamentos</label>
                             <div class="flex-1"></div>
             
-                            <a x-show="payments.length > 1" class="
+                            <button x-show="roomData.payments.length > 1" class="
                                     flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
                                     hover:bg-background-lightest rounded-full
                                     transition-[background, brightness] duration-300
                                 "
-                                href
                                 @click.prevent="
-                                    payments.reverse();
+                                    roomData.payments.reverse();
                                     ascending = !ascending;
                                 "
                                 :title="ascending ? 'Ordenar por: mais recentes primeiro' : 'Ordenar por: mais antigas primeiro'">
                                 <img :src="ascending ? 'assets/icons/order-up.png' : 'assets/icons/order-down.png'" alt="Ordenar">
-                            </a>
+                            </button>
             
-                            <a class="
+                            <button class="
                                     flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
                                     hover:bg-background-lightest rounded-full
                                     transition-[background, brightness] duration-300
                                 "
-                                href
                                 @click.prevent="
-                                    payments = (await getRoom(roomData.number)).payments;
-                                    payments.reverse();
-
-                                    roomData.payments = payments;
+                                    roomData.payments = (await getRoom(roomData.number)).payments;
+                                    roomData.payments.reverse();
                                 "
                                 title="Recarregar Pagamentos">
                                 <img src="assets/icons/reload.png" alt="Recarregar">
-                            </a>
+                            </button>
                         </div>
                         <div class="
                             flex-1 basis-0 h-full max-h-full overflow-y-auto
                             bg-background-more-lighter rounded-lg p-4
                         ">
-                            <div x-show="payments.length > 0">
-                                <template x-for="payment in payments">
+                            <div x-show="roomData.payments.length > 0">
+                                <template x-for="payment in roomData.payments">
                                     <div
                                         class="
                                             bg-background-bit-more-lighter rounded-full
@@ -733,7 +753,7 @@
                                 </template>
                             </div>
 
-                            <div class="w-full h-full flex flex-col justify-center items-center" x-show="payments.length === 0">
+                            <div class="w-full h-full flex flex-col justify-center items-center" x-show="roomData.payments.length === 0">
                                 <img class="mb-4" src="assets/icons/no-money.png" alt="Sem pagamentos">
 
                                 <h1 class="font-bold text-2xl">Sem pagamentos</h1>
@@ -777,8 +797,8 @@
                         ">
                         <div class="w-full h-fit flex lg:flex-row flex-col">
                             <!-- Left -->
-                            <div class="w-1/2 h-full flex justify-start items-center">
-                                <div class="w-72 relative bottom-5">
+                            <div class="w-full lg:w-1/2 h-full flex justify-center lg:justify-start items-center">
+                                <div class="lg:w-64 w-2/3 relative bottom-5">
                                     <label class="
                                         relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
                                         text-md text-label z-10
@@ -790,7 +810,7 @@
                             </div>
 
                             <!-- Right -->
-                            <div class="flex-1 basis-0 flex justify-start lg:justify-end items-center">
+                            <div class="flex-1 basis-0 flex justify-center lg:justify-end items-center">
                                 <div class="w-40 mr-4 relative bottom-5">
                                     <label class="
                                         relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
@@ -838,7 +858,7 @@
                             </div>
                         </div>
 
-                        <div class="flex-1 basis-0 overflow-y-hidden bg-background-more-lighter p-6 rounded-2xl">
+                        <div class="flex-1 basis-0 overflow-y-hidden bg-background-more-lighter p-4 rounded-lg">
                             <canvas class="flex-1 basis-0"></canvas>
                         </div>
                     </div>
@@ -856,6 +876,7 @@
                         x-init="
                             users = await getUsers();
                             fetchedUsers = await getUsers();
+
                             hasUnsavedData = false;
                         ">
                         <div class="flex-1 basis-0 overflow-auto flex flex-col justify-start items-center"
@@ -876,13 +897,14 @@
                                                 <span class="text-occupied">Esse usuário possui um cargo igual ou superior ao seu.</span>
                                             </span>
                                         </span>
+                                        
                                         <div class="flex-1"></div>
-                                        <a class="
+
+                                        <button class="
                                             flex justify-center items-center w-8 h-8 p-2 ml-4
                                             hover:brightness-110 hover:bg-background-lightest rounded-full
                                             transition-[background, brightness] duration-300
                                         "
-                                        href
                                         x-show="
                                             users.length > 1 &&
                                             canChange &&
@@ -894,7 +916,7 @@
                                         "
                                         title="Remover usuário">
                                             <img src="assets/icons/close.png" alt="X" >
-                                        </a>
+                                        </button>
                                     </div>
                                     <div class="w-full">
                                         <div x-data="
@@ -923,7 +945,7 @@
 
                                         <div x-show="!canChange">
                                             <label class="
-                                                relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                                relative top-5 left-2 bg-background-more-lighter p-1 px-2 rounded-t-xl
                                                 text-md text-label z-10
                                             ">Nome</label>
                                             <p class="font-bold text-xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
@@ -956,7 +978,7 @@
 
                                         <div x-show="!canChange">
                                             <label class="
-                                                relative top-5 left-2 bg-background-lighter p-1 px-2 rounded-t-xl
+                                                relative top-5 left-2 bg-background-more-lighter p-1 px-2 rounded-t-xl
                                                 text-md text-label z-10
                                             ">E-mail</label>
                                             <p class="font-bold text-xl mt-2 w-full p-4 rounded-full border-2 border-background-lightest"
@@ -1024,11 +1046,11 @@
                                                             },
                                                         ]
                                                     ">
-                                                        <a class="
-                                                            font-bold text-lg bg-background-lightest p-2 px-4 rounded-full
-                                                            mr-4 transition-[background, brightness] duration-300
-                                                            flex justify-center items-center
-                                                        " href
+                                                        <button class="
+                                                                font-bold text-lg bg-background-lightest p-2 px-4 rounded-full
+                                                                mr-4 transition-[background, brightness] duration-300
+                                                                flex justify-center items-center
+                                                            "
                                                             :class="
                                                                 canChange
                                                                     ? getRoleLevel(role.roleId) >= getRoleLevel(user.role)
@@ -1048,7 +1070,7 @@
                                                             ">
                                                             <div class="rounded-full w-1.5 h-1.5 mr-2.5" :class="role.color"></div>
                                                             <span x-text="role.name"></span>
-                                                        </a>
+                                                        </button>
                                                     </template>
                                                 </div>
                                             </div>
@@ -1056,13 +1078,13 @@
                                     </div>
                                 </div>
                             </template>
-                            <a
+                            
+                            <button
                                 class="
                                     w-1/2 p-4 bg-background-more-lighter rounded-full mb-4
                                     flex justify-center items-center hover:brightness-110
                                     transition-[background, brightness] duration-300
                                 "
-                                href
                                 @click.prevent="
                                     users.push({
                                         id: users.length,
@@ -1076,7 +1098,7 @@
                                 ">
                                 <img class="w-5 mr-4" src="/assets/icons/plus.png" alt="">
                                 Adicionar usuário
-                            </a>
+                            </button>
                         </div>
 
                         <div x-show="hasUnsavedData" class="
@@ -1095,7 +1117,7 @@
                             rounded-full bg-background-more-lighter
                         "
                         x-show="hasUnsavedData" x-transition>
-                            <a x-show="hasUnsavedData" href class="
+                            <button x-show="hasUnsavedData" class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -1111,7 +1133,7 @@
                             "
                             x-transition>
                                 Salvar Alterações
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </template>
@@ -1277,8 +1299,8 @@
                             <div class="flex-1 basis-0 max-h-full h-full md:pl-4 pb-4 flex flex-col">
                                 <div class="flex items-center">
                                     <label class="
-                                        relative top-4 left-3 bg-background-more-lighter p-1 px-2 rounded-t-xl
-                                        text-md transition-[color] duration-300 text-label
+                                        relative top-4 left-3 bg-background-more-lighter p-1 px-2 rounded-xl
+                                        text-md transition-[color] duration-300 text-label z-10
                                     ">
                                         Hóspedes
                                     </label>
@@ -1301,12 +1323,11 @@
                                                 x-text="'Hóspede #' + (index + 1)">
                                                 </h1>
 
-                                                <a class="
+                                                <button class="
                                                     flex justify-center items-center w-8 h-8 p-2 ml-4
                                                     hover:brightness-110 hover:bg-background-lightest rounded-full
                                                     transition-[background, brightness] duration-300
                                                 "
-                                                href
                                                 x-show="
                                                     guests.length > 1 &&
                                                     ['room-available', 'room-reserved'].includes(mode)
@@ -1317,7 +1338,7 @@
                                                 "
                                                 title="Remover hóspede">
                                                     <img src="assets/icons/close.png" alt="X" >
-                                                </a>
+                                                </button>
                                             </div>
 
                                             <div x-show="mode === 'room-occupied'"
@@ -1457,13 +1478,12 @@
                                         </div>
                                     </template>
 
-                                    <a class="
+                                    <button class="
                                             w-2/3 p-4 bg-background-bit-more-lighter rounded-full
                                             flex justify-center items-center hover:brightness-110
                                             transition-[background, brightness] duration-300
                                         "
                                         x-show="['room-available', 'room-reserved'].includes(mode)"
-                                        href
                                         @click.prevent="
                                             guests.push(
                                                 {
@@ -1477,7 +1497,7 @@
                                         ">
                                         <img class="w-5 mr-4" src="/assets/icons/plus.png" alt="">
                                         Adicionar hóspede
-                                    </a>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1498,7 +1518,7 @@
                             rounded-full bg-background-more-lighter
                         ">
                             <!-- Botão Reservar - disponível no modo 'room-available' -->
-                            <a x-show="mode === 'room-available'" href class="
+                            <button x-show="mode === 'room-available'" class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -1511,12 +1531,12 @@
                                 }
                             ">
                                 Reservar
-                            </a>
+                            </button>
 
                             <!-- --- -->
 
                             <!-- Botão Cancelar - disponível no modo 'room-reserved' -->
-                            <a x-show="mode === 'room-reserved'" href class="
+                            <button x-show="mode === 'room-reserved'" class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -1538,10 +1558,10 @@
                                     });
                             ">
                                 Cancelar Reserva
-                            </a>
+                            </button>
 
                             <!-- Botão Editar Reserva (Salvar Alterações 1) - disponível no modo 'room-reserved' -->
-                            <a x-show="mode === 'room-reserved' && hasUnsavedData" href class="
+                            <button x-show="mode === 'room-reserved' && hasUnsavedData" class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -1555,10 +1575,10 @@
                             "
                             x-transition>
                                 Salvar Alterações
-                            </a>
+                            </button>
 
                             <!-- Botão Check-In - disponível no modo 'room-reserved' -->
-                            <a x-show="mode === 'room-reserved'" href class="
+                            <button x-show="mode === 'room-reserved'" class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -1569,12 +1589,12 @@
                                     reset();
                             ">
                                 Efetuar Check-In
-                            </a>
+                            </button>
 
                             <!-- --- -->
 
                             <!-- Botão Efetuar Pagamento - disponível no modo 'room-occupied' -->
-                            <a x-show="mode === 'room-occupied'" href class="
+                            <button x-show="mode === 'room-occupied'" class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -1589,10 +1609,10 @@
                                 document.getElementById('reload-btn').click();
                             ">
                                 Efetuar Pagamento
-                            </a>
+                            </button>
 
                             <!-- Botão Visualizar Pagamentos - disponível no modo 'room-occupied' -->
-                            <a x-show="mode === 'room-occupied'" href class="
+                            <button x-show="mode === 'room-occupied'" class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -1607,10 +1627,10 @@
                                 document.getElementById('reload-btn').click();
                             ">
                                 Visualizar Pagamentos
-                            </a>
+                            </button>
 
                             <!-- Botão Mudar Check-Out (Salvar Alterações 2) - disponível no modo 'room-reserved' -->
-                            <a x-show="mode === 'room-occupied' && hasUnsavedData" href class="
+                            <button x-show="mode === 'room-occupied' && hasUnsavedData" class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -1632,10 +1652,10 @@
                             "
                             x-transition>
                                 Salvar Alterações
-                            </a>
+                            </button>
 
                             <!-- Botão Check-Out - disponível no modo 'room-occupied' -->
-                            <a x-show="mode === 'room-occupied'" href class="
+                            <button x-show="mode === 'room-occupied'" href class="
                                 w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
                                 rounded-full bg-background-lightest
                                 hover:brightness-110 transition-[background, brightness] duration-300
@@ -1694,7 +1714,7 @@
                             ">
                                 
                                 Efetuar Check-Out
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </template>

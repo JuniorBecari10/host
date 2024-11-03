@@ -1,10 +1,10 @@
 # Host
 
-An web app for managing hotels. It's very simple to setup and use.
+A web app for managing hotels. It's very simple to setup and use.
 
 ## Project Overview
 
-Host is a lightweight hotel management web app designed to help manage hotel reservations, rooms, and customer information with ease.
+Host is a lightweight hotel management web app designed to help managing hotel reservations, rooms, and customer information with ease.
 
 ## Installation
 
@@ -13,8 +13,7 @@ npm install
 npm start
 ```
 
-If you are running this in a test environment, it'll create a new `.env` file automatically.
-
+If you are running this in a test environment, it'll create a new `.env` file automatically. <br>
 Databases are managed using `.json` files; they're created automatically as needed too.
 
 ## Environment Configuration

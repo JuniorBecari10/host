@@ -5,6 +5,8 @@ const status = require("../status");
 const msg = require("./api/msg");
 const users = require("../users");
 
+const TOKEN_EXPIRE_TIME = "2h";
+
 function setupAuthRoutes(app) {
     /*
         POST /api/login
@@ -65,7 +67,7 @@ function setupAuthRoutes(app) {
                 role: user.role,
             };
 
-            const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: "2h" });
+            const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: TOKEN_EXPIRE_TIME });
             res.json({ token });
         });
     });
