@@ -430,12 +430,17 @@
                         </div>
                 
                         <div class="flex-1 flex flex-col mt-4">
-                            <div class="w-full h-14 flex items-center">
-                                <label class="relative top-4 left-4 bg-background-more-lighter p-1 px-2 rounded-t-xl text-md text-label">Pagamentos</label>
+                            <div class="w-full h-10 flex items-center">
+                                <label class="
+                                    relative top-3 left-4 bg-background-more-lighter
+                                    p-1 px-2 rounded-xl text-md text-label
+                                ">
+                                    Pagamentos
+                                </label>
                                 <div class="flex-1"></div>
 
                                 <button x-show="payments.length > 1" class="
-                                        flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
+                                        flex justify-center items-center w-8 h-8 p-2 mb-2 hover:brightness-110
                                         hover:bg-background-lightest rounded-full
                                         transition-[background, brightness] duration-300
                                     "
@@ -448,7 +453,7 @@
                                 </button>
                 
                                 <button class="
-                                        flex justify-center items-center w-8 h-8 p-2 mt-2 hover:brightness-110
+                                        flex justify-center items-center w-8 h-8 p-2 mb-2 hover:brightness-110
                                         hover:bg-background-lightest rounded-full
                                         transition-[background, brightness] duration-300
                                     "
@@ -854,9 +859,9 @@
                                     <div class="w-full flex justify-start items-center">
                                         <span class="font-bold uppercase tracking-widest text-sm ml-2 w-fit" x-text="'Usuário #' + (index + 1)"></span>
                                         <span class="flex justify-start items-center">
-                                            <span class="flex justify-start items-center" x-show="!canChange">
-                                                <img class="w-5 mx-2 ml-4" src="/assets/icons/lock.png" alt="Lock">
-                                                <span class="text-occupied">Esse usuário possui um cargo igual ou superior ao seu.</span>
+                                            <span class="flex justify-start items-center ml-4 bg-background-lightest p-2 px-4 rounded-full" x-show="!canChange">
+                                                <img class="w-5 mr-2" src="/assets/icons/lock.png" alt="Lock">
+                                                <span class="text-occupied text-sm">Esse usuário possui um cargo igual ou superior ao seu.</span>
                                             </span>
                                         </span>
                                         
