@@ -948,14 +948,16 @@ function setupApiRoutes(app) {
                                 'reverse' - will perform the operation and reverse the leftover, removing it from the cash.
 
                                 Use 'none' when you don't want to set this.
+        - force: bool - forces a check-out, without verifying if the room has debts or if the check-out isn't today.
+                        the user must be a Manager.
 
         Returns: the modified room.
         Return Type: Room (object)
     */
     app.post("/api/checkout", auth.authorize, auth.checkRole(users.ROLE_RECEPTIONIST), async (req, res) => {
-        const { number, chargeback_mode } = req.body;
+        const { number, chargeback_mode, force } = req.body;
 
-        if (!number) {
+        if (!number || !chargeback_mode || (!force && force !== false)) {
             res.status(status.BAD_REQUEST).send({
                 title: msg.TITLE_INCORRECT_DATA,
                 message: msg.MSG_INCORRECT_DATA,
@@ -964,12 +966,20 @@ function setupApiRoutes(app) {
         }
 
         if (typeof number !== "string" ||
-            typeof chargeback_mode !== "string") {
+            typeof chargeback_mode !== "string" ||
+            typeof force !== "boolean") {
             res.status(status.BAD_REQUEST).send({
                 title: msg.TITLE_INCORRECT_DATA_TYPES,
                 message: msg.MSG_INCORRECT_DATA_TYPES,
             });
             return;
+        }
+
+        if (force && users.getRoleLevel(req.user.role) < users.getRoleLevel(users.ROLE_MANAGER)) {
+            return res.status(status.UNAUTHORIZED).send({
+                title: "Permissões insuficientes",
+                message: `Esse usuário não possui permissão suficiente para realizar essa ação. É necessário um cargo de, pelo menos, ${users.formatRole(users.ROLE_MANAGER)}. Esse usuário possui o cargo ${users.formatRole(req.user.role)}.`,
+            });
         }
 
         const roomIndex = rooms.getRoomIndex(number);
@@ -1002,7 +1012,7 @@ function setupApiRoutes(app) {
         const debt = util.getDebt(room);
         let performReverse = false;
 
-        if (debt > 0) {
+        if (debt > 0 && !force) {
             res.status(status.FORBIDDEN).send({
                 title: msg.TITLE_ROOM_IS_IN_DEBT,
                 message: msg.MSG_ROOM_IS_IN_DEBT,
@@ -1018,7 +1028,7 @@ function setupApiRoutes(app) {
                 
                 case "reverse":
                     // The user must have a role that is equal or above Manager to perform a chargeback.
-                    if (users.getRoleLevel(req.user.role) < users.getRoleLevel(users.ROLE_MANAGER)) {
+                    if (users.getRoleLevel(req.user.role) < users.getRoleLevel(users.ROLE_MANAGER) && !force) {
                         res.status(status.UNAUTHORIZED).send({
                             title: "Permissões insuficientes",
                             message: `Esse usuário não possui permissão suficiente para realizar essa ação. É necessário um cargo de, pelo menos, ${users.formatRole(users.ROLE_MANAGER)}. Esse usuário possui o cargo ${users.formatRole(req.user.role)}.`,
@@ -1039,7 +1049,7 @@ function setupApiRoutes(app) {
             }
         }
 
-        if (new Date(Date.now()).setHours(...rooms.defaultCheckOutHours) !== new Date(room.check_out).setHours(...rooms.defaultCheckOutHours)) {
+        if (new Date(Date.now()).setHours(...rooms.defaultCheckOutHours) !== new Date(room.check_out).setHours(...rooms.defaultCheckOutHours) && !force) {
             res.status(status.FORBIDDEN).send({
                 title: msg.TITLE_ROOMS_CHECK_OUT_IS_NOT_TODAY,
                 message: msg.MSG_ROOMS_CHECK_OUT_IS_NOT_TODAY,

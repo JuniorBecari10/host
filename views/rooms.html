@@ -104,7 +104,19 @@
                                         placeholder: 'Novo nome do hotel',
                                     }
                                 },
-                                buttons: true
+                                buttons: {
+                                    cancel: {
+                                        text: 'Cancelar',
+                                        value: null,
+                                        visible: true,
+                                        closeModal: true
+                                    },
+                                    confirm: {
+                                        text: 'Salvar',
+                                        value: true,
+                                        closeModal: true
+                                    }
+                                }
                             }).then(value => {
                                 if (value !== null) {
                                     setHotelName(value).then(async () => {
@@ -354,7 +366,19 @@
                                     title: 'Você tem certeza disso?',
                                     text: 'Você deseja fechar a tela e perder as alterações?',
                                     icon: 'warning',
-                                    buttons: true,
+                                    buttons: {
+                                        cancel: {
+                                            text: 'Não',
+                                            value: null,
+                                            visible: true,
+                                            closeModal: true
+                                        },
+                                        confirm: {
+                                            text: 'Sim',
+                                            value: true,
+                                            closeModal: true
+                                        }
+                                    },
                                     dangerMode: 'true',
                                 })
                                     .then(async (accepted) => {
@@ -439,7 +463,19 @@
                                                 ? ' Ainda não foram registrados pagamentos. Deseja fechar o caixa assim mesmo?'
                                                 : 'Você deseja fechar o caixa e limpar a lista de pagamentos?',
                                         icon: 'warning',
-                                        buttons: true,
+                                        buttons: {
+                                            cancel: {
+                                                text: 'Não',
+                                                value: null,
+                                                visible: true,
+                                                closeModal: true
+                                            },
+                                            confirm: {
+                                                text: 'Sim',
+                                                value: true,
+                                                closeModal: true
+                                            }
+                                        },
                                         dangerMode: 'true',
                                     })
                                     .then(async (accepted) => {
@@ -1545,7 +1581,19 @@
                                     title: 'Você tem certeza disso?',
                                     text: 'Você deseja cancelar a reserva?',
                                     icon: 'warning',
-                                    buttons: true,
+                                    buttons: {
+                                        cancel: {
+                                            text: 'Não',
+                                            value: null,
+                                            visible: true,
+                                            closeModal: true
+                                        },
+                                        confirm: {
+                                            text: 'Sim',
+                                            value: true,
+                                            closeModal: true
+                                        }
+                                    },
                                     dangerMode: 'true',
                                 })
                                     .then(async (accepted) => {
@@ -1660,6 +1708,31 @@
                                 hover:brightness-110 transition-[background, brightness] duration-300
                             "
                             @click.prevent="
+                                let force = false;
+                                if (getRoleLevel(user.role) >= getRoleLevel('manager')) {
+                                    await swal({
+                                        title: 'Deseja forçar o check-out?',
+                                        text: 'Um check-out forçado não verifica se o quarto possui contas a pagar ou se a data do check-out é hoje. Deseja prosseguir?',
+                                        icon: 'warning',
+                                        buttons: {
+                                            cancel: {
+                                                text: 'Não',
+                                                value: null,
+                                                visible: true,
+                                                closeModal: true
+                                            },
+                                            confirm: {
+                                                text: 'Sim',
+                                                value: true,
+                                                closeModal: true
+                                            }
+                                        }
+                                    }).then(yes => {
+                                        if (yes)
+                                            force = true;
+                                    });
+                                }
+
                                 if (debt < 0) {
                                     if (getRoleLevel(user.role) >= getRoleLevel('manager')) {
                                         swal({
@@ -1670,6 +1743,7 @@
                                                 reverse: {
                                                     text: 'Estornar sobras',
                                                     value: 'reverse',
+                                                    className: 'swal-button--cancel'
                                                 },
     
                                                 keep: {
@@ -1681,7 +1755,7 @@
                                         .then(async (value) => {
                                             if (!['reverse', 'keep'].includes(value)) return;
     
-                                            const res = await checkOut(roomData.number, value);
+                                            const res = await checkOut(roomData.number, value, force);
     
                                             if (res.success)
                                                 reset();
@@ -1691,12 +1765,24 @@
                                         swal({
                                             title: 'O quarto possui sobras na conta',
                                             text: 'As sobras serão deixadas no caixa.',
-                                            buttons: true,
+                                            buttons: {
+                                                cancel: {
+                                                    text: 'Cancelar',
+                                                    value: null,
+                                                    visible: true,
+                                                    closeModal: true
+                                                },
+                                                confirm: {
+                                                    text: 'OK',
+                                                    value: true,
+                                                    closeModal: true
+                                                }
+                                            },
                                             icon: 'warning'
                                         })
                                         .then(async (accepted) => {
                                             if (accepted) {
-                                                const res = await checkOut(roomData.number, 'keep');
+                                                const res = await checkOut(roomData.number, 'keep', force);
     
                                                 if (res.success)
                                                     reset();
@@ -1705,7 +1791,7 @@
                                     }
                                 }
                                 else {
-                                    const res = await checkOut(roomData.number, 'none');
+                                    const res = await checkOut(roomData.number, 'none', force);
 
                                     if (res.success)
                                         reset();

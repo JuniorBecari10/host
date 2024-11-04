@@ -295,8 +295,8 @@ async function checkIn(number) {
     return sendPost('checkin', { number });
 }
 
-async function checkOut(number, chargeback_mode) {
-    return sendPost('checkout', { number, chargeback_mode });
+async function checkOut(number, chargeback_mode, force) {
+    return sendPost('checkout', { number, chargeback_mode, force });
 }
 
 async function pay(number, amount, method) {
