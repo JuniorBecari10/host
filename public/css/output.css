@@ -107,7 +107,7 @@
 }
 
 /*
-! tailwindcss v3.4.14 | MIT License | https://tailwindcss.com
+! tailwindcss v3.4.13 | MIT License | https://tailwindcss.com
 */
 
 /*
@@ -550,7 +550,7 @@ video {
 
 /* Make elements with the HTML hidden attribute stay hidden by default */
 
-[hidden]:where(:not([hidden="until-found"])) {
+[hidden] {
   display: none;
 }
 
@@ -614,6 +614,10 @@ video {
   top: 4rem;
 }
 
+.top-3 {
+  top: 0.75rem;
+}
+
 .top-4 {
   top: 1rem;
 }
@@ -628,10 +632,6 @@ video {
 
 .top-full {
   top: 100%;
-}
-
-.top-3 {
-  top: 0.75rem;
 }
 
 .z-10 {
@@ -855,10 +855,6 @@ video {
 
 .h-screen {
   height: 100vh;
-}
-
-.h-9 {
-  height: 2.25rem;
 }
 
 .max-h-full {
@@ -1220,6 +1216,11 @@ video {
   padding-bottom: 0.5rem;
 }
 
+.px-3 {
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
 .pb-0 {
   padding-bottom: 0px;
 }
@@ -1250,6 +1251,10 @@ video {
 
 .pt-5 {
   padding-top: 1.25rem;
+}
+
+.pl-3 {
+  padding-left: 0.75rem;
 }
 
 .text-center {
@@ -1475,10 +1480,6 @@ video {
 
   .sm\:h-14 {
     height: 3.5rem;
-  }
-
-  .sm\:overflow-y-visible {
-    overflow-y: visible;
   }
 
   .sm\:text-xl {

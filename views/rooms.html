@@ -102,12 +102,11 @@
                                     element: 'input',
                                     attributes: {
                                         placeholder: 'Novo nome do hotel',
-                                        value: name,
                                     }
                                 },
                                 buttons: true
                             }).then(value => {
-                                if (name || name === '') {
+                                if (value !== null) {
                                     setHotelName(value).then(async () => {
                                         name = await getHotelName();
                                     });
@@ -890,7 +889,7 @@
                                     <div class="w-full flex justify-start items-center">
                                         <span class="font-bold uppercase tracking-widest text-sm ml-2 w-fit" x-text="'Usuário #' + (index + 1)"></span>
                                         <span class="flex justify-start items-center">
-                                            <span class="flex justify-start items-center ml-4 bg-background-lightest p-2 px-4 rounded-full" x-show="!canChange">
+                                            <span class="flex justify-start items-center ml-4 bg-background-lightest p-2 px-3 rounded-full" x-show="!canChange">
                                                 <img class="w-5 mr-2" src="/assets/icons/lock.png" alt="Lock">
                                                 <span class="text-occupied text-sm">Esse usuário possui um cargo igual ou superior ao seu.</span>
                                             </span>

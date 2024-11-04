@@ -227,7 +227,7 @@ function setupApiRoutes(app) {
     app.post("/api/name", auth.authorize, auth.checkRole(users.ROLE_ADMINISTRATOR), async (req, res) => {
         const { name } = req.body;
 
-        if (!(name || name !== "")) {
+        if (!name && name !== "") {
             res.status(status.BAD_REQUEST).send({
                 title: msg.TITLE_INCORRECT_DATA,
                 message: msg.MSG_INCORRECT_DATA,
