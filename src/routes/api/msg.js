@@ -4,6 +4,8 @@ module.exports = {
     TITLE_INCORRECT_DATA_TYPES: "Tipos dos dados incorretos",
     TITLE_ROOM_NOT_FOUND: "Quarto não encontrado",
 
+    TITLE_MUST_NOT_BE_A_EMPTY_HOTEL_NAME: "O nome do hotel não deve ser vazio",
+
     TITLE_USER_NOT_FOUND: "Usuário não encontrado",
     TITLE_INCORRECT_PASSWORD: "Senha incorreta",
     TITLE_MISSING_AUTH_TOKEN: "Token de autorização faltando",
@@ -45,6 +47,8 @@ module.exports = {
     MSG_INCORRECT_DATA: "Certifique-se de que todos os campos estão preenchidos corretamente.",
     MSG_INCORRECT_DATA_GUESTS: "Certifique-se de que todos os campos dos dados dos hóspedes estão preenchidos corretamente.",
     MSG_INCORRECT_DATA_NAME: "O nome de um hóspede apenas pode ter letras e espaços.",
+
+    MSG_MUST_NOT_BE_A_EMPTY_HOTEL_NAME: "Coloque um nome que não seja vazio.",
 
     MSG_USER_NOT_FOUND: "Não há usuários com esse e-mail. Verifique se o e-mail digitado está correto.",
     MSG_INCORRECT_PASSWORD: "Verifique se digitou a senha corretamente.",

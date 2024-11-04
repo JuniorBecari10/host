@@ -20,6 +20,15 @@ input {
     color-scheme: dark;
 }
 
+input.swal-content__input {
+    background: #202426;
+}
+
+.swal-modal input,
+.swal-modal button {
+    border-radius: 9999px;
+}
+
 .swal-modal {
     background: #24292b;
     border-radius: 0.5rem;

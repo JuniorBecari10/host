@@ -81,12 +81,43 @@
             </a>
 
             <!-- Hotel name -->
-            <h1
-                class="text-sm font-bold uppercase tracking-widest flex-1 text-center"
-                x-data="{ name: '' }"
-                x-init="name = await getHotelName();"
-                x-text="name">
-            </h1>
+            <div class="flex-1 flex justify-center items-center">
+                <h1
+                    class="text-sm font-bold uppercase tracking-widest text-center"
+                    :class="user.role === 'administrator'
+                        ? 'p-2 px-4 cursor-pointer rounded-full hover:bg-background-lighter transition-[background] duration-300'
+                        : ''
+                    "
+                    x-data="{ name: '' }"
+                    x-init="name = await getHotelName();"
+                    x-text="name"
+                    
+                    :title="user.role === 'administrator' ? 'Clique para alterar o nome do hotel' : ''"
+                    @click.prevent="
+                        if (user.role === 'administrator') {
+                            swal({
+                                title: 'Mudar o nome do hotel',
+                                text: 'Digite o novo nome do hotel:',
+                                content: {
+                                    element: 'input',
+                                    attributes: {
+                                        placeholder: 'Novo nome do hotel',
+                                        value: name,
+                                    }
+                                },
+                                buttons: true
+                            }).then(value => {
+                                if (name || name === '') {
+                                    setHotelName(value).then(async () => {
+                                        name = await getHotelName();
+                                    });
+                                }
+                            });
+                        }
+                    ">
+                </h1>
+            </div>
+
 
             <!-- Account info -->
             <div

@@ -278,6 +278,10 @@ async function changePrice(number, price) {
     return sendPost('change-price', { number, price });
 }
 
+async function setHotelName(name) {
+    return sendPost('name', { name });
+}
+
 async function editUsers(users) {
     return sendPost('users', { users });
 }

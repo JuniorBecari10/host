@@ -55,6 +55,10 @@ function getHotelName() {
     return hotel.name;
 }
 
+function setHotelName(name) {
+    hotel.name = name;
+}
+
 function getHotelRooms() {
     return hotel.rooms;
 }
@@ -192,6 +196,7 @@ module.exports = {
     saveData,
 
     getHotelName,
+    setHotelName,
     getHotelRooms,
     getHotelCash,
     getHotelCashOpeningTime,

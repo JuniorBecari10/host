@@ -214,6 +214,49 @@ function setupApiRoutes(app) {
     });
 
     /*
+        POST /api/name
+        Sets the name of the hotel.
+
+        Parameters:
+        - name: string
+
+        Returns: the new hotel name.
+        Return Type: string
+        Required Role: Administrator
+    */
+    app.post("/api/name", auth.authorize, auth.checkRole(users.ROLE_ADMINISTRATOR), async (req, res) => {
+        const { name } = req.body;
+
+        if (!(name || name !== "")) {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA,
+                message: msg.MSG_INCORRECT_DATA,
+            });
+            return;
+        }
+
+        if (name === "") {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_MUST_NOT_BE_A_EMPTY_HOTEL_NAME,
+                message: msg.MSG_MUST_NOT_BE_A_EMPTY_HOTEL_NAME,
+            });
+            return;
+        }
+
+
+        if (typeof name !== "string") {
+            res.status(status.BAD_REQUEST).send({
+                title: msg.TITLE_INCORRECT_DATA_TYPES,
+                message: msg.MSG_INCORRECT_DATA_TYPES,
+            });
+            return;
+        }
+
+        rooms.setHotelName(name);
+        res.json({ name: name });
+    });
+
+    /*
         GET /api/rooms
         Gets all the rooms of the hotel.
 
