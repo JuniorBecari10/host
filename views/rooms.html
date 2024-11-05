@@ -43,6 +43,7 @@
                 user: {},
                 userBg: '',
                 contrasting: '',
+                hotelName: '',
 
                 showManagerButtons: false,
 
@@ -88,42 +89,14 @@
                         ? 'p-2 px-4 cursor-pointer rounded-full hover:bg-background-lighter transition-[background] duration-300'
                         : ''
                     "
-                    x-data="{ name: '' }"
-                    x-init="name = await getHotelName();"
-                    x-text="name"
+                    x-init="hotelName = await getHotelName();"
+                    x-text="hotelName"
                     
                     :title="user.role === 'administrator' ? 'Clique para alterar o nome do hotel' : ''"
                     @click.prevent="
                         if (user.role === 'administrator') {
-                            swal({
-                                title: 'Mudar o nome do hotel',
-                                text: 'Digite o novo nome do hotel:',
-                                content: {
-                                    element: 'input',
-                                    attributes: {
-                                        placeholder: 'Novo nome do hotel',
-                                    }
-                                },
-                                buttons: {
-                                    cancel: {
-                                        text: 'Cancelar',
-                                        value: null,
-                                        visible: true,
-                                        closeModal: true
-                                    },
-                                    confirm: {
-                                        text: 'Salvar',
-                                        value: true,
-                                        closeModal: true
-                                    }
-                                }
-                            }).then(value => {
-                                if (value !== null) {
-                                    setHotelName(value).then(async () => {
-                                        name = await getHotelName();
-                                    });
-                                }
-                            });
+                            mode = 'set-hotel-name';
+                            visible = true;
                         }
                     ">
                 </h1>
@@ -313,9 +286,10 @@
         " x-show="visible" x-transition>
             <!-- Card -->
             <div class="
-                w-4/5 md:w-4/5 h-9/10 flex flex-col
+                flex flex-col
                 bg-background-lighter rounded-2xl shadow-md top-full
             "
+            :class="mode === 'set-hotel-name' ? ((hasUnsavedData ? 'h-2/5 ' : 'h-44 ') + 'w-4/5 md:w-2/5') : 'w-4/5 md:w-4/5 h-9/10'"
             x-data="
                 {
                     hasUnsavedData: false,
@@ -351,6 +325,11 @@
                             <span class="ml-2 uppercase tracking-widest font-semibold text-xs bg-background-lightest brightness-125 p-1 px-2 rounded-full">Gerente +</span>
                         </p>
 
+                        <p x-show="mode === 'set-hotel-name'">
+                            <span>Definir nome do hotel</span>
+                            <span class="ml-2 uppercase tracking-widest font-semibold text-xs bg-background-lightest brightness-125 p-1 px-2 rounded-full">Administrador</span>
+                        </p>
+
                         <p x-show="mode === 'room-available'" x-text="'Reservar: ' + roomData.number"></p>
                         <p x-show="mode === 'room-reserved'" x-text="'Editar Reserva: ' + roomData.number"></p>
                         <p x-show="mode === 'room-occupied'" x-text="'Visualizar Apartamento: ' + roomData.number"></p>
@@ -361,7 +340,7 @@
                             hover:bg-background-lightest rounded-full transition-[background, brightness] duration-300
                         "
                         @click.prevent="
-                            if (['room-available', 'room-reserved', 'room-occupied', 'manage-users'].includes(mode) && hasUnsavedData) {
+                            if (['room-available', 'room-reserved', 'room-occupied', 'manage-users', 'set-hotel-name'].includes(mode) && hasUnsavedData) {
                                 swal({
                                     title: 'Você tem certeza disso?',
                                     text: 'Você deseja fechar a tela e perder as alterações?',
@@ -1163,6 +1142,80 @@
 
                                 users.forEach(u => u.password = '');
                                 users.forEach(u => u.email = u.email.toLowerCase());
+                            "
+                            x-transition>
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <template x-if="mode === 'set-hotel-name'">
+                    <div class="w-full h-full max-h-full p-5 pt-0 flex flex-col flex-1 basis-0"
+                        x-data="
+                            {
+                                inputName: '',
+                            }
+                        "
+                        x-init="
+                            inputName = await getHotelName();
+                            hasUnsavedData = false;
+                        ">
+                        <div class="flex-1 flex flex-col justify-start items-center">
+                            <!-- Entry -->
+                            <div x-data="
+                                {
+                                    focused: false,
+                                }
+                            "
+                            x-show="mode !== 'room-occupied' || getRoleLevel(user.role) >= getRoleLevel('manager')">
+                                <label class="
+                                    relative top-4 left-2 bg-background-more-lighter p-1 px-2 rounded-t-xl
+                                    text-md transition-[color] duration-300
+                                "
+                                :class="focused ? 'text-reserved' : 'text-label'">
+                                    Nome do hotel
+                                </label>
+                            
+                                <input class="
+                                    font-bold text-2xl mt-2 w-full p-2 px-4
+                                    outline-none bg-background-more-lighter rounded-full
+                                    transition-[border] duration-300 border-2
+                                "
+                                :class="focused ? 'border-reserved' : 'border-background-more-lighter'"
+                                type="text" x-model="inputName"
+
+                                @input="(_) => {
+                                    hasUnsavedData = true;
+                                }"
+
+                                @keyup.enter="$refs.setHotelNameBtn.click()"
+                                @focus="focused = true"
+                                @blur="focused = false">
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="
+                            w-full h-14 flex items-center justify-evenly
+                            rounded-full bg-background-more-lighter
+                        " x-show="hasUnsavedData" x-transition>
+                            <button x-show="hasUnsavedData" class="
+                                w-fit h-10 flex items-center justify-center p-2 pr-4 pl-4
+                                rounded-full bg-background-lightest
+                                hover:brightness-110 transition-[background, brightness] duration-300
+                            " x-transition
+
+                            x-ref="setHotelNameBtn"
+                            @click.prevent="
+                                const res = await setHotelName(inputName);
+                                
+                                if (res.success) {
+                                    hotelName = await getHotelName();
+
+                                    reset();
+                                    hasUnsavedData = false;
+                                }
                             "
                             x-transition>
                                 Salvar Alterações

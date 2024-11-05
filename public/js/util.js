@@ -279,7 +279,6 @@ async function changePrice(number, price) {
 }
 
 async function setHotelName(name) {
-    console.log(name);
     return sendPost('name', { name });
 }
 
